@@ -4,11 +4,18 @@ import { motion } from 'framer-motion'
 
 const ENTRIES = [
   {
+    company:     'Brunswick BI Design Lab',
+    role:        'Computer Graphics Software Development Intern',
+    period:      'May 2026 – Present',
+    description: 'Developing an interactive boating simulator in Unreal Engine 5.7 for a CES 2027 AI-assisted navigation demo. Building boat AI for ambient NPC traffic, contributing to game design and core backend, and supporting cross-application data flow via Python/Websockets.',
+    stack:       ['Unreal Engine 5', 'C++', 'Python', 'Websockets', 'Perforce'],
+  },
+  {
     company:     'Immersive Learning Lab',
     role:        'Unity VR Developer',
     period:      'Oct 2025 – Present',
-    description: "Designed and programmed a VR educational module in Unity/C#/Blender for the European Space Agency's Comet Interceptor Mission.",
-    stack:       ['Unity', 'C#', 'Blender', 'VR'],
+    description: "Designed and programmed a VR educational module in Unity/C# visualizing the MANiaC mass spectrometer (ESA's Comet Interceptor mission) and built a near-photorealistic replica of the ISSI lobby in Bern. Presented at the IMMERSE Annual Symposium (April 2026).",
+    stack:       ['Unity', 'C#', 'Blender', 'VR', 'XR Toolkit'],
   },
   {
     company:     'Origami Games',
@@ -117,7 +124,7 @@ function EntryCard({ entry, fromLeft = false }) {
 export function Experience() {
   return (
     <section
-      className="relative px-6 pb-28 pt-4 w-full max-w-5xl mx-auto"
+      className="relative px-6 pb-28 pt-4 w-full max-w-6xl mx-auto"
       style={{ zIndex: 10 }}
     >
       {/* Section header */}
@@ -140,29 +147,31 @@ export function Experience() {
 
         {/* ── Desktop: alternating left / right ── */}
         <div className="hidden sm:block">
-
-          {/* Entry 1 — card on LEFT */}
-          <div className="flex items-start pb-24">
-            <div className="flex-1 pr-8 flex justify-end">
-              <EntryCard entry={ENTRIES[0]} fromLeft />
+          {ENTRIES.map((entry, i) => (
+            <div key={entry.company} className={`flex items-start${i < ENTRIES.length - 1 ? ' pb-24' : ''}`}>
+              {i % 2 === 0 ? (
+                <>
+                  <div className="flex-1 pr-4 flex justify-end">
+                    <EntryCard entry={entry} fromLeft />
+                  </div>
+                  <div className="w-10 shrink-0 flex justify-center pt-6">
+                    <Dot />
+                  </div>
+                  <div className="flex-1 pl-4" />
+                </>
+              ) : (
+                <>
+                  <div className="flex-1 pr-4" />
+                  <div className="w-10 shrink-0 flex justify-center pt-6">
+                    <Dot />
+                  </div>
+                  <div className="flex-1 pl-4">
+                    <EntryCard entry={entry} fromLeft={false} />
+                  </div>
+                </>
+              )}
             </div>
-            <div className="w-10 shrink-0 flex justify-center pt-6">
-              <Dot />
-            </div>
-            <div className="flex-1 pl-8" />
-          </div>
-
-          {/* Entry 2 — card on RIGHT */}
-          <div className="flex items-start">
-            <div className="flex-1 pr-8" />
-            <div className="w-10 shrink-0 flex justify-center pt-6">
-              <Dot />
-            </div>
-            <div className="flex-1 pl-8">
-              <EntryCard entry={ENTRIES[1]} fromLeft={false} />
-            </div>
-          </div>
-
+          ))}
         </div>
 
         {/* ── Mobile: line on left, cards stacked right ── */}

@@ -126,7 +126,7 @@ function SkillGroup({ group }) {
 export function Skills() {
   return (
     <section
-      className="relative px-6 pb-28 pt-4 w-full max-w-5xl mx-auto"
+      className="relative px-6 pb-28 pt-4 w-full max-w-6xl mx-auto"
       style={{ zIndex: 10 }}
     >
       {/* Section header */}

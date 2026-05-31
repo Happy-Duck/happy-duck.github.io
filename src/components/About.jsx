@@ -9,7 +9,7 @@ const LOG_ENTRIES = [
   "Gamer at heart: Zelda is an all-time favorite, Minecraft is timeless.",
   "Musical theater nerd: catching every touring production I ever can",
   "Cooking enthusiast: my favorite thing to cook is something I've never cooked before",
-  'Avid fly fisherman: fished the Wisconsin Driftless, the Appalachians in Virginia. Current catch count: 2',
+  'Avid fly fisherman: fished the Wisconsin Driftless, the Appalachians in Virginia. Current trout count: 4',
   'TTRPG Player: if I use the name, then Wizards of the Coast™ might get me',
 ]
 
@@ -32,41 +32,9 @@ function useRotatingTypewriter(lines, pauseMs = 4000) {
     if (started.current) return
     started.current = true
 
-    // Build initial entries with unique ids
     const initial = lines.map(text => ({ text, id: idRef.current++ }))
-    let built = []
-    let lineIdx = 0
-
-    // Type each line sequentially during initial burst
-    function typeNextLine() {
-      if (lineIdx >= initial.length) {
-        // All lines typed — enter cycling pause
-        setPhase('paused')
-        timeoutRef.current = setTimeout(cycle, pauseMs)
-        return
-      }
-
-      const entry = initial[lineIdx]
-      built = [...built, entry]
-      setEntries(built)
-      setTypingIdx(built.length - 1)
-      setPhase('typing')
-
-      let charIdx = 0
-      function tick() {
-        if (charIdx >= entry.text.length) {
-          setTypingIdx(-1)
-          lineIdx++
-          typeNextLine()
-          return
-        }
-        charIdx++
-        setTypingLen(charIdx)
-        const variance = (Math.random() - 0.5) * 20
-        timeoutRef.current = setTimeout(tick, 40 + variance)
-      }
-      tick()
-    }
+    setEntries(initial)
+    setPhase('paused')
 
     // Cycle: remove top, re-type it at bottom
     function cycle() {
@@ -99,7 +67,7 @@ function useRotatingTypewriter(lines, pauseMs = 4000) {
       })
     }
 
-    typeNextLine()
+    timeoutRef.current = setTimeout(cycle, pauseMs)
   }, [lines, pauseMs])
 
   return { entries, typingIdx, typingLen, phase, start }
@@ -280,7 +248,7 @@ function TypewriterLog() {
 export function About() {
   return (
     <section
-      className="relative px-6 pb-28 pt-4 w-full max-w-5xl mx-auto"
+      className="relative px-6 pb-28 pt-4 w-full max-w-6xl mx-auto"
       style={{ zIndex: 10 }}
     >
       {/* Captain's log card — single unified console */}

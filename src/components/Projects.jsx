@@ -21,6 +21,12 @@ const PROJECTS = [
     link:        'https://store.steampowered.com/app/2645390/Pelagos_A_Marine_Adventure',
   },
   {
+    title:       'Party School',
+    description: 'Multiplayer sandbox party game with minigame activities built in a five-person team. Built the world map and core gameplay base shared across all minigames; implementing the racing minigame using Unreal\'s Chaos Vehicle system.',
+    stack:       ['Unreal Engine 5', 'Blueprints', 'Chaos Vehicles'],
+    link:        '#',
+  },
+  {
     title:       'Flarp',
     description: "A puzzle Metroidvania built around wind mechanics and momentum-based traversal. Developed with UIUC's ACM GameBuilders club.",
     stack:       ['GameMaker Studio', 'GML'],
@@ -197,7 +203,7 @@ function ProjectCard({ project, delay }) {
 export function Projects() {
   return (
     <section
-      className="relative px-6 pb-28 pt-4 w-full max-w-5xl mx-auto"
+      className="relative px-6 pb-28 pt-4 w-full max-w-6xl mx-auto"
       style={{ zIndex: 10 }}
     >
       {/* Section header */}
