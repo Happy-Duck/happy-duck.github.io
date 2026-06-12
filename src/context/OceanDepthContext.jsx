@@ -53,11 +53,12 @@ export function OceanDepthProvider({ children }) {
   // Subscriber registry — creatures register tick callbacks here
   const subscribers  = useRef(new Set())
   const frameRef     = useRef(null)
-  const dirtyRef     = useRef(false)
+  const dirtyRef     = useRef(true)   // true → first frame initializes everything
   const lastDepthRef = useRef(-1)
   const themeRef     = useRef('shallow-reef')
   const lastUiRef    = useRef(0)
   const lastNowRef   = useRef(0)
+  const reducedRef   = useRef(false)
 
   // Stable subscribe function — never changes reference
   const subscribe = useCallback((fn) => {
@@ -81,7 +82,15 @@ export function OceanDepthProvider({ children }) {
     const onScroll = () => { dirtyRef.current = true }
     window.addEventListener('scroll', onScroll, { passive: true })
 
+    // Reduced motion — creatures hold position except while scrolling
+    const motionQuery = window.matchMedia('(prefers-reduced-motion: reduce)')
+    reducedRef.current = motionQuery.matches
+    const onMotionChange = (e) => { reducedRef.current = e.matches }
+    motionQuery.addEventListener('change', onMotionChange)
+
     const loop = (now) => {
+      let depthChanged = false
+
       // ── Depth update (scroll-dirty) ──────────────────────────────
       if (dirtyRef.current) {
         dirtyRef.current = false
@@ -91,6 +100,7 @@ export function OceanDepthProvider({ children }) {
         const d          = maxScroll > 0 ? Math.max(0, Math.min(1, scrollY / maxScroll)) : 0
 
         if (Math.abs(d - lastDepthRef.current) >= 0.001) {
+          depthChanged         = true
           lastDepthRef.current = d
           depthRef.current     = d
 
@@ -135,14 +145,17 @@ export function OceanDepthProvider({ children }) {
         }
       }
 
-      // ── Always call creature subscribers (continuous animation) ───
+      // ── Creature subscribers — continuous animation, unless the user
+      //    prefers reduced motion (then only tick while depth changes) ──
       const depth = depthRef.current
-      subscribers.current.forEach(fn => fn(depth))
+      if (!reducedRef.current || depthChanged) {
+        subscribers.current.forEach(fn => fn(depth))
+      }
 
       // ── Performance monitor ────────────────────────────────────────
       if (lastNowRef.current > 0) {
         const dt = now - lastNowRef.current
-        if (dt > 20 && process.env.NODE_ENV === 'development') {
+        if (dt > 20 && import.meta.env.DEV) {
           const zone = getZone(depth)
           console.warn(
             `[ocean] Frame drop ~${Math.round(1000 / dt)}fps — likely: ${ZONE_CULPRIT[zone.key]}`
@@ -159,6 +172,7 @@ export function OceanDepthProvider({ children }) {
     return () => {
       cancelAnimationFrame(frameRef.current)
       window.removeEventListener('scroll', onScroll)
+      motionQuery.removeEventListener('change', onMotionChange)
     }
   }, [])
 

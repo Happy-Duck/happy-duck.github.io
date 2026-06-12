@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef, useCallback } from 'react'
+import { useState, useEffect, useRef, useCallback, useSyncExternalStore } from 'react'
 import { motion } from 'framer-motion'
 import { useLanyard } from '../hooks/useLanyard'
 
@@ -35,6 +35,9 @@ function useRotatingTypewriter(lines, pauseMs = 4000) {
     const initial = lines.map(text => ({ text, id: idRef.current++ }))
     setEntries(initial)
     setPhase('paused')
+
+    // Reduced motion — show all entries statically, skip the retype cycle
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return
 
     // Cycle: remove top, re-type it at bottom
     function cycle() {
@@ -91,55 +94,57 @@ function resolveActivityImage(activity) {
 const appIconCache = {}
 
 function useAppIcon(appId) {
-  const [iconUrl, setIconUrl] = useState(null)
+  // Bumped when a fetch lands so the cache read below re-runs
+  const [, setFetchedAt] = useState(0)
 
   useEffect(() => {
-    if (!appId) { setIconUrl(null); return }
-
-    if (appIconCache[appId]) {
-      setIconUrl(appIconCache[appId])
-      return
-    }
+    if (!appId || appIconCache[appId]) return
 
     let cancelled = false
     fetch(`https://discord.com/api/v9/applications/${appId}/rpc`)
       .then(r => r.ok ? r.json() : null)
       .then(data => {
         if (cancelled || !data?.icon) return
-        const url = `https://cdn.discordapp.com/app-icons/${appId}/${data.icon}.png`
-        appIconCache[appId] = url
-        setIconUrl(url)
+        appIconCache[appId] = `https://cdn.discordapp.com/app-icons/${appId}/${data.icon}.png`
+        setFetchedAt(t => t + 1)
       })
       .catch(() => {})
 
     return () => { cancelled = true }
   }, [appId])
 
-  return iconUrl
+  return appId ? appIconCache[appId] || null : null
+}
+
+// Second-resolution clock — external store, only ticks while needed
+function subscribeClock(cb) {
+  const id = setInterval(cb, 1000)
+  return () => clearInterval(id)
+}
+function subscribeNoop() {
+  return () => {}
+}
+function clockSnapshot() {
+  return Math.floor(Date.now() / 1000)
+}
+function zeroSnapshot() {
+  return 0
 }
 
 function useElapsed(startTimestamp) {
-  const [elapsed, setElapsed] = useState('')
+  const nowSec = useSyncExternalStore(
+    startTimestamp ? subscribeClock : subscribeNoop,
+    startTimestamp ? clockSnapshot : zeroSnapshot,
+  )
 
-  useEffect(() => {
-    if (!startTimestamp) { setElapsed(''); return }
-
-    function update() {
-      const diff = Math.max(0, Math.floor((Date.now() - startTimestamp) / 1000))
-      const h = Math.floor(diff / 3600)
-      const m = Math.floor((diff % 3600) / 60)
-      const s = diff % 60
-      setElapsed(h > 0
-        ? `${h}:${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`
-        : `${m}:${String(s).padStart(2,'0')}`)
-    }
-
-    update()
-    const id = setInterval(update, 1000)
-    return () => clearInterval(id)
-  }, [startTimestamp])
-
-  return elapsed
+  if (!startTimestamp) return ''
+  const diff = Math.max(0, nowSec - Math.floor(startTimestamp / 1000))
+  const h = Math.floor(diff / 3600)
+  const m = Math.floor((diff % 3600) / 60)
+  const s = diff % 60
+  return h > 0
+    ? `${h}:${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`
+    : `${m}:${String(s).padStart(2,'0')}`
 }
 
 function LivePresence() {
@@ -165,10 +170,12 @@ function LivePresence() {
     }
   }
 
-  // Track when we first see an activity as fallback for missing timestamps
+  // Track when we first see an activity as fallback for missing timestamps.
+  // Wall-clock capture has no pure equivalent — Lanyard omits the start time.
   const activityKey = line || null
   if (activityKey && !startTs) {
     if (!fallbackTs.current || fallbackTs.current.key !== activityKey) {
+      // eslint-disable-next-line react-hooks/purity
       fallbackTs.current = { key: activityKey, ts: Date.now() }
     }
     startTs = fallbackTs.current.ts

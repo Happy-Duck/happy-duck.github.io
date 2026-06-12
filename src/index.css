@@ -12,6 +12,52 @@ html { scrollbar-width: none; overscroll-behavior: none; overflow-anchor: none; 
 html::-webkit-scrollbar { display: none; }
 
 /* ═══════════════════════════════════════════════════════════════════
+   ACCESSIBILITY
+   ═══════════════════════════════════════════════════════════════════ */
+
+/* Keyboard focus — visible ring on links, buttons, orbs */
+:focus-visible {
+  outline:        2px solid var(--card-link-hover, #00d4ff);
+  outline-offset: 3px;
+}
+
+/* Skip link — hidden until focused via keyboard */
+.skip-link {
+  position:        fixed;
+  top:             -100px;
+  left:            16px;
+  z-index:         100;
+  padding:         10px 16px;
+  border-radius:   8px;
+  background:      rgba(2, 12, 38, 0.92);
+  color:           #aee6ff;
+  font-family:     ui-monospace, monospace;
+  font-size:       0.8rem;
+  letter-spacing:  0.08em;
+  text-decoration: none;
+  transition:      top 0.2s ease;
+}
+.skip-link:focus-visible { top: 16px; }
+
+/* Reduced motion — still the water: no autonomous/looping animation.
+   Creature swimming is gated in OceanDepthContext; Framer Motion via
+   MotionConfig. This handles the pure-CSS loops. */
+@media (prefers-reduced-motion: reduce) {
+  .marine-snow-wrap,
+  .plankton-wrap,
+  .signal-ring { display: none; }
+
+  .beach-wave-1, .beach-wave-2, .beach-wave-3,
+  .kelp-current,
+  .signal-orb, .sidebar-orb,
+  .jelly-bell, .jelly-tentacle,
+  .bio-pulse, .lure-pulse, .angler-lure,
+  .crab-scuttle,
+  .presence-shimmer, .presence-dot--online,
+  .typewriter-cursor { animation: none !important; }
+}
+
+/* ═══════════════════════════════════════════════════════════════════
    THEME CSS VARIABLES
    One data-theme attribute change cascades everywhere — zero JS per frame
    ═══════════════════════════════════════════════════════════════════ */

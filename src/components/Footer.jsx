@@ -21,6 +21,12 @@ function Crab() {
     const floorEl = outer.parentElement
     let floorW    = floorEl ? floorEl.clientWidth : window.innerWidth
 
+    // Reduced motion — park the crab, no walking or fleeing
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+      outer.style.transform = `translateX(${floorW * 0.4}px)`
+      return
+    }
+
     const onResize = () => {
       floorW = floorEl ? floorEl.clientWidth : window.innerWidth
     }

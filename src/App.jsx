@@ -14,6 +14,9 @@ import { Footer        } from './components/Footer'
 export default function App() {
   return (
     <>
+      {/* Skip link — first focusable element, keyboard/screen-reader only */}
+      <a href="#main" className="skip-link">Skip to content</a>
+
       {/* ── Fixed backdrop layers (z 0–4) ─────────────────────────── */}
       {/* Smooth color-interpolated background */}
       <div className="ocean-backdrop" aria-hidden="true" />
@@ -43,11 +46,13 @@ export default function App() {
         <DepthGauge />
 
         {/* ── Page content (z 10) ────────────────────────────────── */}
-        <Hero />
-        <Projects />
-        <Experience />
-        <Skills />
-        <About />
+        <main id="main">
+          <Hero />
+          <Projects />
+          <Experience />
+          <Skills />
+          <About />
+        </main>
 
       </div>
 
