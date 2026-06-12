@@ -76,7 +76,7 @@ export function AbyssalJellyfish() {
     })
 
     return unsubscribe
-  }, [subscribe])
+  }, [subscribe, mouseRef])
 
   return (
     <div

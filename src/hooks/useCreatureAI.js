@@ -25,23 +25,25 @@ export function useCreatureAI({
   const { subscribe } = useOceanDepthContext()
   const isMobile   = useRef(false)
 
-  // Persistent animation state (outside React state to avoid re-renders)
+  // Persistent animation state (outside React state to avoid re-renders).
+  // Seeded in the effect — render stays pure.
   const s = useRef(null)
-  if (!s.current) {
-    const W = typeof window !== 'undefined' ? window.innerWidth  : 1200
-    const H = typeof window !== 'undefined' ? window.innerHeight : 800
-    s.current = {
-      t:          Math.random() * 6000,
-      pathRawX:   Math.random() * W,
-      pathX:      Math.random() * W,
-      speedBoost: 0,
-      dodgeY:     0,
-      baseY:      H * centerYFrac,
-    }
-  }
 
   useEffect(() => {
     isMobile.current = window.matchMedia('(pointer: coarse)').matches
+
+    if (!s.current) {
+      const W = window.innerWidth
+      const H = window.innerHeight
+      s.current = {
+        t:          Math.random() * 6000,
+        pathRawX:   Math.random() * W,
+        pathX:      Math.random() * W,
+        speedBoost: 0,
+        dodgeY:     0,
+        baseY:      H * centerYFrac,
+      }
+    }
 
     const unsubscribe = subscribe((depth) => {
       const opacity = creatureOpacity(depth, depthRange)
@@ -123,7 +125,7 @@ export function useCreatureAI({
     })
 
     return unsubscribe
-  }, [subscribe, depthRange, speed, dir, freq, amplitude, centerYFrac, fleeRadius, W_SVG, H_SVG, peers, peerIndex])
+  }, [subscribe, mouseRef, depthRange, speed, dir, freq, amplitude, centerYFrac, fleeRadius, W_SVG, H_SVG, peers, peerIndex])
 
   return { wrapperRef }
 }

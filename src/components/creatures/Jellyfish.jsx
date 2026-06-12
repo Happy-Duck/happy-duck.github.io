@@ -103,7 +103,7 @@ function SingleJelly({ cfg, idx, peers }) {
     })
 
     return unsubscribe
-  }, [subscribe, idx])
+  }, [subscribe, idx, cfg, peers, mouseRef, sw, sh])
 
   return (
     <div

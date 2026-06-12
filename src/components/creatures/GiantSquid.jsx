@@ -100,7 +100,7 @@ export function GiantSquid() {
     })
 
     return unsubscribe
-  }, [subscribe])
+  }, [subscribe, mouseRef])
 
   return (
     <div

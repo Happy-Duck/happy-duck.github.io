@@ -26,8 +26,8 @@ function SingleSquid({ cfg, idx, peers }) {
     dodgeY: 0,
     dartPhase: 0,       // 0 = glide, 1 = dart
     dartTimer: cfg.dartOffset,
-    glideLen: 100 + Math.random() * 60,   // randomized glide duration
-    dartLen:  18 + Math.random() * 15,     // randomized dart duration
+    glideLen: 0,        // seeded on first tick — render stays pure
+    dartLen:  0,
   })
 
   useEffect(() => {
@@ -48,6 +48,8 @@ function SingleSquid({ cfg, idx, peers }) {
         p.x       = cfg.startOffset * VW
         p.y       = cfg.yFrac * VH
         p.pathRawX = p.x
+        p.glideLen = 100 + Math.random() * 60   // randomized glide duration
+        p.dartLen  = 18 + Math.random() * 15    // randomized dart duration
       }
 
       // Dart / glide cycle with randomized intervals
@@ -113,7 +115,7 @@ function SingleSquid({ cfg, idx, peers }) {
     })
 
     return unsubscribe
-  }, [subscribe])
+  }, [subscribe, idx, cfg, peers, mouseRef])
 
   return (
     <div
