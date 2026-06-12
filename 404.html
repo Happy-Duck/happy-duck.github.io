@@ -1,0 +1,131 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>404 — Lost at Sea | Rishi Garhyan</title>
+    <meta name="robots" content="noindex" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png" />
+    <meta name="theme-color" content="#020818" />
+    <style>
+      * { margin: 0; padding: 0; box-sizing: border-box; }
+
+      html, body {
+        height: 100%;
+        background: radial-gradient(ellipse at 50% 120%, #04204a 0%, #020818 55%, #010408 100%);
+        color: #a8d8f0;
+        font-family: ui-monospace, 'Cascadia Code', 'Source Code Pro', Menlo, monospace;
+      }
+
+      body {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        gap: 1.25rem;
+        text-align: center;
+        padding: 1.5rem;
+        overflow: hidden;
+      }
+
+      .depth {
+        font-size: 0.7rem;
+        letter-spacing: 0.3em;
+        text-transform: uppercase;
+        color: rgba(0, 212, 255, 0.45);
+      }
+
+      h1 {
+        font-size: clamp(3rem, 14vw, 7rem);
+        font-weight: 900;
+        letter-spacing: 0.04em;
+        color: rgba(168, 216, 240, 0.95);
+        text-shadow: 0 0 40px rgba(0, 180, 255, 0.4), 0 0 80px rgba(0, 80, 200, 0.2);
+      }
+
+      p {
+        max-width: 36ch;
+        font-size: clamp(0.85rem, 2.5vw, 1rem);
+        line-height: 1.7;
+        color: rgba(140, 192, 225, 0.7);
+      }
+
+      a.surface {
+        margin-top: 0.75rem;
+        display: inline-block;
+        padding: 0.8rem 1.6rem;
+        border: 1px solid rgba(0, 212, 255, 0.35);
+        border-radius: 999px;
+        color: #00d4ff;
+        text-decoration: none;
+        font-size: 0.8rem;
+        letter-spacing: 0.18em;
+        text-transform: uppercase;
+        transition: background 0.25s ease, box-shadow 0.25s ease;
+      }
+
+      a.surface:hover,
+      a.surface:focus-visible {
+        background: rgba(0, 212, 255, 0.1);
+        box-shadow: 0 0 24px rgba(0, 212, 255, 0.25);
+        outline: none;
+      }
+
+      /* Anglerfish lure — a lone glow in the dark */
+      .lure {
+        position: fixed;
+        top: 18%;
+        right: 16%;
+        width: 6px;
+        height: 6px;
+        border-radius: 50%;
+        background: #ccf6ff;
+        box-shadow: 0 0 22px 12px rgba(80, 210, 255, 0.45), 0 0 50px 26px rgba(60, 160, 255, 0.18);
+        animation: lure 3.2s ease-in-out infinite;
+      }
+
+      @keyframes lure {
+        0%, 100% { opacity: 0.5; transform: scale(1); }
+        50%      { opacity: 1;   transform: scale(1.35); }
+      }
+
+      .bubble {
+        position: fixed;
+        bottom: -20px;
+        border-radius: 50%;
+        border: 1px solid rgba(160, 220, 255, 0.25);
+        animation: rise linear infinite;
+      }
+
+      .bubble:nth-child(1) { left: 12%; width: 10px; height: 10px; animation-duration: 11s; }
+      .bubble:nth-child(2) { left: 28%; width: 6px;  height: 6px;  animation-duration: 14s; animation-delay: -6s; }
+      .bubble:nth-child(3) { left: 71%; width: 8px;  height: 8px;  animation-duration: 12s; animation-delay: -3s; }
+      .bubble:nth-child(4) { left: 86%; width: 5px;  height: 5px;  animation-duration: 16s; animation-delay: -9s; }
+
+      @keyframes rise {
+        from { transform: translateY(0); opacity: 0.7; }
+        to   { transform: translateY(-110vh); opacity: 0; }
+      }
+
+      @media (prefers-reduced-motion: reduce) {
+        .lure, .bubble { animation: none; }
+        .bubble { display: none; }
+      }
+    </style>
+  </head>
+  <body>
+    <div aria-hidden="true">
+      <span class="bubble"></span>
+      <span class="bubble"></span>
+      <span class="bubble"></span>
+      <span class="bubble"></span>
+      <span class="lure"></span>
+    </div>
+
+    <span class="depth">depth: unknown</span>
+    <h1>404</h1>
+    <p>You've drifted into uncharted waters. Whatever was here has been lost to the abyss — or never existed at all.</p>
+    <a class="surface" href="/">Resurface</a>
+  </body>
+</html>
