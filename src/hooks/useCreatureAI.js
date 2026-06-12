@@ -7,6 +7,7 @@ import { useMouse } from '../context/MouseContext'
 import { useOceanDepthContext } from '../context/OceanDepthContext'
 import { creatureOpacity } from '../constants/depthZones'
 import { tickSeen } from '../lib/diveLog'
+import { pingImpulse } from '../lib/sonar'
 
 export function useCreatureAI({
   W_SVG       = 50,
@@ -88,6 +89,13 @@ export function useCreatureAI({
           // Mild vertical dodge away from cursor
           p.dodgeY += -(dy / dist) * str * 2.0
         }
+      }
+
+      // Sonar ping — scatter away from the epicenter
+      const imp = pingImpulse(p.pathX, pathY + p.dodgeY)
+      if (imp) {
+        p.speedBoost = Math.max(p.speedBoost, imp.str * speed * 6)
+        p.dodgeY += imp.uy * imp.str * 2.5
       }
 
       // Peer repulsion — gentle vertical separation

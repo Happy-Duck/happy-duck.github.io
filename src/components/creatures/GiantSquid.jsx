@@ -5,6 +5,7 @@ import { useMouse } from '../../context/MouseContext'
 import { useOceanDepthContext } from '../../context/OceanDepthContext'
 import { creatureOpacity } from '../../constants/depthZones'
 import { tickSeen } from '../../lib/diveLog'
+import { pingImpulse } from '../../lib/sonar'
 
 const W = 350, H = 175
 const DEPTH_RANGE = { enter: 0.65, exit: 1.02 }
@@ -85,6 +86,13 @@ export function GiantSquid() {
           // Mild vertical dodge
           p.dodgeY += -(dy / dist) * str * 2.0
         }
+      }
+
+      // Sonar ping — surge away
+      const imp = pingImpulse(p.x, p.y + p.dodgeY)
+      if (imp) {
+        p.speedBoost = Math.max(p.speedBoost, imp.str * TRAVERSE_SPEED * 6)
+        p.dodgeY += imp.uy * imp.str * 2.5
       }
 
       p.speedBoost *= 0.94

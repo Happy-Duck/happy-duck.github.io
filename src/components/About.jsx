@@ -69,7 +69,7 @@ function useRotatingTypewriter(lines, pauseMs = 4000) {
     }
 
     timeoutRef.current = setTimeout(cycle, pauseMs)
-  }, [lines, pauseMs])
+  }, [pauseMs])
 
   return { entries, typingIdx, typingLen, phase, start }
 }

@@ -5,6 +5,7 @@ import { useMouse } from '../../context/MouseContext'
 import { useOceanDepthContext } from '../../context/OceanDepthContext'
 import { creatureOpacity } from '../../constants/depthZones'
 import { tickSeen } from '../../lib/diveLog'
+import { pingImpulse } from '../../lib/sonar'
 
 const W = 120, H = 170
 const DEPTH_RANGE = { enter: 0.20, exit: 0.55 }
@@ -73,6 +74,13 @@ function SingleJelly({ cfg, idx, peers }) {
           p.driftBoost = Math.max(p.driftBoost, str * 1.5)
           p.dodgeX += -(dx / dist) * str * 1.5
         }
+      }
+
+      // Sonar ping — dart upward and away
+      const imp = pingImpulse(p.x + p.dodgeX, p.y)
+      if (imp) {
+        p.driftBoost = Math.max(p.driftBoost, imp.str * 2.2)
+        p.dodgeX += imp.ux * imp.str * 2.0
       }
 
       p.dodgeX *= 0.96

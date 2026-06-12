@@ -1674,6 +1674,211 @@ html::-webkit-scrollbar { display: none; }
 }
 
 /* ═══════════════════════════════════════════════════════════════════
+   SUBMARINE TERMINAL
+   ═══════════════════════════════════════════════════════════════════ */
+
+.term-overlay {
+  position:        fixed;
+  inset:           0;
+  z-index:         80;
+  display:         flex;
+  align-items:     flex-start;
+  justify-content: center;
+  padding:         12vh 16px 0;
+  background:      rgba(0, 4, 12, 0.55);
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+}
+
+.term-box {
+  width:          min(640px, 100%);
+  display:        flex;
+  flex-direction: column;
+  border:         1px solid rgba(0, 212, 255, 0.35);
+  border-radius:  10px;
+  background:     rgba(1, 8, 22, 0.96);
+  box-shadow:     0 0 40px rgba(0, 212, 255, 0.14), 0 24px 64px rgba(0, 0, 0, 0.6);
+  font-family:    'Share Tech Mono', ui-monospace, monospace;
+  overflow:       hidden;
+  position:       relative;
+}
+
+/* CRT scanlines */
+.term-box::after {
+  content:        '';
+  position:       absolute;
+  inset:          0;
+  pointer-events: none;
+  background:     repeating-linear-gradient(
+    to bottom,
+    transparent          0px,
+    transparent          3px,
+    rgba(0, 212, 255, 0.025) 4px
+  );
+}
+
+.term-body {
+  padding:    1rem 1.1rem 0.4rem;
+  max-height: min(48vh, 420px);
+  min-height: 130px;
+  overflow-y: auto;
+  scrollbar-width: thin;
+}
+
+.term-line {
+  margin:        0 0 3px;
+  font-size:     0.8rem;
+  line-height:   1.55;
+  color:         rgba(140, 222, 245, 0.85);
+  white-space:   pre-wrap;
+  word-break:    break-word;
+}
+
+.term-line--banner { color: rgba(0, 212, 255, 0.65); }
+.term-line--in     { color: rgba(220, 245, 255, 0.95); }
+
+.term-prompt {
+  color: rgba(0, 212, 255, 0.8);
+}
+
+.term-input-row {
+  display:     flex;
+  align-items: center;
+  gap:         0.55rem;
+  padding:     0.65rem 1.1rem 0.9rem;
+  border-top:  1px solid rgba(0, 212, 255, 0.12);
+}
+
+.term-input {
+  flex:        1;
+  border:      none;
+  outline:     none;
+  background:  transparent;
+  color:       rgba(220, 245, 255, 0.95);
+  font:        inherit;
+  font-size:   0.85rem;
+  caret-color: #00d4ff;
+}
+
+/* ═══════════════════════════════════════════════════════════════════
+   WHALE — rare crossing event
+   ═══════════════════════════════════════════════════════════════════ */
+
+.whale-track {
+  position:       fixed;
+  inset:          0;
+  z-index:        2;             /* far background — behind creatures */
+  pointer-events: none;
+  overflow:       hidden;
+}
+
+.whale {
+  position:    absolute;
+  top:         22%;
+  left:        0;
+  width:       min(55vw, 760px);
+  aspect-ratio: 600 / 220;
+  animation:
+    whale-cross 35s linear forwards,
+    whale-bob   9s ease-in-out infinite;
+  filter:      blur(2px);
+  opacity:     0.9;
+}
+
+/* Slightly darker than the surrounding water — a shadow passing by */
+.whale-body {
+  fill: rgba(0, 0, 0, 0.22);
+}
+.whale-eye {
+  fill: rgba(180, 220, 255, 0.12);
+}
+
+@keyframes whale-cross {
+  from { transform: translateX(-110%); }
+  to   { transform: translateX(calc(100vw + 10%)); }
+}
+
+@keyframes whale-bob {
+  0%, 100% { margin-top: 0; }
+  50%       { margin-top: 26px; }
+}
+
+/* Reduced motion: terminal summon shows a static fade instead */
+@media (prefers-reduced-motion: reduce) {
+  .whale {
+    animation: whale-appear 8s ease-in-out forwards;
+    left: 22%;
+  }
+  @keyframes whale-appear {
+    0%   { opacity: 0; }
+    25%  { opacity: 0.9; }
+    75%  { opacity: 0.9; }
+    100% { opacity: 0; }
+  }
+}
+
+/* ═══════════════════════════════════════════════════════════════════
+   SONAR PING
+   ═══════════════════════════════════════════════════════════════════ */
+
+.sonar-layer {
+  position:       fixed;
+  inset:          0;
+  z-index:        6;
+  pointer-events: none;
+}
+
+.sonar-ring-wrap {
+  position: absolute;
+  color:    var(--card-link, rgba(0, 212, 255, 0.8));
+}
+
+.sonar-ring {
+  position:      absolute;
+  left:          -6px;
+  top:           -6px;
+  width:         12px;
+  height:        12px;
+  border-radius: 50%;
+  border:        1.5px solid currentColor;
+  opacity:       0;
+  animation:     sonar-expand 1.6s ease-out forwards;
+}
+
+.sonar-ring--late { animation-delay: 0.16s; }
+
+@keyframes sonar-expand {
+  0%   { transform: scale(0.4); opacity: 0.85; }
+  100% { transform: scale(52);  opacity: 0; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .sonar-ring {
+    animation: sonar-fade 1s ease-out forwards;
+    transform: scale(18);
+  }
+  .sonar-ring--late { display: none; }
+}
+
+@keyframes sonar-fade {
+  0%   { opacity: 0.6; }
+  100% { opacity: 0; }
+}
+
+/* Footer hint */
+.footer-hint {
+  position:       absolute;
+  bottom:         6px;
+  right:          12px;
+  font-family:    ui-monospace, monospace;
+  font-size:      0.6rem;
+  letter-spacing: 0.1em;
+  color:          var(--floor-credits-text);
+  opacity:        0.55;
+  user-select:    none;
+}
+
+/* ═══════════════════════════════════════════════════════════════════
    DEPTH GAUGE
    ═══════════════════════════════════════════════════════════════════ */
 

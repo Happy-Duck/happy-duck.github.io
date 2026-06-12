@@ -1,8 +1,10 @@
 import { MarineSnow    } from './components/MarineSnow'
 import { Plankton      } from './components/Plankton'
 import { RovLight      } from './components/RovLight'
+import { SonarPing     } from './components/SonarPing'
 import { WaterSurface  } from './components/WaterSurface'
 import { CreatureLayer } from './components/creatures/CreatureLayer'
+import { Whale         } from './components/creatures/Whale'
 import { DepthGauge    } from './components/DepthGauge'
 import { Hero          } from './components/Hero'
 import { Experience    } from './components/Experience'
@@ -11,6 +13,7 @@ import { Projects      } from './components/Projects'
 import { About         } from './components/About'
 import { ContactSidebar } from './components/ContactSidebar'
 import { DiveLog       } from './components/DiveLog'
+import { Terminal      } from './components/Terminal'
 import { Footer        } from './components/Footer'
 
 export default function App() {
@@ -29,6 +32,9 @@ export default function App() {
       {/* Dive log — discovery journal, bottom-right */}
       <DiveLog />
 
+      {/* Submarine terminal — type "dive" or press ` */}
+      <Terminal />
+
       <div className="relative overflow-hidden">
 
         {/* Water surface — underwater perspective, only near surface (depth < 0.20) */}
@@ -37,6 +43,9 @@ export default function App() {
         {/* Depth overlay gradients */}
         <div className="overlay-deep" />
         <div className="overlay-reef" />
+
+        {/* Whale — rare background crossing event */}
+        <Whale />
 
         {/* Sea creatures — depth-zone aware */}
         <CreatureLayer />
@@ -49,6 +58,9 @@ export default function App() {
 
         {/* ROV headlight — darkness + cursor light cone in deep zones */}
         <RovLight />
+
+        {/* Sonar ping rings — click open water */}
+        <SonarPing />
 
         {/* Depth gauge — right edge, scroll-triggered */}
         <DepthGauge />

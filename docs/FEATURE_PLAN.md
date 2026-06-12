@@ -81,7 +81,7 @@ tracks 10 species. Persisted across visits. Completion = certificate stamp.
 uses an IntersectionObserver dwell in Footer. Verified all 10 discoverable +
 EXPEDITION COMPLETE stamp + persistence + zero console errors.
 
-## 3. Submarine Terminal — [ ] TODO
+## 3. Submarine Terminal — [x] DONE
 
 **Pitch:** Hidden interactive terminal. Type `dive` anywhere (or press `` ` ``)
 to open a submarine console over the page.
@@ -104,9 +104,11 @@ to open a submarine console over the page.
 **Files:** `src/components/Terminal.jsx`, `App.jsx`, `index.css`,
 `Footer.jsx` (hint).
 
-**Status:** not started.
+**Status:** DONE. Gotcha fixed: the final "e" of typed "dive" needed
+preventDefault or it landed in the freshly-focused input. All commands
+verified headless.
 
-## 4. Sonar Ping — [ ] TODO
+## 4. Sonar Ping — [x] DONE
 
 **Pitch:** Click open water -> expanding sonar ring from the click point;
 nearby creatures scatter (they already have `speedBoost`/dodge state).
@@ -126,9 +128,11 @@ Terminal `ping` triggers one at screen center.
 **Files:** `src/lib/sonar.js`, `src/components/SonarPing.jsx`, creature tick
 hooks (`useCreatureAI.js` + bespoke creatures), `index.css`, `App.jsx`.
 
-**Status:** not started.
+**Status:** DONE. sonar.js exposes pingImpulse(x, y) so each creature adds
+one small block. SnailFish intentionally doesn't react (deepest fish ever
+recorded; unbothered). Rings render z-6, above the ROV darkness.
 
-## 5. Rare Ambient Events — whale crossing — [ ] TODO
+## 5. Rare Ambient Events — whale crossing — [x] DONE
 
 **Pitch:** ~1-in-6 visits, while you're in the twilight band, a huge whale
 silhouette crosses far in the background over ~35s. Rarity = shareability.
@@ -148,7 +152,8 @@ silhouette crosses far in the background over ~35s. Rarity = shareability.
 **Files:** `src/components/creatures/Whale.jsx`, `App.jsx`,
 `species.js` (bonus entry), `index.css`.
 
-**Status:** not started.
+**Status:** DONE. Inline SVG silhouette, 35s crossing at z-2 with blur,
+session-rolled 1-in-6, terminal summon verified, Leviathan logs ~6s in.
 
 ## 6. Shipwreck & Treasure — [ ] TODO
 
@@ -296,9 +301,9 @@ Fill in as features land:
 | 0 | Plan doc | fd02826 | — |
 | 1 | ROV Headlight | with #2 | headless Edge OK |
 | 2 | Dive Log | feat: ROV headlight + dive log | headless Edge OK |
-| 3 | Terminal | — | — |
-| 4 | Sonar Ping | — | — |
-| 5 | Whale | — | — |
+| 3 | Terminal | feat: terminal + sonar + whale | headless Edge OK |
+| 4 | Sonar Ping | with #3 | headless Edge OK |
+| 5 | Whale | with #3 | headless Edge OK |
 | 6 | Shipwreck | — | — |
 | 7 | Bio Trail | — | — |
 | 8 | Crab Poke | — | — |

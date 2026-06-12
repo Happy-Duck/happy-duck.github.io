@@ -5,6 +5,7 @@ import { useMouse } from '../../context/MouseContext'
 import { useOceanDepthContext } from '../../context/OceanDepthContext'
 import { creatureOpacity } from '../../constants/depthZones'
 import { tickSeen } from '../../lib/diveLog'
+import { pingImpulse } from '../../lib/sonar'
 
 const W = 100, H = 138
 const DEPTH_RANGE = { enter: 0.23, exit: 0.55 }
@@ -82,6 +83,13 @@ function SingleSquid({ cfg, idx, peers }) {
           p.speedBoost = Math.max(p.speedBoost, str * baseSpeed * 4)
           p.dodgeY += -(dy / dist) * str * 2.0
         }
+      }
+
+      // Sonar ping — burst away
+      const imp = pingImpulse(p.x, pathY + p.dodgeY)
+      if (imp) {
+        p.speedBoost = Math.max(p.speedBoost, imp.str * baseSpeed * 5)
+        p.dodgeY += imp.uy * imp.str * 2.5
       }
 
       // Peer repulsion

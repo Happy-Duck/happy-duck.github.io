@@ -5,6 +5,7 @@ import { useMouse } from '../../context/MouseContext'
 import { useOceanDepthContext } from '../../context/OceanDepthContext'
 import { creatureOpacity } from '../../constants/depthZones'
 import { tickSeen } from '../../lib/diveLog'
+import { pingImpulse } from '../../lib/sonar'
 
 const W = 225, H = 170
 const DEPTH_RANGE = { enter: 0.45, exit: 0.75 }
@@ -62,6 +63,13 @@ export function Anglerfish() {
           // Mild vertical dodge
           p.dodgeY += -(dy / dist) * str * 1.5
         }
+      }
+
+      // Sonar ping — drift away, mildly annoyed
+      const imp = pingImpulse(p.x, p.y + p.dodgeY)
+      if (imp) {
+        p.speedBoost += imp.ux * imp.str * 0.5
+        p.dodgeY += imp.uy * imp.str * 3.0
       }
 
       p.speedBoost *= 0.96

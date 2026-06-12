@@ -127,6 +127,7 @@ export function Footer() {
       {/* Ocean floor — sandy/rocky texture */}
       <div className="footer-floor">
         <Crab />
+        <span className="footer-hint" aria-hidden="true">psst — type 'dive'</span>
       </div>
 
     </footer>

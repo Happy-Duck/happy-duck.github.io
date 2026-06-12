@@ -5,6 +5,7 @@ import { useMouse } from '../../context/MouseContext'
 import { useOceanDepthContext } from '../../context/OceanDepthContext'
 import { creatureOpacity } from '../../constants/depthZones'
 import { tickSeen } from '../../lib/diveLog'
+import { pingImpulse } from '../../lib/sonar'
 
 const W = 130, H = 182
 const DEPTH_RANGE = { enter: 0.68, exit: 1.02 }
@@ -65,6 +66,13 @@ export function AbyssalJellyfish() {
           p.driftBoost = Math.max(p.driftBoost, str * 1.2)
           p.dodgeX += -(dx / dist) * str * 1.2
         }
+      }
+
+      // Sonar ping — dart upward and away
+      const imp = pingImpulse(p.x + p.dodgeX, p.y)
+      if (imp) {
+        p.driftBoost = Math.max(p.driftBoost, imp.str * 1.8)
+        p.dodgeX += imp.ux * imp.str * 1.8
       }
 
       p.dodgeX *= 0.96
