@@ -1,15 +1,14 @@
 import { motion } from 'framer-motion'
-import {
-  CplusplusPlain,
-  CsharpPlain,
-  JavaPlain,
-  PythonPlain,
-  UnityPlain,
-  UnrealengineOriginal,
-  BlenderOriginal,
-  DjangoPlain,
-  AzuresqldatabasePlain,
-} from 'devicons-react'
+// Per-icon imports — the package index is CJS and pulls in every icon (~10 MB)
+import CplusplusPlain        from 'devicons-react/lib/icons/CplusplusPlain'
+import CsharpPlain           from 'devicons-react/lib/icons/CsharpPlain'
+import JavaPlain             from 'devicons-react/lib/icons/JavaPlain'
+import PythonPlain           from 'devicons-react/lib/icons/PythonPlain'
+import UnityPlain            from 'devicons-react/lib/icons/UnityPlain'
+import UnrealengineOriginal  from 'devicons-react/lib/icons/UnrealengineOriginal'
+import BlenderOriginal       from 'devicons-react/lib/icons/BlenderOriginal'
+import DjangoPlain           from 'devicons-react/lib/icons/DjangoPlain'
+import AzuresqldatabasePlain from 'devicons-react/lib/icons/AzuresqldatabasePlain'
 
 // Wrapper to force fill color on icons that don't accept a color prop
 function ForcedColorIcon({ Icon, size }) {

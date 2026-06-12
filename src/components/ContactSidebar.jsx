@@ -1,6 +1,7 @@
 import { useState, useCallback } from 'react'
 import { motion } from 'framer-motion'
-import { GithubOriginal, LinkedinPlain } from 'devicons-react'
+import GithubOriginal from 'devicons-react/lib/icons/GithubOriginal'
+import LinkedinPlain  from 'devicons-react/lib/icons/LinkedinPlain'
 
 // Wrapper to force fill color on icons that don't accept a color prop
 function ForcedColorIcon({ Icon, size }) {
