@@ -24,6 +24,7 @@ function SingleDeepFish({ cfg, idx, peers }) {
     fleeRadius:  130,
     peers,
     peerIndex:   idx,
+    speciesId:   'deepSeaFish',
   })
 
   return (

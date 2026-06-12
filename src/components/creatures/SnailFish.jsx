@@ -4,6 +4,7 @@
 import { useEffect, useRef } from 'react'
 import { useOceanDepthContext } from '../../context/OceanDepthContext'
 import { creatureOpacity } from '../../constants/depthZones'
+import { tickSeen } from '../../lib/diveLog'
 
 const W = 200, H = 67
 const DEPTH_RANGE = { enter: 0.82, exit: 1.02 }
@@ -21,6 +22,7 @@ export function SnailFish() {
       if (!el) return
 
       if (opacity < 0.01) { el.style.opacity = '0'; return }
+      if (opacity >= 0.5) tickSeen('snailfish')
 
       const VW = window.innerWidth
       const VH = window.innerHeight

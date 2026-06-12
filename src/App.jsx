@@ -1,5 +1,6 @@
 import { MarineSnow    } from './components/MarineSnow'
 import { Plankton      } from './components/Plankton'
+import { RovLight      } from './components/RovLight'
 import { WaterSurface  } from './components/WaterSurface'
 import { CreatureLayer } from './components/creatures/CreatureLayer'
 import { DepthGauge    } from './components/DepthGauge'
@@ -9,6 +10,7 @@ import { Skills        } from './components/Skills'
 import { Projects      } from './components/Projects'
 import { About         } from './components/About'
 import { ContactSidebar } from './components/ContactSidebar'
+import { DiveLog       } from './components/DiveLog'
 import { Footer        } from './components/Footer'
 
 export default function App() {
@@ -23,6 +25,9 @@ export default function App() {
 
       {/* Contact sidebar — persistent left edge */}
       <ContactSidebar />
+
+      {/* Dive log — discovery journal, bottom-right */}
+      <DiveLog />
 
       <div className="relative overflow-hidden">
 
@@ -41,6 +46,9 @@ export default function App() {
 
         {/* Marine snow — CSS-only, fades in at depth > 0.35 */}
         <MarineSnow />
+
+        {/* ROV headlight — darkness + cursor light cone in deep zones */}
+        <RovLight />
 
         {/* Depth gauge — right edge, scroll-triggered */}
         <DepthGauge />

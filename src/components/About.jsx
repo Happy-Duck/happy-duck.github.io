@@ -18,13 +18,15 @@ const LOCATION = 'Urbana, IL'
 // ── Rotating typewriter hook ─────────────────────────────────────────
 
 function useRotatingTypewriter(lines, pauseMs = 4000) {
-  const [entries, setEntries]       = useState([])
+  // All entries render from first paint — the card's height never shifts.
+  // start() only kicks off the retype cycle.
+  const [entries, setEntries]       = useState(() => lines.map((text, i) => ({ text, id: i })))
   const [typingIdx, setTypingIdx]   = useState(-1)
   const [typingLen, setTypingLen]   = useState(0)
-  const [phase, setPhase]           = useState('idle') // idle | typing | paused
+  const [phase, setPhase]           = useState('paused') // typing | paused
   const started   = useRef(false)
   const timeoutRef = useRef(null)
-  const idRef     = useRef(0)
+  const idRef     = useRef(lines.length)
 
   useEffect(() => () => clearTimeout(timeoutRef.current), [])
 
@@ -32,11 +34,7 @@ function useRotatingTypewriter(lines, pauseMs = 4000) {
     if (started.current) return
     started.current = true
 
-    const initial = lines.map(text => ({ text, id: idRef.current++ }))
-    setEntries(initial)
-    setPhase('paused')
-
-    // Reduced motion — show all entries statically, skip the retype cycle
+    // Reduced motion — entries stay static, skip the retype cycle
     if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return
 
     // Cycle: remove top, re-type it at bottom

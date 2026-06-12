@@ -4,6 +4,7 @@ import { useEffect, useRef } from 'react'
 import { useMouse } from '../../context/MouseContext'
 import { useOceanDepthContext } from '../../context/OceanDepthContext'
 import { creatureOpacity } from '../../constants/depthZones'
+import { tickSeen } from '../../lib/diveLog'
 
 const W = 100, H = 138
 const DEPTH_RANGE = { enter: 0.23, exit: 0.55 }
@@ -39,6 +40,7 @@ function SingleSquid({ cfg, idx, peers }) {
       if (!el) return
 
       if (opacity < 0.01) { el.style.opacity = '0'; return }
+      if (opacity >= 0.5) tickSeen('squid')
 
       const VW = window.innerWidth
       const VH = window.innerHeight

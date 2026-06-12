@@ -4,6 +4,7 @@ import { useEffect, useRef } from 'react'
 import { useMouse } from '../../context/MouseContext'
 import { useOceanDepthContext } from '../../context/OceanDepthContext'
 import { creatureOpacity } from '../../constants/depthZones'
+import { tickSeen } from '../../lib/diveLog'
 
 const W = 350, H = 175
 const DEPTH_RANGE = { enter: 0.65, exit: 1.02 }
@@ -34,6 +35,7 @@ export function GiantSquid() {
       if (!el) return
 
       if (opacity < 0.01) { el.style.opacity = '0'; return }
+      if (opacity >= 0.5) tickSeen('giantSquid')
 
       const VW = window.innerWidth
       const VH = window.innerHeight

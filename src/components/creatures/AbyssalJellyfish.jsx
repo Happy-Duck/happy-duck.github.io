@@ -4,6 +4,7 @@ import { useEffect, useRef } from 'react'
 import { useMouse } from '../../context/MouseContext'
 import { useOceanDepthContext } from '../../context/OceanDepthContext'
 import { creatureOpacity } from '../../constants/depthZones'
+import { tickSeen } from '../../lib/diveLog'
 
 const W = 130, H = 182
 const DEPTH_RANGE = { enter: 0.68, exit: 1.02 }
@@ -28,6 +29,7 @@ export function AbyssalJellyfish() {
       if (!el) return
 
       if (opacity < 0.01) { el.style.opacity = '0'; return }
+      if (opacity >= 0.5) tickSeen('abyssalJellyfish')
 
       const VW = window.innerWidth
       const VH = window.innerHeight

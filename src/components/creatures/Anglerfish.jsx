@@ -4,6 +4,7 @@ import { useEffect, useRef } from 'react'
 import { useMouse } from '../../context/MouseContext'
 import { useOceanDepthContext } from '../../context/OceanDepthContext'
 import { creatureOpacity } from '../../constants/depthZones'
+import { tickSeen } from '../../lib/diveLog'
 
 const W = 225, H = 170
 const DEPTH_RANGE = { enter: 0.45, exit: 0.75 }
@@ -29,6 +30,7 @@ export function Anglerfish() {
       if (!el) return
 
       if (opacity < 0.01) { el.style.opacity = '0'; return }
+      if (opacity >= 0.5) tickSeen('anglerfish')
 
       const VW = window.innerWidth
       const VH = window.innerHeight

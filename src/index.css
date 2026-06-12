@@ -1430,6 +1430,250 @@ html::-webkit-scrollbar { display: none; }
 }
 
 /* ═══════════════════════════════════════════════════════════════════
+   ROV HEADLIGHT — deep-zone darkness + cursor light cone
+   ═══════════════════════════════════════════════════════════════════ */
+
+/* Wrapper: above creatures (3) & particles (4), below content (10).
+   Opacity ramps 0 → 0.9 across depth 0.55 → 0.75 — no JS needed. */
+.rov-dark {
+  position:       fixed;
+  inset:          0;
+  z-index:        5;
+  pointer-events: none;
+  overflow:       hidden;
+  opacity:        clamp(0, calc((var(--ocean-depth-progress, 0) - 0.55) * 4.5), 0.9);
+}
+
+/* The beam: a huge square centered on the cursor. Transparent core,
+   solid darkness past ~560px. Moved via transform = compositor-only. */
+.rov-beam {
+  position:    absolute;
+  top:         0;
+  left:        0;
+  width:       260vmax;
+  height:      260vmax;
+  /* Default resting spot before first mousemove / on touch devices */
+  transform:   translate(50vw, 38vh) translate(-50%, -50%);
+  will-change: transform;
+  background:
+    radial-gradient(circle,
+      rgba(150, 215, 255, 0.06) 0,
+      rgba(150, 215, 255, 0.03) 120px,
+      transparent 200px),
+    radial-gradient(circle,
+      rgba(1, 5, 14, 0)    0,
+      rgba(1, 5, 14, 0)    150px,
+      rgba(1, 5, 14, 0.55) 320px,
+      rgba(1, 5, 14, 0.96) 560px,
+      rgba(1, 5, 14, 0.96) 100%);
+}
+
+/* Terminal "lights" command toggles this class on <html> */
+:root.rov-off .rov-dark { display: none; }
+
+/* ═══════════════════════════════════════════════════════════════════
+   DIVE LOG — discovery journal
+   ═══════════════════════════════════════════════════════════════════ */
+
+.divelog-btn {
+  position:        fixed;
+  right:           16px;
+  bottom:          16px;
+  z-index:         60;
+  display:         flex;
+  align-items:     center;
+  gap:             7px;
+  padding:         10px 14px;
+  border-radius:   999px;
+  border:          1px solid var(--card-border);
+  background:      var(--card-bg);
+  color:           var(--card-link);
+  cursor:          pointer;
+  font:            inherit;
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  box-shadow:      0 4px 18px rgba(0,0,0,0.30);
+  transition:
+    border-color     0.25s ease,
+    color            0.25s ease,
+    transform        0.18s ease,
+    background-color var(--theme-dur) var(--theme-ease);
+}
+.divelog-btn:hover {
+  border-color: var(--card-border-hover);
+  color:        var(--card-link-hover);
+  transform:    translateY(-2px);
+}
+
+.divelog-count {
+  font-family:    ui-monospace, monospace;
+  font-size:      0.72rem;
+  letter-spacing: 0.08em;
+  font-variant-numeric: tabular-nums;
+}
+
+.divelog-panel {
+  position:        fixed;
+  right:           16px;
+  bottom:          72px;
+  z-index:         60;
+  width:           min(330px, calc(100vw - 32px));
+  max-height:      min(60vh, 520px);
+  display:         flex;
+  flex-direction:  column;
+  border-radius:   14px;
+  border:          1px solid var(--card-border);
+  background:      var(--card-bg);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  box-shadow:      var(--card-shadow-hover);
+  padding:         1rem 1.1rem;
+  font-family:     'Share Tech Mono', ui-monospace, monospace;
+}
+
+.divelog-head {
+  display:         flex;
+  align-items:     center;
+  justify-content: space-between;
+  margin-bottom:   0.2rem;
+}
+
+.divelog-title {
+  font-size:      1rem;
+  font-weight:    700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color:          var(--card-title);
+}
+
+.divelog-close {
+  border:        none;
+  background:    none;
+  color:         var(--card-body);
+  font-size:     1.3rem;
+  line-height:   1;
+  cursor:        pointer;
+  padding:       2px 6px;
+  border-radius: 6px;
+}
+.divelog-close:hover { color: var(--card-link-hover); }
+
+.divelog-sub {
+  font-size:      0.68rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color:          var(--card-body);
+  margin-bottom:  0.7rem;
+}
+
+.divelog-stamp {
+  display:        inline-block;
+  padding:        2px 8px;
+  border:         1.5px solid var(--badge-text);
+  border-radius:  4px;
+  color:          var(--badge-text);
+  font-weight:    700;
+  letter-spacing: 0.14em;
+  transform:      rotate(-2deg);
+}
+
+.divelog-list {
+  list-style: none;
+  margin:     0;
+  padding:    0;
+  overflow-y: auto;
+  display:    flex;
+  flex-direction: column;
+  gap:        0.55rem;
+  scrollbar-width: thin;
+}
+
+.divelog-entry {
+  padding:       0.45rem 0.6rem;
+  border-radius: 8px;
+  border:        1px dashed var(--card-border);
+  opacity:       0.55;
+  transition:    opacity 0.3s ease, border-color 0.3s ease;
+}
+.divelog-entry--found {
+  border-style: solid;
+  opacity:      1;
+}
+.divelog-entry--bonus {
+  border-color: var(--badge-text);
+  box-shadow:   0 0 14px var(--pill-bg);
+}
+
+.divelog-entry-head {
+  display:         flex;
+  justify-content: space-between;
+  align-items:     baseline;
+  gap:             0.5rem;
+}
+
+.divelog-name {
+  font-size:      0.8rem;
+  font-weight:    700;
+  letter-spacing: 0.04em;
+  color:          var(--card-title);
+}
+
+.divelog-depth {
+  font-size:   0.62rem;
+  color:       var(--card-link);
+  white-space: nowrap;
+}
+
+.divelog-note {
+  display:     block;
+  font-size:   0.68rem;
+  line-height: 1.5;
+  color:       var(--card-body);
+  margin-top:  2px;
+}
+
+.divelog-toast {
+  position:        fixed;
+  left:            50%;
+  bottom:          18px;
+  transform:       translateX(-50%);
+  z-index:         70;
+  display:         flex;
+  align-items:     baseline;
+  gap:             0.6rem;
+  padding:         0.65rem 1.1rem;
+  border-radius:   10px;
+  border:          1px solid var(--card-border-hover);
+  background:      var(--card-bg);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  box-shadow:      0 6px 28px rgba(0,0,0,0.40);
+  font-family:     'Share Tech Mono', ui-monospace, monospace;
+  pointer-events:  none;
+}
+
+.divelog-toast-label {
+  font-size:      0.6rem;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color:          var(--card-link);
+}
+
+.divelog-toast-name {
+  font-size:      0.85rem;
+  font-weight:    700;
+  letter-spacing: 0.06em;
+  color:          var(--card-title);
+}
+
+/* Mobile: contact sidebar owns bottom-center; keep journal clear of it */
+@media (max-width: 640px) {
+  .divelog-btn  { bottom: 78px; }
+  .divelog-panel { bottom: 134px; }
+  .divelog-toast { bottom: 80px; }
+}
+
+/* ═══════════════════════════════════════════════════════════════════
    DEPTH GAUGE
    ═══════════════════════════════════════════════════════════════════ */
 

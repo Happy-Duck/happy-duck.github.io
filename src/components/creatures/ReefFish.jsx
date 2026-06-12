@@ -25,6 +25,7 @@ function SingleFish({ cfg, idx, peers }) {
     fleeRadius:  110,
     peers,
     peerIndex:   idx,
+    speciesId:   'reefFish',
   })
 
   return (

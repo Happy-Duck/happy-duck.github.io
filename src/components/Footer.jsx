@@ -1,5 +1,6 @@
 import { useEffect, useRef } from 'react'
 import { useMouse } from '../context/MouseContext'
+import { markSeen } from '../lib/diveLog'
 
 // ── Dimensions ─────────────────────────────────────────────────────────
 
@@ -12,6 +13,23 @@ function Crab() {
   const outerRef = useRef(null)   // translateX — position
   const innerRef = useRef(null)   // scaleX    — facing direction
   const mouseRef = useMouse()
+
+  // Dive-log discovery — 1.5s of the crab on screen counts as a sighting
+  useEffect(() => {
+    const outer = outerRef.current
+    if (!outer) return
+
+    let dwell = null
+    const obs = new IntersectionObserver(([entry]) => {
+      if (entry.isIntersecting) {
+        dwell = setTimeout(() => { markSeen('crab'); obs.disconnect() }, 1500)
+      } else {
+        clearTimeout(dwell)
+      }
+    }, { threshold: 0.5 })
+    obs.observe(outer)
+    return () => { clearTimeout(dwell); obs.disconnect() }
+  }, [])
 
   useEffect(() => {
     const outer = outerRef.current

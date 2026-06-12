@@ -19,7 +19,7 @@ the handoff artifact if a session ends mid-build.
 
 ---
 
-## 1. ROV Headlight — [ ] TODO
+## 1. ROV Headlight — [x] DONE
 
 **Pitch:** In the midnight/abyssal zones the water gets truly dark and the
 cursor becomes a submersible light cone. Creatures are only clearly visible
@@ -44,9 +44,12 @@ in the beam. The showstopper.
 **Files:** `src/components/RovLight.jsx` (new), `index.css`, `App.jsx`,
 `OceanDepthContext.jsx` (one CSS var).
 
-**Status:** not started.
+**Status:** DONE. Went pure-CSS for opacity (clamp() on existing
+--ocean-depth-progress var — no new JS); beam is a 260vmax div moved by
+transform (compositor-only). Verified: opacity 0 at surface, 0.9 at depth,
+light cone follows cursor, content stays readable.
 
-## 2. Dive Log — creature discovery collection — [ ] TODO
+## 2. Dive Log — creature discovery collection — [x] DONE
 
 **Pitch:** Creatures get "discovered" as you encounter them; a field journal
 tracks 10 species. Persisted across visits. Completion = certificate stamp.
@@ -74,7 +77,9 @@ tracks 10 species. Persisted across visits. Completion = certificate stamp.
 `src/components/DiveLog.jsx` (journal + toast), hooks into creature files +
 `useCreatureAI.js`, `App.jsx`, `index.css`.
 
-**Status:** not started.
+**Status:** DONE. tickSeen is frame-count based (90 frames ≈ 1.5s). Crab
+uses an IntersectionObserver dwell in Footer. Verified all 10 discoverable +
+EXPEDITION COMPLETE stamp + persistence + zero console errors.
 
 ## 3. Submarine Terminal — [ ] TODO
 
@@ -288,9 +293,9 @@ Fill in as features land:
 
 | # | Feature | Commit | Verified |
 |---|---------|--------|----------|
-| 0 | Plan doc | pending | — |
-| 1 | ROV Headlight | — | — |
-| 2 | Dive Log | — | — |
+| 0 | Plan doc | fd02826 | — |
+| 1 | ROV Headlight | with #2 | headless Edge OK |
+| 2 | Dive Log | feat: ROV headlight + dive log | headless Edge OK |
 | 3 | Terminal | — | — |
 | 4 | Sonar Ping | — | — |
 | 5 | Whale | — | — |
@@ -304,4 +309,10 @@ Fill in as features land:
 
 ## Notes / decisions made along the way
 
-- (append as you go)
+- Features 1+2 committed together (shared App.jsx/index.css edits).
+- Fixed a pre-existing CLS bug found while testing: TypewriterLog rendered
+  empty until scrolled into view, growing the document 179px on first
+  scroll (jump-to-bottom landed short). Entries now render from first
+  paint; only the retype cycle waits for visibility.
+- At depth exactly 0, surface creatures are opacity 0 by design (fade-in
+  starts once you begin scrolling) — discovery requires slight descent.

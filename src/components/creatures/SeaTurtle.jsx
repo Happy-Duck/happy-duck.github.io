@@ -16,6 +16,7 @@ export function SeaTurtle() {
     dir:         -1,
     depthRange:  DEPTH_RANGE,
     fleeRadius:  200,
+    speciesId:   'seaTurtle',
   })
 
   return (

@@ -6,6 +6,7 @@ import { useEffect, useRef } from 'react'
 import { useMouse } from '../context/MouseContext'
 import { useOceanDepthContext } from '../context/OceanDepthContext'
 import { creatureOpacity } from '../constants/depthZones'
+import { tickSeen } from '../lib/diveLog'
 
 export function useCreatureAI({
   W_SVG       = 50,
@@ -19,6 +20,7 @@ export function useCreatureAI({
   fleeRadius  = 130,
   peers       = null,       // shared useRef([]) for peer repulsion
   peerIndex   = 0,
+  speciesId   = null,       // dive-log species id
 }) {
   const wrapperRef = useRef(null)
   const mouseRef   = useMouse()
@@ -55,6 +57,8 @@ export function useCreatureAI({
         el.style.opacity = '0'
         return
       }
+
+      if (speciesId && opacity >= 0.5) tickSeen(speciesId)
 
       const W = window.innerWidth
       const H = window.innerHeight
@@ -125,7 +129,7 @@ export function useCreatureAI({
     })
 
     return unsubscribe
-  }, [subscribe, mouseRef, depthRange, speed, dir, freq, amplitude, centerYFrac, fleeRadius, W_SVG, H_SVG, peers, peerIndex])
+  }, [subscribe, mouseRef, depthRange, speed, dir, freq, amplitude, centerYFrac, fleeRadius, W_SVG, H_SVG, peers, peerIndex, speciesId])
 
   return { wrapperRef }
 }
