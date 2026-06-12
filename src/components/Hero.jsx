@@ -106,7 +106,7 @@ export function Hero() {
           className="hero-tagline select-none mt-3
                      text-[clamp(0.7rem,1.6vw,0.95rem)]"
         >
-          This is your captain speaking, today we are diving down to 6000 ft
+          This is your captain speaking, today we are diving down to 6,000 meters
         </motion.p>
 
       </div>
