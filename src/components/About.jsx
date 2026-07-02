@@ -31,6 +31,9 @@ function useRotatingTypewriter(lines, pauseMs = 4000) {
 
   useEffect(() => () => clearTimeout(timeoutRef.current), [])
 
+  // Which line rotates next — entries are always a rotation of `lines`
+  const headRef = useRef(0)
+
   const start = useCallback(() => {
     if (started.current) return
     started.current = true
@@ -38,39 +41,40 @@ function useRotatingTypewriter(lines, pauseMs = 4000) {
     // Reduced motion — entries stay static, skip the retype cycle
     if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return
 
-    // Cycle: remove top, re-type it at bottom
+    const n = lines.length
+
+    // Cycle: remove top, re-type it at bottom. All side effects (timer
+    // chains) live OUTSIDE the state updater — StrictMode double-invokes
+    // updaters, and side effects inside one fork the typing loop into
+    // exponentially multiplying chains.
     function cycle() {
-      setEntries(prev => {
-        const removed = prev[0]
-        const rest = prev.slice(1)
-        const newEntry = { text: removed.text, id: idRef.current++ }
-        const next = [...rest, newEntry]
+      const text = lines[headRef.current % n]
+      headRef.current++
+      const id = idRef.current++
 
-        // Start typing the new bottom entry
-        setTypingIdx(next.length - 1)
-        setPhase('typing')
-        let charIdx = 0
+      setEntries(prev => [...prev.slice(1), { text, id }])
+      setTypingIdx(n - 1)
+      setTypingLen(0)
+      setPhase('typing')
 
-        function tick() {
-          if (charIdx >= newEntry.text.length) {
-            setTypingIdx(-1)
-            setPhase('paused')
-            timeoutRef.current = setTimeout(cycle, pauseMs)
-            return
-          }
-          charIdx++
-          setTypingLen(charIdx)
-          const variance = (Math.random() - 0.5) * 20
-          timeoutRef.current = setTimeout(tick, 40 + variance)
+      let charIdx = 0
+      function tick() {
+        if (charIdx >= text.length) {
+          setTypingIdx(-1)
+          setPhase('paused')
+          timeoutRef.current = setTimeout(cycle, pauseMs)
+          return
         }
-        tick()
-
-        return next
-      })
+        charIdx++
+        setTypingLen(charIdx)
+        const variance = (Math.random() - 0.5) * 20
+        timeoutRef.current = setTimeout(tick, 40 + variance)
+      }
+      tick()
     }
 
     timeoutRef.current = setTimeout(cycle, pauseMs)
-  }, [pauseMs])
+  }, [lines, pauseMs])
 
   return { entries, typingIdx, typingLen, phase, start }
 }

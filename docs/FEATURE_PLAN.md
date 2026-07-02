@@ -337,3 +337,10 @@ Fill in as features land:
   starts once you begin scrolling) — discovery requires slight descent.
 - ALL 12 FEATURES COMPLETE. Final sweep: 22 checks green, lint clean,
   build 412 kB / 132 kB gzip, zero console errors.
+- Post-review fixes: (1) Captain's Log typewriter ran its timer chains
+  inside a setEntries updater — StrictMode double-invokes updaters, so
+  chains multiplied exponentially ("speeding by insanely"). Side effects
+  now live outside the updater. (2) The footer "type dive" hint was
+  obscured by the dive-log button and useless on touch — replaced by a
+  persistent >_ console button bottom-left (mirrors the journal button,
+  tooltip reveals the typed secret).

@@ -153,7 +153,6 @@ export function Footer() {
       <div className="footer-floor">
         <Shipwreck />
         <Crab />
-        <span className="footer-hint" aria-hidden="true">psst — type 'dive'</span>
       </div>
 
     </footer>

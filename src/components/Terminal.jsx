@@ -223,7 +223,21 @@ export function Terminal() {
   }
 
   return (
-    <AnimatePresence>
+    <>
+      {/* Console button — the discoverable way in (typing "dive" still works) */}
+      <button
+        type="button"
+        className="term-fab"
+        data-no-ping
+        onClick={() => setOpen(o => !o)}
+        aria-label="Open the submarine console"
+        aria-expanded={open}
+      >
+        <span className="term-fab-glyph" aria-hidden="true">&gt;_</span>
+        <span className="term-fab-tip">sub console — psst: typing 'dive' works too</span>
+      </button>
+
+      <AnimatePresence>
       {open && (
         <motion.div
           className="term-overlay"
@@ -270,6 +284,7 @@ export function Terminal() {
           </motion.div>
         </motion.div>
       )}
-    </AnimatePresence>
+      </AnimatePresence>
+    </>
   )
 }
