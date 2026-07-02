@@ -6,6 +6,13 @@ import react from '@vitejs/plugin-react'
 export default defineConfig({
   plugins: [react()],
   base: '/',
+  server: {
+    watch: {
+      // OneDrive locks freshly-dropped files mid-sync; watching them
+      // crashes the dev server with EBUSY. Static assets don't need HMR.
+      ignored: ['**/public/**'],
+    },
+  },
   resolve: {
     alias: {
       '@': fileURLToPath(new URL('./src', import.meta.url)),

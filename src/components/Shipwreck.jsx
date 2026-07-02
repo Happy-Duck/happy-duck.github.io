@@ -1,49 +1,7 @@
-// ── Shipwreck — wrecked hull on the ocean floor + treasure chest ───────
-// The chest opens the "treasure": the resume. Bubbles included.
+// ── Shipwreck — real wreck photo settled on the ocean floor ────────────
+// Underwater grading + list applied in CSS. The treasure glow in the hull
+// opens the real treasure: the resume. Bubbles included.
 import { useState, useRef } from 'react'
-
-function WreckSvg() {
-  return (
-    <svg viewBox="0 0 320 150" width="100%" height="100%" aria-hidden="true">
-      <g transform="rotate(-7 160 100)">
-        {/* Hull */}
-        <path
-          className="wreck-hull"
-          d="M18 112
-             C 40 82, 92 62, 152 58
-             L 284 50
-             L 294 96
-             C 244 120, 122 128, 62 120
-             C 42 117, 24 115, 18 112 Z"
-        />
-        {/* Deck line */}
-        <path
-          className="wreck-detail-stroke"
-          d="M30 104 C 80 84, 180 68, 286 56"
-          fill="none"
-          strokeWidth="3"
-        />
-        {/* Broken mast */}
-        <path
-          className="wreck-detail"
-          d="M150 60 L 144 14 L 152 10 L 154 26 L 160 24 L 158 59 Z"
-        />
-        {/* Hull breach — jagged hole */}
-        <path
-          className="wreck-hole"
-          d="M96 92 L 116 84 L 112 98 L 130 94 L 122 110 L 100 108 Z"
-        />
-        {/* Ribs showing through the breach */}
-        <path className="wreck-detail-stroke" d="M102 90 L 104 106" strokeWidth="2" fill="none" />
-        <path className="wreck-detail-stroke" d="M114 88 L 116 104" strokeWidth="2" fill="none" />
-        {/* Portholes */}
-        <circle className="wreck-porthole" cx="190" cy="84" r="5" />
-        <circle className="wreck-porthole wreck-porthole--lit bio-pulse" cx="222" cy="78" r="5" />
-        <circle className="wreck-porthole" cx="254" cy="72" r="5" />
-      </g>
-    </svg>
-  )
-}
 
 export function Shipwreck() {
   const [bubbles, setBubbles] = useState([])
@@ -67,9 +25,13 @@ export function Shipwreck() {
 
   return (
     <div className="shipwreck" aria-hidden="false">
-      <div className="shipwreck-svg" aria-hidden="true">
-        <WreckSvg />
-      </div>
+      <img
+        className="shipwreck-img"
+        src="/creatures/shipwreck.png"
+        alt=""
+        draggable={false}
+        aria-hidden="true"
+      />
 
       {/* Treasure — warm light spilling from the hull breach */}
       <button

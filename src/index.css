@@ -190,12 +190,7 @@ html::-webkit-scrollbar { display: none; }
   --crab-leg:            #1a3860;
   --crab-ridge:          rgba(100,160,220,0.35);
   --crab-filter:         drop-shadow(0 0 5px rgba(80,160,255,0.45));
-  /* Shipwreck */
-  --wreck-hull:          #071833;
-  --wreck-detail:        #0c2148;
-  --wreck-hole:          #020a18;
-  --wreck-stroke:        rgba(90,150,210,0.22);
-  --wreck-glow:          rgba(0,212,255,0.55);
+  /* Shipwreck treasure */
   --chest-glow:          rgba(255,214,110,0.85);
 }
 
@@ -308,12 +303,7 @@ html::-webkit-scrollbar { display: none; }
   --crab-leg:            #c45c12;
   --crab-ridge:          rgba(100,40,0,0.25);
   --crab-filter:         drop-shadow(0 2px 4px rgba(100,40,0,0.35));
-  /* Shipwreck */
-  --wreck-hull:          #7e5e28;
-  --wreck-detail:        #654a1c;
-  --wreck-hole:          #4a350f;
-  --wreck-stroke:        rgba(70,48,10,0.45);
-  --wreck-glow:          rgba(255,200,90,0.8);
+  /* Shipwreck treasure */
   --chest-glow:          rgba(255,222,130,0.95);
 }
 
@@ -1590,7 +1580,7 @@ html::-webkit-scrollbar { display: none; }
   width:      100%;
   overflow:   clip;
   position:   relative;
-  padding-top: 50px;
+  padding-top: 150px;   /* headroom for the wreck rising above the floor */
 }
 
 /* Sandy / rocky floor texture */
@@ -2071,31 +2061,36 @@ html::-webkit-scrollbar { display: none; }
 
 .shipwreck {
   position:       absolute;
-  bottom:         2px;
-  left:           5%;
-  width:          clamp(170px, 22vw, 250px);
+  bottom:         4px;
+  left:           4%;
+  width:          clamp(180px, 23vw, 250px);
   pointer-events: none;
 }
 
-.shipwreck-svg {
-  width:        100%;
-  aspect-ratio: 320 / 150;
+/* Real wreck photo — underwater grade + slight list, keel settled into
+   the sand. Shot in daylight, sold as sunken by the color treatment. */
+.shipwreck-img {
+  display:          block;
+  width:            100%;
+  height:           auto;
+  transform:        rotate(-5deg);
+  transform-origin: 50% 90%;
+  margin-bottom:    -10px;
+  filter:           brightness(0.85) saturate(0.75);
+  transition:       filter var(--theme-dur) var(--theme-ease);
 }
 
-.wreck-hull     { fill: var(--wreck-hull);   transition: fill var(--theme-dur) var(--theme-ease); }
-.wreck-detail   { fill: var(--wreck-detail); transition: fill var(--theme-dur) var(--theme-ease); }
-.wreck-hole     { fill: var(--wreck-hole);   transition: fill var(--theme-dur) var(--theme-ease); }
-.wreck-porthole { fill: var(--wreck-hole);   transition: fill var(--theme-dur) var(--theme-ease); }
-.wreck-porthole--lit { fill: var(--wreck-glow); }
-.wreck-detail-stroke { stroke: var(--wreck-stroke); transition: stroke var(--theme-dur) var(--theme-ease); }
+:root[data-theme="deep-sea"] .shipwreck-img {
+  filter: brightness(0.4) saturate(0.55) sepia(0.35) hue-rotate(165deg);
+}
 
 /* Treasure — warm light spilling from the hull breach. The breach sits
    at ~(113, 97) in the 320x150 viewBox → ~35% / 65% of the wreck box. */
 .treasure-btn {
   position:       absolute;
-  left:           22%;
-  top:            36%;
-  width:          27%;
+  left:           26%;
+  top:            46%;
+  width:          25%;
   aspect-ratio:   1;
   padding:        0;
   border:         none;
