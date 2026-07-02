@@ -2,6 +2,8 @@ import { MarineSnow    } from './components/MarineSnow'
 import { Plankton      } from './components/Plankton'
 import { RovLight      } from './components/RovLight'
 import { SonarPing     } from './components/SonarPing'
+import { BioTrail      } from './components/BioTrail'
+import { FloorStamp    } from './components/FloorStamp'
 import { WaterSurface  } from './components/WaterSurface'
 import { CreatureLayer } from './components/creatures/CreatureLayer'
 import { Whale         } from './components/creatures/Whale'
@@ -61,6 +63,12 @@ export default function App() {
 
         {/* Sonar ping rings — click open water */}
         <SonarPing />
+
+        {/* Bioluminescent cursor trail — stirred plankton at depth */}
+        <BioTrail />
+
+        {/* First-dive stamp — fires on reaching the floor */}
+        <FloorStamp />
 
         {/* Depth gauge — right edge, scroll-triggered */}
         <DepthGauge />

@@ -1,6 +1,7 @@
-import { useEffect, useRef } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { useMouse } from '../context/MouseContext'
 import { markSeen } from '../lib/diveLog'
+import { Shipwreck } from './Shipwreck'
 
 // ── Dimensions ─────────────────────────────────────────────────────────
 
@@ -13,6 +14,20 @@ function Crab() {
   const outerRef = useRef(null)   // translateX — position
   const innerRef = useRef(null)   // scaleX    — facing direction
   const mouseRef = useMouse()
+  const pokeRef  = useRef({ until: 0, dir: 1 })
+  const [poked, setPoked] = useState(false)
+
+  const onPoke = (e) => {
+    const rect = e.currentTarget.getBoundingClientRect()
+    const center = rect.left + rect.width / 2
+    pokeRef.current = {
+      until: performance.now() + 900,
+      dir:   e.clientX >= center ? -1 : 1,   // run away from the poke
+    }
+    setPoked(true)
+    setTimeout(() => setPoked(false), 900)
+    markSeen('crab')
+  }
 
   // Dive-log discovery — 1.5s of the crab on screen counts as a sighting
   useEffect(() => {
@@ -72,6 +87,12 @@ function Crab() {
       if (dist < 150 && dist > 0) {
         fleeX += (dx / dist) * ((150 - dist) / 150) * 6.5
       }
+
+      // Startled by a poke — sprint away
+      if (performance.now() < pokeRef.current.until) {
+        fleeX += pokeRef.current.dir * 4.5
+      }
+
       fleeX *= 0.90
 
       // Move + clamp
@@ -104,12 +125,16 @@ function Crab() {
       ref={outerRef}
       style={{ position: 'absolute', bottom: '14px', left: 0, willChange: 'transform', pointerEvents: 'none' }}
     >
+      {poked && <span className="crab-exclaim" aria-hidden="true">!</span>}
       <div ref={innerRef} style={{ transformOrigin: `${CRAB_W / 2}px ${CRAB_H / 2}px` }}>
         <img
           src="/creatures/crab.gif"
           alt=""
           width={CRAB_W}
           height={CRAB_H}
+          className={poked ? 'crab-img crab-img--hop' : 'crab-img'}
+          data-no-ping
+          onClick={onPoke}
           style={{ display: 'block', filter: 'hue-rotate(180deg) saturate(1.4) brightness(0.7)' }}
           draggable={false}
         />
@@ -126,6 +151,7 @@ export function Footer() {
 
       {/* Ocean floor — sandy/rocky texture */}
       <div className="footer-floor">
+        <Shipwreck />
         <Crab />
         <span className="footer-hint" aria-hidden="true">psst — type 'dive'</span>
       </div>

@@ -155,7 +155,7 @@ silhouette crosses far in the background over ~35s. Rarity = shareability.
 **Status:** DONE. Inline SVG silhouette, 35s crossing at z-2 with blur,
 session-rolled 1-in-6, terminal summon verified, Leviathan logs ~6s in.
 
-## 6. Shipwreck & Treasure — [ ] TODO
+## 6. Shipwreck & Treasure — [x] DONE
 
 **Pitch:** A wrecked hull rests on the ocean floor by the footer. Its
 treasure chest glints; clicking it opens the "treasure" — the resume.
@@ -175,9 +175,11 @@ Plus: reaching the floor the first time shows an "ABYSSAL FLOOR REACHED —
 **Files:** `src/components/Shipwreck.jsx`, `src/components/FloorStamp.jsx`,
 `Footer.jsx`, `index.css`.
 
-**Status:** not started.
+**Status:** DONE. Stamp subscribes to the depth rAF store (not
+setState-in-effect). Stamp centers via the standalone CSS `translate`
+property since framer owns `transform`. Chest verified opening the PDF.
 
-## 7. Bioluminescent Cursor Trail — [ ] TODO
+## 7. Bioluminescent Cursor Trail — [x] DONE
 
 **Pitch:** Below depth 0.5, moving the cursor stirs up glowing plankton —
 small cyan motes that drift and fade behind the pointer.
@@ -191,9 +193,10 @@ small cyan motes that drift and fade behind the pointer.
 
 **Files:** `src/components/BioTrail.jsx`, `index.css`, `App.jsx`.
 
-**Status:** not started.
+**Status:** DONE. Imperative DOM (no state churn); motes verified spawning
+at depth 0.7 and not at surface.
 
-## 8. Crab Poke — [ ] TODO
+## 8. Crab Poke — [x] DONE
 
 **Pitch:** Click the crab -> it startles (hop + fast scuttle away) with a
 little "!" bubble. Logs the crab in the dive log.
@@ -206,7 +209,8 @@ little "!" bubble. Logs the crab in the dive log.
 
 **Files:** `Footer.jsx`, `index.css`.
 
-**Status:** not started.
+**Status:** DONE. Startle state lives in a ref read by the walk loop; hop
+animation on the img (wrapper transforms are owned by the loop).
 
 ## 9. Project Case-Study Modals — [ ] TODO
 
@@ -304,9 +308,9 @@ Fill in as features land:
 | 3 | Terminal | feat: terminal + sonar + whale | headless Edge OK |
 | 4 | Sonar Ping | with #3 | headless Edge OK |
 | 5 | Whale | with #3 | headless Edge OK |
-| 6 | Shipwreck | — | — |
-| 7 | Bio Trail | — | — |
-| 8 | Crab Poke | — | — |
+| 6 | Shipwreck | feat: shipwreck, floor stamp, bio trail, crab poke | headless Edge OK |
+| 7 | Bio Trail | with #6 | headless Edge OK |
+| 8 | Crab Poke | with #6 | headless Edge OK |
 | 9 | Case Studies | — | — |
 | 10 | Time of Day | — | — |
 | 11 | GH Manifest | — | — |

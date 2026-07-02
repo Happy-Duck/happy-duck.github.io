@@ -190,6 +190,15 @@ html::-webkit-scrollbar { display: none; }
   --crab-leg:            #1a3860;
   --crab-ridge:          rgba(100,160,220,0.35);
   --crab-filter:         drop-shadow(0 0 5px rgba(80,160,255,0.45));
+  /* Shipwreck */
+  --wreck-hull:          #071833;
+  --wreck-detail:        #0c2148;
+  --wreck-hole:          #020a18;
+  --wreck-stroke:        rgba(90,150,210,0.22);
+  --wreck-glow:          rgba(0,212,255,0.55);
+  --chest-base:          #14305c;
+  --chest-lid:           #0e2546;
+  --chest-glow:          rgba(255,214,110,0.85);
 }
 
 :root[data-theme="shallow-reef"] {
@@ -301,6 +310,15 @@ html::-webkit-scrollbar { display: none; }
   --crab-leg:            #c45c12;
   --crab-ridge:          rgba(100,40,0,0.25);
   --crab-filter:         drop-shadow(0 2px 4px rgba(100,40,0,0.35));
+  /* Shipwreck */
+  --wreck-hull:          #7e5e28;
+  --wreck-detail:        #654a1c;
+  --wreck-hole:          #4a350f;
+  --wreck-stroke:        rgba(70,48,10,0.45);
+  --wreck-glow:          rgba(255,200,90,0.8);
+  --chest-base:          #8a5a1c;
+  --chest-lid:           #6e4514;
+  --chest-glow:          rgba(255,222,130,0.95);
 }
 
 /* ═══════════════════════════════════════════════════════════════════
@@ -1815,6 +1833,203 @@ html::-webkit-scrollbar { display: none; }
     75%  { opacity: 0.9; }
     100% { opacity: 0; }
   }
+}
+
+/* ═══════════════════════════════════════════════════════════════════
+   SHIPWRECK & TREASURE — ocean floor
+   ═══════════════════════════════════════════════════════════════════ */
+
+.shipwreck {
+  position:       absolute;
+  bottom:         2px;
+  left:           5%;
+  width:          clamp(170px, 22vw, 250px);
+  pointer-events: none;
+}
+
+.shipwreck-svg {
+  width:        100%;
+  aspect-ratio: 320 / 150;
+}
+
+.wreck-hull     { fill: var(--wreck-hull);   transition: fill var(--theme-dur) var(--theme-ease); }
+.wreck-detail   { fill: var(--wreck-detail); transition: fill var(--theme-dur) var(--theme-ease); }
+.wreck-hole     { fill: var(--wreck-hole);   transition: fill var(--theme-dur) var(--theme-ease); }
+.wreck-porthole { fill: var(--wreck-hole);   transition: fill var(--theme-dur) var(--theme-ease); }
+.wreck-porthole--lit { fill: var(--wreck-glow); }
+.wreck-detail-stroke { stroke: var(--wreck-stroke); transition: stroke var(--theme-dur) var(--theme-ease); }
+
+/* Treasure chest — a real button, glinting by the hull breach */
+.chest-btn {
+  position:       absolute;
+  right:          10%;
+  bottom:         4px;
+  width:          32px;
+  height:         25px;
+  padding:        0;
+  border:         none;
+  background:     none;
+  cursor:         pointer;
+  pointer-events: auto;
+  filter:         drop-shadow(0 0 6px var(--chest-glow));
+  animation:      chest-glint 5s ease-in-out infinite;
+  transition:     transform 0.2s ease;
+}
+.chest-btn:hover { transform: scale(1.18); }
+
+.chest-base { fill: var(--chest-base); }
+.chest-lid  { fill: var(--chest-lid); }
+.chest-lock { fill: var(--chest-glow); }
+.chest-glow-seam { fill: var(--chest-glow); }
+
+@keyframes chest-glint {
+  0%, 100% { filter: drop-shadow(0 0 3px var(--chest-glow)); }
+  50%      { filter: drop-shadow(0 0 10px var(--chest-glow)); }
+}
+
+/* Tooltip */
+.chest-tip {
+  position:       absolute;
+  bottom:         calc(100% + 8px);
+  left:           50%;
+  transform:      translateX(-50%) translateY(3px);
+  white-space:    nowrap;
+  font-family:    ui-monospace, monospace;
+  font-size:      0.62rem;
+  letter-spacing: 0.08em;
+  padding:        3px 8px;
+  border-radius:  6px;
+  background:     rgba(0, 10, 24, 0.85);
+  color:          rgba(255, 226, 150, 0.95);
+  opacity:        0;
+  pointer-events: none;
+  transition:     opacity 0.2s ease, transform 0.2s ease;
+}
+.chest-btn:hover .chest-tip,
+.chest-btn:focus-visible .chest-tip {
+  opacity:   1;
+  transform: translateX(-50%) translateY(0);
+}
+
+/* Bubble burst on open */
+.chest-bubble {
+  position:       absolute;
+  left:           50%;
+  top:            0;
+  border-radius:  50%;
+  border:         1px solid rgba(190, 235, 255, 0.7);
+  pointer-events: none;
+  animation:      chest-bubble-rise 1.3s ease-out forwards;
+}
+
+@keyframes chest-bubble-rise {
+  0%   { transform: translate(0, 0);              opacity: 0.9; }
+  100% { transform: translate(var(--bx), -74px);  opacity: 0; }
+}
+
+/* ═══════════════════════════════════════════════════════════════════
+   FLOOR STAMP — first full dive
+   ═══════════════════════════════════════════════════════════════════ */
+
+.floor-stamp {
+  position:       fixed;
+  left:           50%;
+  top:            42%;
+  /* framer-motion owns transform; the standalone translate property
+     keeps horizontal centering independent of it */
+  translate:      -50% 0;
+  z-index:        65;
+  display:        flex;
+  flex-direction: column;
+  align-items:    center;
+  gap:            2px;
+  padding:        14px 22px;
+  border:         3px double var(--badge-text);
+  border-radius:  10px;
+  color:          var(--badge-text);
+  background:     color-mix(in srgb, var(--card-bg) 55%, transparent);
+  font-family:    'Share Tech Mono', ui-monospace, monospace;
+  text-transform: uppercase;
+  pointer-events: none;
+  box-shadow:     0 0 34px rgba(0, 0, 0, 0.25);
+}
+
+.floor-stamp-top   { font-size: clamp(0.8rem, 2.4vw, 1.1rem); font-weight: 700; letter-spacing: 0.22em; }
+.floor-stamp-depth { font-size: clamp(1.3rem, 3.6vw, 1.9rem); font-weight: 700; letter-spacing: 0.3em; }
+.floor-stamp-sub   { font-size: clamp(0.52rem, 1.4vw, 0.66rem); letter-spacing: 0.18em; opacity: 0.75; }
+
+/* ═══════════════════════════════════════════════════════════════════
+   BIO TRAIL — stirred plankton behind the cursor at depth
+   ═══════════════════════════════════════════════════════════════════ */
+
+.bio-trail {
+  position:       fixed;
+  inset:          0;
+  z-index:        6;
+  pointer-events: none;
+  overflow:       hidden;
+}
+
+.bio-mote {
+  position:      absolute;
+  border-radius: 50%;
+  background:    rgba(110, 225, 255, 0.9);
+  box-shadow:    0 0 6px rgba(80, 210, 255, 0.8);
+  animation:     bio-mote-drift 1.4s ease-out forwards;
+}
+
+@keyframes bio-mote-drift {
+  0%   { transform: translate(0, 0) scale(1); }
+  100% { transform: translate(6px, -26px) scale(0.4); opacity: 0; }
+}
+
+/* ═══════════════════════════════════════════════════════════════════
+   CRAB POKE
+   ═══════════════════════════════════════════════════════════════════ */
+
+.crab-img {
+  pointer-events: auto;
+  cursor:         pointer;
+}
+
+.crab-img--hop {
+  animation: crab-hop 0.45s ease-out;
+}
+
+@keyframes crab-hop {
+  0%   { transform: translateY(0); }
+  38%  { transform: translateY(-15px); }
+  70%  { transform: translateY(2px); }
+  100% { transform: translateY(0); }
+}
+
+.crab-exclaim {
+  position:       absolute;
+  top:            -18px;
+  left:           50%;
+  transform:      translateX(-50%);
+  font-family:    'Share Tech Mono', ui-monospace, monospace;
+  font-weight:    700;
+  font-size:      1.1rem;
+  color:          var(--card-link-hover, #00d4ff);
+  text-shadow:    0 0 8px currentColor;
+  animation:      exclaim-pop 0.9s ease-out forwards;
+  pointer-events: none;
+}
+
+@keyframes exclaim-pop {
+  0%   { opacity: 0; transform: translateX(-50%) scale(0.4); }
+  18%  { opacity: 1; transform: translateX(-50%) scale(1.25); }
+  30%  { transform: translateX(-50%) scale(1); }
+  80%  { opacity: 1; }
+  100% { opacity: 0; transform: translateX(-50%) translateY(-6px) scale(0.9); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .chest-btn     { animation: none; }
+  .chest-bubble  { display: none; }
+  .crab-img--hop { animation: none; }
+  .bio-trail     { display: none; }
 }
 
 /* ═══════════════════════════════════════════════════════════════════
