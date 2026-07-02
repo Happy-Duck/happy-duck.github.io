@@ -337,6 +337,11 @@ Fill in as features land:
   starts once you begin scrolling) — discovery requires slight descent.
 - ALL 12 FEATURES COMPLETE. Final sweep: 22 checks green, lint clean,
   build 412 kB / 132 kB gzip, zero console errors.
+- Owner feedback round: terminal trigger is now typed "cmd" (not "dive");
+  a persistent >_ console button sits bottom-left; the whale uses the
+  owner-supplied public/creatures/blue-whale.png (faces left, so the
+  crossing runs right-to-left), rendered as a dark distant shadow in
+  sunlit water and a luminous ghost above content (z-11) in the deep.
 - Post-review fixes: (1) Captain's Log typewriter ran its timer chains
   inside a setEntries updater — StrictMode double-invokes updaters, so
   chains multiplied exponentially ("speeding by insanely"). Side effects

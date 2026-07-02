@@ -69,7 +69,8 @@ function runCommand(raw, ctx) {
 
     case 'whale':
       window.dispatchEvent(new CustomEvent('ocean:summon-whale'))
-      setTimeout(ctx.close, 400)
+      // Linger long enough to read the contact report before the view clears
+      setTimeout(ctx.close, 1600)
       return ['large biological contact on sonar. look to the deep…']
 
     case 'ping':
@@ -125,6 +126,8 @@ function runCommand(raw, ctx) {
       return ['blub blub.']
     case 'dive':
       return ['we\'re already down here, captain.']
+    case 'cmd':
+      return ['this IS the command console.']
 
     default:
       return [`command not found: ${cmd} — try 'help'`]
@@ -143,7 +146,7 @@ export function Terminal() {
   const close = useCallback(() => setOpen(false), [])
   const clear = useCallback(() => setLines([]), [])
 
-  // Global open triggers: type "dive" anywhere, or press ` / ~
+  // Global open triggers: type "cmd" anywhere, or press ` / ~
   useEffect(() => {
     const onKey = (e) => {
       const t = e.target
@@ -157,9 +160,9 @@ export function Terminal() {
         return
       }
       if (e.key.length === 1) {
-        bufferRef.current = (bufferRef.current + e.key.toLowerCase()).slice(-4)
-        if (bufferRef.current === 'dive') {
-          // The same keystroke would otherwise type "e" into the
+        bufferRef.current = (bufferRef.current + e.key.toLowerCase()).slice(-3)
+        if (bufferRef.current === 'cmd') {
+          // The same keystroke would otherwise type "d" into the
           // freshly-focused console input
           e.preventDefault()
           setOpen(true)
@@ -234,7 +237,7 @@ export function Terminal() {
         aria-expanded={open}
       >
         <span className="term-fab-glyph" aria-hidden="true">&gt;_</span>
-        <span className="term-fab-tip">sub console — psst: typing 'dive' works too</span>
+        <span className="term-fab-tip">sub console — psst: typing 'cmd' works too</span>
       </button>
 
       <AnimatePresence>

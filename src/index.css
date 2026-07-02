@@ -2016,38 +2016,37 @@ html::-webkit-scrollbar { display: none; }
 :root[data-theme="deep-sea"] .whale-track { z-index: 11; }
 
 .whale {
-  position:    absolute;
-  top:         22%;
-  left:        0;
-  width:       min(55vw, 760px);
-  aspect-ratio: 600 / 220;
+  position:  absolute;
+  top:       22%;
+  left:      0;
+  width:     min(58vw, 820px);
   animation:
     whale-cross 35s linear forwards,
     whale-bob   9s ease-in-out infinite;
-  filter:      blur(2px);
-  opacity:     0.9;
 }
 
-/* Sunlit water: slightly darker than the surroundings — a passing shadow.
+.whale img {
+  display: block;
+  width:   100%;
+  height:  auto;
+}
+
+/* Sunlit water: a dark shape passing in the distance.
    Deep water: faintly luminous — a ghost in the dark. */
-.whale-body {
-  fill:       rgba(0, 0, 0, 0.22);
-  transition: fill var(--theme-dur) var(--theme-ease);
-}
-.whale-eye {
-  fill:       rgba(180, 220, 255, 0.12);
-  transition: fill var(--theme-dur) var(--theme-ease);
+.whale {
+  filter:  blur(2px) brightness(0.3) saturate(0.5);
+  opacity: 0.4;
 }
 
-:root[data-theme="deep-sea"] .whale-body { fill: rgba(160, 210, 250, 0.2); }
-:root[data-theme="deep-sea"] .whale-eye  { fill: rgba(220, 245, 255, 0.55); }
 :root[data-theme="deep-sea"] .whale {
-  filter: blur(2px) drop-shadow(0 0 30px rgba(100, 180, 255, 0.4));
+  filter:  blur(1.5px) brightness(1.2) drop-shadow(0 0 30px rgba(100, 180, 255, 0.45));
+  opacity: 0.32;
 }
 
+/* Artwork faces left — enter from the right, swim head-first to the left */
 @keyframes whale-cross {
-  from { transform: translateX(-110%); }
-  to   { transform: translateX(calc(100vw + 10%)); }
+  from { transform: translateX(calc(100vw + 10%)); }
+  to   { transform: translateX(-110%); }
 }
 
 @keyframes whale-bob {
@@ -2060,11 +2059,12 @@ html::-webkit-scrollbar { display: none; }
   .whale {
     animation: whale-appear 8s ease-in-out forwards;
     left: 22%;
+    width: min(46vw, 640px);
   }
   @keyframes whale-appear {
     0%   { opacity: 0; }
-    25%  { opacity: 0.9; }
-    75%  { opacity: 0.9; }
+    25%  { opacity: 0.4; }
+    75%  { opacity: 0.4; }
     100% { opacity: 0; }
   }
 }
