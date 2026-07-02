@@ -1580,7 +1580,7 @@ html::-webkit-scrollbar { display: none; }
   width:      100%;
   overflow:   clip;
   position:   relative;
-  padding-top: 150px;   /* headroom for the wreck rising above the floor */
+  padding-top: 280px;   /* headroom for the wreck rising above the floor */
 }
 
 /* Sandy / rocky floor texture */
@@ -2063,7 +2063,7 @@ html::-webkit-scrollbar { display: none; }
   position:       absolute;
   bottom:         4px;
   left:           4%;
-  width:          clamp(180px, 23vw, 250px);
+  width:          clamp(280px, 34vw, 430px);
   pointer-events: none;
 }
 
@@ -2073,9 +2073,9 @@ html::-webkit-scrollbar { display: none; }
   display:          block;
   width:            100%;
   height:           auto;
-  transform:        rotate(-5deg);
+  transform:        rotate(-12deg);
   transform-origin: 50% 90%;
-  margin-bottom:    -10px;
+  margin-bottom:    -18px;
   filter:           brightness(0.85) saturate(0.75);
   transition:       filter var(--theme-dur) var(--theme-ease);
 }
@@ -2161,8 +2161,8 @@ html::-webkit-scrollbar { display: none; }
   pointer-events: none;
   transition:     opacity 0.2s ease, transform 0.2s ease;
 }
-.chest-btn:hover .chest-tip,
-.chest-btn:focus-visible .chest-tip {
+.treasure-btn:hover .chest-tip,
+.treasure-btn:focus-visible .chest-tip {
   opacity:   1;
   transform: translateX(-50%) translateY(0);
 }
