@@ -1,4 +1,5 @@
 import { useRef, useState, useEffect } from 'react'
+import { createPortal } from 'react-dom'
 import { motion, AnimatePresence } from 'framer-motion'
 import GithubOriginal from 'devicons-react/lib/icons/GithubOriginal'
 
@@ -299,7 +300,9 @@ function ProjectModal({ project, onClose }) {
     }
   }, [onClose])
 
-  return (
+  // Portal to <body> — the section's position:relative + z-index creates a
+  // stacking context that would trap the fixed backdrop under later sections
+  return createPortal(
     <motion.div
       className="pmodal-backdrop"
       data-no-ping
@@ -377,7 +380,8 @@ function ProjectModal({ project, onClose }) {
           )}
         </div>
       </motion.div>
-    </motion.div>
+    </motion.div>,
+    document.body,
   )
 }
 

@@ -2010,6 +2010,10 @@ html::-webkit-scrollbar { display: none; }
   overflow:       hidden;
 }
 
+/* In the deep the whale rises above the ROV darkness (z-5) — a shadow
+   would be invisible against near-black water */
+:root[data-theme="deep-sea"] .whale-track { z-index: 6; }
+
 .whale {
   position:    absolute;
   top:         22%;
@@ -2023,12 +2027,21 @@ html::-webkit-scrollbar { display: none; }
   opacity:     0.9;
 }
 
-/* Slightly darker than the surrounding water — a shadow passing by */
+/* Sunlit water: slightly darker than the surroundings — a passing shadow.
+   Deep water: faintly luminous — a ghost in the dark. */
 .whale-body {
-  fill: rgba(0, 0, 0, 0.22);
+  fill:       rgba(0, 0, 0, 0.22);
+  transition: fill var(--theme-dur) var(--theme-ease);
 }
 .whale-eye {
-  fill: rgba(180, 220, 255, 0.12);
+  fill:       rgba(180, 220, 255, 0.12);
+  transition: fill var(--theme-dur) var(--theme-ease);
+}
+
+:root[data-theme="deep-sea"] .whale-body { fill: rgba(150, 205, 245, 0.14); }
+:root[data-theme="deep-sea"] .whale-eye  { fill: rgba(210, 240, 255, 0.4); }
+:root[data-theme="deep-sea"] .whale {
+  filter: blur(2px) drop-shadow(0 0 26px rgba(90, 170, 255, 0.3));
 }
 
 @keyframes whale-cross {
