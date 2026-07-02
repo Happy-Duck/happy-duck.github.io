@@ -3,7 +3,7 @@
 // Session-cached 10 min; silently renders nothing on error/rate-limit.
 import { useState, useEffect } from 'react'
 
-const CACHE_KEY = 'ocean.ghActivity'
+const CACHE_KEY = 'ocean.ghActivity.v2'
 const CACHE_MS = 10 * 60 * 1000
 const USER = 'Happy-Duck'
 
@@ -31,9 +31,11 @@ const CACHED = (() => {
 
 function condense(events, limit) {
   const items = []
+  const seenRepos = new Set() // at most one entry per repo
   for (const ev of events) {
     if (items.length >= limit) break
     const repo = ev.repo?.name?.split('/')[1] || ev.repo?.name || '?'
+    if (seenRepos.has(repo)) continue
     if (ev.type === 'PushEvent') {
       // Browser-origin (CORS) requests get a trimmed payload: no commits
       // array, only ref/head/before. Fall back to branch + short sha.
@@ -44,16 +46,19 @@ function condense(events, limit) {
         ? commits[commits.length - 1].message.split('\n')[0]
         : `pushed${branch ? ` to ${branch}` : ''}${sha ? ` @ ${sha}` : ''}`
       items.push({ id: ev.id, repo, msg, when: relTime(ev.created_at) })
+      seenRepos.add(repo)
     } else if (ev.type === 'CreateEvent' && ev.payload?.ref_type === 'repository') {
       items.push({ id: ev.id, repo, msg: 'new vessel launched', when: relTime(ev.created_at) })
+      seenRepos.add(repo)
     } else if (ev.type === 'ReleaseEvent') {
       items.push({ id: ev.id, repo, msg: `release ${ev.payload?.release?.tag_name || ''}`.trim(), when: relTime(ev.created_at) })
+      seenRepos.add(repo)
     }
   }
   return items
 }
 
-export function useGithubActivity(limit = 4) {
+export function useGithubActivity(limit = 3) {
   const [items, setItems] = useState(CACHED)
 
   useEffect(() => {

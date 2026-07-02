@@ -45,27 +45,12 @@ function WreckSvg() {
   )
 }
 
-function ChestSvg() {
-  return (
-    <svg viewBox="0 0 34 26" width="100%" height="100%" aria-hidden="true">
-      {/* Lid, slightly ajar */}
-      <path className="chest-lid" d="M3 11 Q 17 -1 31 11 L 31 13 L 3 13 Z" transform="rotate(-6 17 12)" />
-      {/* Glow escaping the seam */}
-      <rect className="chest-glow-seam" x="4" y="11.5" width="26" height="2" rx="1" />
-      {/* Base */}
-      <rect className="chest-base" x="4" y="13" width="26" height="11" rx="2" />
-      {/* Lock */}
-      <rect className="chest-lock" x="15" y="12" width="4" height="6" rx="1" />
-    </svg>
-  )
-}
-
 export function Shipwreck() {
   const [bubbles, setBubbles] = useState([])
   const idRef = useRef(0)
 
-  const onChestClick = () => {
-    // Bubble burst
+  const onTreasureClick = () => {
+    // Bubble burst from the breach
     const burst = Array.from({ length: 5 }, () => ({
       id: idRef.current++,
       dx: (Math.random() - 0.5) * 36,
@@ -86,14 +71,18 @@ export function Shipwreck() {
         <WreckSvg />
       </div>
 
+      {/* Treasure — warm light spilling from the hull breach */}
       <button
         type="button"
-        className="chest-btn"
+        className="treasure-btn"
         data-no-ping
-        onClick={onChestClick}
-        aria-label="Open the treasure chest (the captain's resume)"
+        onClick={onTreasureClick}
+        aria-label="Something glints inside the wreck (the captain's resume)"
       >
-        <ChestSvg />
+        <span className="treasure-glow" aria-hidden="true" />
+        <span className="treasure-spark treasure-spark--1" aria-hidden="true" />
+        <span className="treasure-spark treasure-spark--2" aria-hidden="true" />
+        <span className="treasure-spark treasure-spark--3" aria-hidden="true" />
         <span className="chest-tip">the real treasure</span>
         {bubbles.map(b => (
           <span

@@ -196,8 +196,6 @@ html::-webkit-scrollbar { display: none; }
   --wreck-hole:          #020a18;
   --wreck-stroke:        rgba(90,150,210,0.22);
   --wreck-glow:          rgba(0,212,255,0.55);
-  --chest-base:          #14305c;
-  --chest-lid:           #0e2546;
   --chest-glow:          rgba(255,214,110,0.85);
 }
 
@@ -316,8 +314,6 @@ html::-webkit-scrollbar { display: none; }
   --wreck-hole:          #4a350f;
   --wreck-stroke:        rgba(70,48,10,0.45);
   --wreck-glow:          rgba(255,200,90,0.8);
-  --chest-base:          #8a5a1c;
-  --chest-lid:           #6e4514;
   --chest-glow:          rgba(255,222,130,0.95);
 }
 
@@ -2093,32 +2089,63 @@ html::-webkit-scrollbar { display: none; }
 .wreck-porthole--lit { fill: var(--wreck-glow); }
 .wreck-detail-stroke { stroke: var(--wreck-stroke); transition: stroke var(--theme-dur) var(--theme-ease); }
 
-/* Treasure chest — a real button, glinting by the hull breach */
-.chest-btn {
+/* Treasure — warm light spilling from the hull breach. The breach sits
+   at ~(113, 97) in the 320x150 viewBox → ~35% / 65% of the wreck box. */
+.treasure-btn {
   position:       absolute;
-  right:          10%;
-  bottom:         4px;
-  width:          32px;
-  height:         25px;
+  left:           22%;
+  top:            36%;
+  width:          27%;
+  aspect-ratio:   1;
   padding:        0;
   border:         none;
   background:     none;
   cursor:         pointer;
   pointer-events: auto;
-  filter:         drop-shadow(0 0 6px var(--chest-glow));
-  animation:      chest-glint 5s ease-in-out infinite;
-  transition:     transform 0.2s ease;
 }
-.chest-btn:hover { transform: scale(1.18); }
 
-.chest-base { fill: var(--chest-base); }
-.chest-lid  { fill: var(--chest-lid); }
-.chest-lock { fill: var(--chest-glow); }
-.chest-glow-seam { fill: var(--chest-glow); }
+.treasure-glow {
+  position:      absolute;
+  inset:         0;
+  border-radius: 50%;
+  background:    radial-gradient(circle,
+    var(--chest-glow) 0%,
+    rgba(255, 200, 90, 0.22) 42%,
+    transparent 70%);
+  animation:  treasure-pulse 4.5s ease-in-out infinite;
+  transition: transform 0.25s ease;
+}
+.treasure-btn:hover .treasure-glow,
+.treasure-btn:focus-visible .treasure-glow {
+  transform: scale(1.3);
+}
 
-@keyframes chest-glint {
-  0%, 100% { filter: drop-shadow(0 0 3px var(--chest-glow)); }
-  50%      { filter: drop-shadow(0 0 10px var(--chest-glow)); }
+@keyframes treasure-pulse {
+  0%, 100% { opacity: 0.55; }
+  50%       { opacity: 1; }
+}
+
+/* Tiny glints drifting up out of the breach */
+.treasure-spark {
+  position:       absolute;
+  width:          3px;
+  height:         3px;
+  border-radius:  50%;
+  background:     var(--chest-glow);
+  box-shadow:     0 0 5px var(--chest-glow);
+  pointer-events: none;
+  animation:      treasure-spark 3.6s ease-in-out infinite;
+  opacity:        0;
+}
+.treasure-spark--1 { left: 38%; top: 55%; animation-delay: 0s; }
+.treasure-spark--2 { left: 55%; top: 60%; animation-delay: 1.3s; }
+.treasure-spark--3 { left: 46%; top: 50%; animation-delay: 2.4s; }
+
+@keyframes treasure-spark {
+  0%   { transform: translateY(0);     opacity: 0; }
+  15%  { opacity: 0.9; }
+  60%  { opacity: 0.5; }
+  100% { transform: translateY(-26px); opacity: 0; }
 }
 
 /* Tooltip */
@@ -2260,10 +2287,11 @@ html::-webkit-scrollbar { display: none; }
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .chest-btn     { animation: none; }
-  .chest-bubble  { display: none; }
-  .crab-img--hop { animation: none; }
-  .bio-trail     { display: none; }
+  .treasure-glow  { animation: none; opacity: 0.85; }
+  .treasure-spark { display: none; }
+  .chest-bubble   { display: none; }
+  .crab-img--hop  { animation: none; }
+  .bio-trail      { display: none; }
 }
 
 /* ═══════════════════════════════════════════════════════════════════
