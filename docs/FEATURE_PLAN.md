@@ -282,7 +282,7 @@ Log card, mirroring the Discord presence pattern.
 payloads on unauthenticated browser-origin (CORS) requests — fall back to
 "pushed to <branch> @ <sha7>". Empty results aren't cached.
 
-## 12. WebGL Caustics (stretch) — [ ] TODO
+## 12. WebGL Caustics (stretch) — [x] DONE
 
 **Pitch:** Real shader caustics dancing across the sunlit zone — a graphics
 flex appropriate for a CG intern. Raw WebGL2, no dependencies.
@@ -298,7 +298,11 @@ flex appropriate for a CG intern. Raw WebGL2, no dependencies.
 
 **Files:** `src/components/Caustics.jsx`, `App.jsx`, `index.css`.
 
-**Status:** not started.
+**Status:** DONE. Iterative turbulence shader (thin filaments, near-zero
+baseline), buffer-less fullscreen triangle via gl_VertexID, half-res.
+Big gotcha: never call WEBGL_lose_context.loseContext() in effect
+cleanup — StrictMode remounts get the same permanently-dead context back
+and the canvas paints opaque white.
 
 ---
 
@@ -320,7 +324,7 @@ Fill in as features land:
 | 9 | Case Studies | feat: case-study modals, time-of-day, gh manifest | headless Edge OK |
 | 10 | Time of Day | with #9 | headless Edge OK |
 | 11 | GH Manifest | with #9 | headless Edge OK |
-| 12 | Caustics | — | — |
+| 12 | Caustics | feat: webgl caustics in the sunlit zone | headless Edge OK — full 22-check sweep green |
 
 ## Notes / decisions made along the way
 
@@ -331,3 +335,5 @@ Fill in as features land:
   paint; only the retype cycle waits for visibility.
 - At depth exactly 0, surface creatures are opacity 0 by design (fade-in
   starts once you begin scrolling) — discovery requires slight descent.
+- ALL 12 FEATURES COMPLETE. Final sweep: 22 checks green, lint clean,
+  build 412 kB / 132 kB gzip, zero console errors.

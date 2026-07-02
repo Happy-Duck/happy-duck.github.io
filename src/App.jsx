@@ -5,6 +5,7 @@ import { SonarPing     } from './components/SonarPing'
 import { BioTrail      } from './components/BioTrail'
 import { FloorStamp    } from './components/FloorStamp'
 import { WaterSurface  } from './components/WaterSurface'
+import { Caustics      } from './components/Caustics'
 import { CreatureLayer } from './components/creatures/CreatureLayer'
 import { Whale         } from './components/creatures/Whale'
 import { DepthGauge    } from './components/DepthGauge'
@@ -38,6 +39,9 @@ export default function App() {
       <Terminal />
 
       <div className="relative overflow-hidden">
+
+        {/* WebGL caustics — shader light-dance in the sunlit zone */}
+        <Caustics />
 
         {/* Water surface — underwater perspective, only near surface (depth < 0.20) */}
         <WaterSurface />
