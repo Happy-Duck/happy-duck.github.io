@@ -2059,11 +2059,13 @@ html::-webkit-scrollbar { display: none; }
    SHIPWRECK & TREASURE — ocean floor
    ═══════════════════════════════════════════════════════════════════ */
 
+/* Tucked into the page corner — the viewport clips the hull's left and
+   bottom edges, selling it as half-buried and half out of frame */
 .shipwreck {
   position:       absolute;
-  bottom:         4px;
-  left:           4%;
-  width:          clamp(280px, 34vw, 430px);
+  bottom:         -48px;
+  left:           clamp(-90px, -6vw, -40px);
+  width:          clamp(300px, 36vw, 450px);
   pointer-events: none;
 }
 

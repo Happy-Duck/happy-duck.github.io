@@ -71,6 +71,10 @@ function Crab() {
     let facing  = 1               // 1 = right, -1 = left
     let rafId
 
+    // The shipwreck occupies the bottom-left corner — the crab's beach
+    // starts to its right
+    const wreckEdge = () => Math.min(floorW * 0.28, 380)
+
     const tick = () => {
       const mouse = mouseRef.current
 
@@ -95,11 +99,12 @@ function Crab() {
 
       fleeX *= 0.90
 
-      // Move + clamp
-      x = Math.max(0, Math.min(floorW - CRAB_W, x + vx + fleeX))
+      // Move + clamp (left wall = the wreck)
+      const minX = wreckEdge()
+      x = Math.max(minX, Math.min(floorW - CRAB_W, x + vx + fleeX))
 
       // Bounce at walls
-      if (x <= 0)             vx =  Math.abs(vx)
+      if (x <= minX)            vx =  Math.abs(vx)
       if (x >= floorW - CRAB_W) vx = -Math.abs(vx)
 
       // Facing
