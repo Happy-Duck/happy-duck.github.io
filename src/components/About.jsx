@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef, useCallback, useSyncExternalStore } from 'react'
 import { motion } from 'framer-motion'
 import { useLanyard } from '../hooks/useLanyard'
+import { useGithubActivity } from '../hooks/useGithubActivity'
 
 // ── Data ───────────────────────────────────────────────────────────────
 
@@ -207,6 +208,28 @@ function LivePresence() {
   )
 }
 
+// ── GitHub shipping manifest ───────────────────────────────────────────
+
+function ShippingManifest() {
+  const items = useGithubActivity()
+  if (!items || items.length === 0) return null
+
+  return (
+    <div className="log-manifest">
+      <span className="log-presence-label">engine room — recent transmissions //</span>
+      <ul className="manifest-list">
+        {items.map(it => (
+          <li key={it.id} className="manifest-item">
+            <span className="manifest-repo">{it.repo}</span>
+            <span className="manifest-msg">{it.msg}</span>
+            <span className="manifest-when">{it.when}</span>
+          </li>
+        ))}
+      </ul>
+    </div>
+  )
+}
+
 // ── Typewriter log entries ─────────────────────────────────────────────
 
 function TypewriterLog() {
@@ -280,6 +303,9 @@ export function About() {
 
         {/* Live Discord presence — only shows when active */}
         <LivePresence />
+
+        {/* Recent GitHub activity — hides itself on error/rate-limit */}
+        <ShippingManifest />
 
       </motion.div>
     </section>

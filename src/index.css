@@ -361,9 +361,15 @@ html::-webkit-scrollbar { display: none; }
   opacity: var(--overlay-deep-op);
 }
 .overlay-reef {
-  background: radial-gradient(ellipse at 50% 0%, rgba(255,240,180,0.25) 0%, transparent 65%);
+  background: radial-gradient(ellipse at 50% 0%, var(--tod-overlay, rgba(255,240,180,0.25)) 0%, transparent 65%);
   opacity: var(--overlay-reef-op);
 }
+
+/* ── Time-of-day tints (data-tod set pre-paint in index.html) ────────── */
+:root[data-tod="dawn"]  { --tod-overlay: rgba(255,195,175,0.28); }
+:root[data-tod="day"]   { --tod-overlay: rgba(255,240,180,0.25); }
+:root[data-tod="dusk"]  { --tod-overlay: rgba(255,170,110,0.32); }
+:root[data-tod="night"] { --tod-overlay: rgba(175,205,255,0.18); }
 
 /* ── Marine snow — CSS-only, 20 divs ─────────────────────────────────── */
 .marine-snow-wrap {
@@ -586,6 +592,143 @@ html::-webkit-scrollbar { display: none; }
 
 
 /* ═══════════════════════════════════════════════════════════════════
+   PROJECT CASE-STUDY MODAL
+   ═══════════════════════════════════════════════════════════════════ */
+
+.project-card--clickable { cursor: pointer; }
+
+.card-expand {
+  display:         inline-flex;
+  align-items:     center;
+  justify-content: center;
+  min-width:       28px;
+  min-height:      44px;
+  color:           var(--card-link);
+  opacity:         0.55;
+  transition:      opacity 0.2s ease, color 0.2s ease;
+}
+.project-card--clickable:hover .card-expand {
+  opacity: 1;
+  color:   var(--card-link-hover);
+}
+
+.pmodal-backdrop {
+  position:        fixed;
+  inset:           0;
+  z-index:         90;
+  display:         flex;
+  align-items:     center;
+  justify-content: center;
+  padding:         16px;
+  background:      rgba(0, 6, 18, 0.55);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+}
+
+.pmodal {
+  width:          min(620px, 100%);
+  max-height:     min(84vh, 720px);
+  overflow-y:     auto;
+  scrollbar-width: thin;
+  border-radius:  16px;
+  border:         1px solid var(--card-border-hover);
+  background:     var(--card-bg);
+  box-shadow:     var(--card-shadow-hover);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  padding:        clamp(1.2rem, 1rem + 1.5vw, 1.8rem);
+}
+
+.pmodal-head {
+  display:         flex;
+  align-items:     flex-start;
+  justify-content: space-between;
+  gap:             0.75rem;
+  margin-bottom:   0.2rem;
+}
+
+.pmodal-title {
+  font-size:   clamp(1.15rem, 1rem + 1vw, 1.5rem);
+  font-weight: 800;
+  line-height: 1.25;
+  color:       var(--card-title);
+  margin:      0;
+}
+
+.pmodal-close {
+  border:        none;
+  background:    none;
+  color:         var(--card-body);
+  font-size:     1.6rem;
+  line-height:   1;
+  cursor:        pointer;
+  padding:       2px 8px;
+  border-radius: 8px;
+  flex-shrink:   0;
+}
+.pmodal-close:hover { color: var(--card-link-hover); }
+
+.pmodal-role {
+  font-family:    ui-monospace, monospace;
+  font-size:      0.72rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color:          var(--card-link);
+  margin:         0 0 0.9rem;
+}
+
+.pmodal-desc {
+  font-size:   0.9rem;
+  line-height: 1.65;
+  color:       var(--card-body);
+  margin:      0 0 0.9rem;
+}
+
+.pmodal-highlights {
+  list-style: none;
+  margin:     0 0 1.1rem;
+  padding:    0;
+  display:    flex;
+  flex-direction: column;
+  gap:        0.45rem;
+}
+
+.pmodal-highlights li {
+  position:    relative;
+  padding-left: 1.15rem;
+  font-size:   0.85rem;
+  line-height: 1.55;
+  color:       var(--card-title);
+}
+
+.pmodal-highlights li::before {
+  content:  '»';
+  position: absolute;
+  left:     0;
+  color:    var(--card-link);
+}
+
+.pmodal-embed {
+  margin: 0 0 1.1rem;
+}
+
+.pmodal-embed iframe {
+  display:       block;
+  width:         100%;
+  border:        1px solid var(--card-border);
+  border-radius: 10px;
+  background:    rgba(0, 0, 0, 0.25);
+}
+
+.pmodal-foot {
+  display:         flex;
+  align-items:     center;
+  justify-content: space-between;
+  gap:             0.75rem;
+  flex-wrap:       wrap;
+}
+
+/* ═══════════════════════════════════════════════════════════════════
    JELLYFISH BELL PULSE
    ═══════════════════════════════════════════════════════════════════ */
 
@@ -618,16 +761,30 @@ html::-webkit-scrollbar { display: none; }
   /* No transition — JS drives --beach-op per-frame */
 }
 
-/* Sunlight coming from above — bright band fading into the water */
+/* Sunlight coming from above — bright band fading into the water.
+   Tinted by time of day. */
 .water-surface-glow {
   position:   absolute;
   inset:      0;
   background: linear-gradient(
     to bottom,
-    rgba(220, 245, 255, 0.70)  0%,
-    rgba(160, 220, 245, 0.35) 45%,
+    var(--tod-surf-a, rgba(220, 245, 255, 0.70))  0%,
+    var(--tod-surf-b, rgba(160, 220, 245, 0.35)) 45%,
     transparent               100%
   );
+}
+
+:root[data-tod="dawn"] {
+  --tod-surf-a: rgba(255, 226, 205, 0.65);
+  --tod-surf-b: rgba(255, 190, 170, 0.30);
+}
+:root[data-tod="dusk"] {
+  --tod-surf-a: rgba(255, 205, 140, 0.62);
+  --tod-surf-b: rgba(240, 160, 110, 0.30);
+}
+:root[data-tod="night"] {
+  --tod-surf-a: rgba(200, 220, 255, 0.42);
+  --tod-surf-b: rgba(150, 185, 240, 0.20);
 }
 
 /* Wave ripples at the very top — seen from below the surface */
@@ -1096,6 +1253,55 @@ html::-webkit-scrollbar { display: none; }
   white-space:    nowrap;
   overflow:       hidden;
   text-overflow:  ellipsis;
+}
+
+/* ── GitHub shipping manifest ─────────────────────────────────────────── */
+
+.log-manifest {
+  margin-top:  1.25rem;
+  padding-top: 1rem;
+  border-top:  1px solid var(--about-divider);
+}
+
+.manifest-list {
+  list-style:     none;
+  margin:         0;
+  padding:        0;
+  display:        flex;
+  flex-direction: column;
+  gap:            0.4rem;
+}
+
+.manifest-item {
+  display:     flex;
+  align-items: baseline;
+  gap:         0.7rem;
+  font-size:   clamp(0.68rem, 0.62rem + 0.15vw, 0.8rem);
+  line-height: 1.5;
+  min-width:   0;
+}
+
+.manifest-repo {
+  flex-shrink:    0;
+  color:          var(--icon-color);
+  letter-spacing: 0.04em;
+}
+
+.manifest-msg {
+  color:         var(--about-body);
+  opacity:       0.8;
+  white-space:   nowrap;
+  overflow:      hidden;
+  text-overflow: ellipsis;
+  min-width:     0;
+  flex:          1;
+}
+
+.manifest-when {
+  flex-shrink: 0;
+  color:       var(--about-body);
+  opacity:     0.45;
+  font-variant-numeric: tabular-nums;
 }
 
 /* ═══════════════════════════════════════════════════════════════════

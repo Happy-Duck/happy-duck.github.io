@@ -1,8 +1,11 @@
 import { createContext, useCallback, useContext, useEffect, useRef, useState } from 'react'
 import { getZone } from '../constants/depthZones'
+import { todBucket, TOD_SURFACE } from '../constants/timeOfDay'
 
 // ── Color interpolation ────────────────────────────────────────────────
 
+// First two stops are retinted at module load to match the visitor's
+// local time of day (see constants/timeOfDay.js)
 const BG_STOPS = [
   { d: 0.00, r: 0x48, g: 0xb8, b: 0xb0 },
   { d: 0.15, r: 0x16, g: 0x6a, b: 0x60 },
@@ -11,6 +14,17 @@ const BG_STOPS = [
   { d: 0.85, r: 0x02, g: 0x08, b: 0x10 },
   { d: 1.00, r: 0x01, g: 0x04, b: 0x08 },
 ]
+
+// Retint the surface stops for the local hour (module load = pre-render).
+// index.html's pre-paint script sets data-tod + the initial bg color; this
+// re-asserts both in case that script drifts out of sync.
+{
+  const tod = todBucket()
+  const surf = TOD_SURFACE[tod]
+  Object.assign(BG_STOPS[0], surf[0])
+  Object.assign(BG_STOPS[1], surf[1])
+  document.documentElement.setAttribute('data-tod', tod)
+}
 
 function lerp(a, b, t) { return a + (b - a) * t }
 

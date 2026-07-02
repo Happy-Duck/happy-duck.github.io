@@ -3,6 +3,7 @@ import { useState, useEffect, useRef, useCallback } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { SPECIES, BONUS_SPECIES } from '../constants/species'
 import { getDiscovered } from '../lib/diveLog'
+import { todBucket } from '../constants/timeOfDay'
 
 const BANNER = [
   'R.O.V. CONSOLE v2.6 — R/V HAPPY DUCK',
@@ -81,7 +82,10 @@ function runCommand(raw, ctx) {
       const now = new Date()
       const h = now.getHours()
       const watch = h < 5 ? 'middle watch' : h < 8 ? 'morning watch' : h < 17 ? 'forenoon watch' : h < 20 ? 'dog watch' : 'first watch'
-      return [`ship's clock: ${now.toLocaleTimeString()} — ${watch}`]
+      return [
+        `ship's clock: ${now.toLocaleTimeString()} — ${watch}`,
+        `surface conditions: ${todBucket(h)}`,
+      ]
     }
 
     case 'resume':

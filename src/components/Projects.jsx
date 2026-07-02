@@ -1,5 +1,5 @@
-import { useRef } from 'react'
-import { motion } from 'framer-motion'
+import { useRef, useState, useEffect } from 'react'
+import { motion, AnimatePresence } from 'framer-motion'
 import GithubOriginal from 'devicons-react/lib/icons/GithubOriginal'
 
 // Wrapper to force fill color on icons that don't accept a color prop
@@ -12,6 +12,8 @@ function ForcedColorIcon({ Icon, size }) {
 }
 
 // ── Data ───────────────────────────────────────────────────────────────
+// details.highlights wording drawn from the card descriptions + README —
+// owner should review and punch up with specifics.
 
 const PROJECTS = [
   {
@@ -19,36 +21,82 @@ const PROJECTS = [
     description: 'A narrative-driven marine exploration game built entirely in Unity. Self-published on Steam and downloaded 30k+ times. Adopted by local schools as an interactive environmental science teaching tool.',
     stack:       ['Unity', 'C#', 'Steam', 'Steamworks SDK'],
     link:        'https://store.steampowered.com/app/2645390/Pelagos_A_Marine_Adventure',
+    details: {
+      role: 'Solo developer — design, code, and publishing',
+      highlights: [
+        'Self-published on Steam with 30,000+ downloads',
+        'Adopted by local schools as an environmental-science teaching tool',
+        'Full production pipeline in Unity/C#, from gameplay to Steamworks integration',
+      ],
+      embed: { src: 'https://store.steampowered.com/widget/2645390/', height: 190, title: 'Pelagos on Steam' },
+    },
   },
   {
     title:       'Party School',
     description: 'Multiplayer sandbox party game with minigame activities built in a five-person team. Built the world map and core gameplay base shared across all minigames; implementing the racing minigame using Unreal\'s Chaos Vehicle system.',
     stack:       ['Unreal Engine 5', 'Blueprints', 'Chaos Vehicles'],
     link:        '#',
+    details: {
+      role: 'Gameplay engineer on a five-person team',
+      highlights: [
+        'Built the world map and the core gameplay base shared across all minigames',
+        "Implementing the racing minigame on Unreal's Chaos Vehicle system",
+      ],
+    },
   },
   {
     title:       'Flarp',
     description: "A puzzle Metroidvania built around wind mechanics and momentum-based traversal. Developed with UIUC's ACM GameBuilders club.",
     stack:       ['GameMaker Studio', 'GML'],
     link:        'https://orangepainting.itch.io/flarp',
+    details: {
+      role: "Developer — UIUC ACM GameBuilders club project",
+      highlights: [
+        'Puzzle Metroidvania built around wind mechanics and momentum-based traversal',
+        'Playable on itch.io',
+      ],
+      embed: { src: 'https://itch.io/embed/3890349?dark=true', height: 167, title: 'Flarp on itch.io' },
+    },
   },
   {
     title:       'SportsBot',
     description: 'Discord bot delivering live scores, player stats, and schedule alerts through a clean slash-command interface backed by REST sports APIs.',
     stack:       ['Python', 'discord.py', 'REST APIs'],
     link:        'https://github.com/Happy-Duck/DiscordSportsBot',
+    details: {
+      role: 'Solo developer',
+      highlights: [
+        'Live scores, player stats, and schedule alerts via slash commands',
+        'Backed by REST sports APIs with a SQL persistence layer',
+      ],
+    },
   },
   {
     title:       'Tide Toss',
     description: 'Physics-based "Tosser" game built in 48 hours for the Game Builders Game Jam. Combination of 2D art, 3D physics, and 1D gameplay',
     stack:       ['Unity', 'C#', 'Espresso'],
     link:        'https://happy-ducky.itch.io/tide-toss',
+    details: {
+      role: '48-hour jam entry — Game Builders Game Jam',
+      highlights: [
+        'Physics "tosser" mixing 2D art, 3D physics, and 1D gameplay',
+        'Concept to shipped build in one weekend',
+      ],
+      embed: { src: 'https://itch.io/embed/3856158?dark=true', height: 167, title: 'Tide Toss on itch.io' },
+    },
   },
   {
     title:       'Computer Vision Research',
     description: 'Benchmark comparison of Faster R-CNN (Detectron2) against YOLOv8 for real-time object detection on the COCO dataset. Analysed accuracy–latency tradeoffs.',
     stack:       ['Python', 'Detectron2', 'YOLOv8', 'COCO'],
     link:        '#',
+    details: {
+      role: 'Undergraduate researcher',
+      highlights: [
+        'Benchmarked Faster R-CNN (Detectron2) against YOLOv8 on COCO',
+        'Analyzed accuracy–latency tradeoffs for real-time object detection',
+      ],
+    },
   },
 ]
 
@@ -77,6 +125,18 @@ function ExternalLinkIcon() {
       <path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6" />
       <polyline points="15 3 21 3 21 9" />
       <line x1="10" y1="14" x2="21" y2="3" />
+    </svg>
+  )
+}
+
+function ExpandIcon() {
+  return (
+    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+      strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+      <polyline points="15 3 21 3 21 9" />
+      <polyline points="9 21 3 21 3 15" />
+      <line x1="21" y1="3" x2="14" y2="10" />
+      <line x1="3" y1="21" x2="10" y2="14" />
     </svg>
   )
 }
@@ -111,7 +171,7 @@ const headerItem = {
 
 // ── Parallax card shell ────────────────────────────────────────────────
 
-function ParallaxCard({ children, delay = 0 }) {
+function ParallaxCard({ children, delay = 0, onOpen, label }) {
   const innerRef = useRef(null)
 
   const onMouseMove = (e) => {
@@ -132,6 +192,13 @@ function ParallaxCard({ children, delay = 0 }) {
     el.style.transition = 'transform 0.55s cubic-bezier(0.22,1,0.36,1), box-shadow 0.55s ease, border-color 0.55s ease'
   }
 
+  const onKeyDown = (e) => {
+    if (e.key === 'Enter' || e.key === ' ') {
+      e.preventDefault()
+      onOpen()
+    }
+  }
+
   return (
     <motion.div
       variants={fadeUp}
@@ -142,7 +209,13 @@ function ParallaxCard({ children, delay = 0 }) {
     >
       <div
         ref={innerRef}
-        className="project-card h-full"
+        className="project-card project-card--clickable h-full"
+        data-no-ping
+        role="button"
+        tabIndex={0}
+        aria-label={`${label} — open case study`}
+        onClick={onOpen}
+        onKeyDown={onKeyDown}
         onMouseMove={onMouseMove}
         onMouseLeave={onMouseLeave}
       >
@@ -154,11 +227,11 @@ function ParallaxCard({ children, delay = 0 }) {
 
 // ── Standard card ──────────────────────────────────────────────────────
 
-function ProjectCard({ project, delay }) {
+function ProjectCard({ project, delay, onOpen }) {
   const { Icon, label } = linkIcon(project.link)
   const hasLink = project.link && project.link !== '#'
   return (
-    <ParallaxCard delay={delay}>
+    <ParallaxCard delay={delay} onOpen={onOpen} label={project.title}>
       <div className="flex flex-col gap-3 h-full">
 
         {/* Header row */}
@@ -166,18 +239,24 @@ function ProjectCard({ project, delay }) {
           <h3 className="card-title font-semibold leading-snug text-base sm:text-lg">
             {project.title}
           </h3>
-          {hasLink && (
-            <a
-              href={project.link}
-              target="_blank"
-              rel="noopener noreferrer"
-              aria-label={label}
-              className="card-link-btn"
-            >
-              <Icon />
-              <span className="card-link-label">{label}</span>
-            </a>
-          )}
+          <div className="flex items-center gap-1">
+            {hasLink && (
+              <a
+                href={project.link}
+                target="_blank"
+                rel="noopener noreferrer"
+                aria-label={label}
+                className="card-link-btn"
+                onClick={(e) => e.stopPropagation()}
+              >
+                <Icon />
+                <span className="card-link-label">{label}</span>
+              </a>
+            )}
+            <span className="card-expand" aria-hidden="true">
+              <ExpandIcon />
+            </span>
+          </div>
         </div>
 
         {/* Description */}
@@ -198,9 +277,115 @@ function ProjectCard({ project, delay }) {
   )
 }
 
+// ── Case-study modal ───────────────────────────────────────────────────
+
+function ProjectModal({ project, onClose }) {
+  const closeRef = useRef(null)
+  const { Icon, label } = linkIcon(project.link)
+  const hasLink = project.link && project.link !== '#'
+  const d = project.details
+
+  useEffect(() => {
+    const prev = document.activeElement
+    closeRef.current?.focus()
+    document.body.style.overflow = 'hidden'
+
+    const onKey = (e) => { if (e.key === 'Escape') onClose() }
+    window.addEventListener('keydown', onKey)
+    return () => {
+      window.removeEventListener('keydown', onKey)
+      document.body.style.overflow = ''
+      if (prev && prev.focus) prev.focus()
+    }
+  }, [onClose])
+
+  return (
+    <motion.div
+      className="pmodal-backdrop"
+      data-no-ping
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      exit={{ opacity: 0 }}
+      transition={{ duration: 0.18 }}
+      onMouseDown={(e) => { if (e.target === e.currentTarget) onClose() }}
+    >
+      <motion.div
+        className="pmodal"
+        role="dialog"
+        aria-modal="true"
+        aria-label={project.title}
+        initial={{ opacity: 0, y: 26, scale: 0.97 }}
+        animate={{ opacity: 1, y: 0, scale: 1 }}
+        exit={{ opacity: 0, y: 18, scale: 0.97 }}
+        transition={{ duration: 0.24, ease: [0.22, 1, 0.36, 1] }}
+      >
+        <div className="pmodal-head">
+          <h3 className="pmodal-title">{project.title}</h3>
+          <button
+            ref={closeRef}
+            type="button"
+            className="pmodal-close"
+            onClick={onClose}
+            aria-label="Close case study"
+          >
+            ×
+          </button>
+        </div>
+
+        {d?.role && <p className="pmodal-role">{d.role}</p>}
+
+        <p className="pmodal-desc">{project.description}</p>
+
+        {d?.highlights?.length > 0 && (
+          <ul className="pmodal-highlights">
+            {d.highlights.map(h => (
+              <li key={h}>{h}</li>
+            ))}
+          </ul>
+        )}
+
+        {d?.embed && (
+          <div className="pmodal-embed">
+            <iframe
+              src={d.embed.src}
+              height={d.embed.height}
+              title={d.embed.title}
+              loading="lazy"
+            />
+          </div>
+        )}
+
+        <div className="pmodal-foot">
+          <div className="flex flex-wrap gap-1.5">
+            {project.stack.map(t => (
+              <span key={t} className="card-pill px-2 py-0.5 rounded-full text-[clamp(0.625rem,0.55rem+0.2vw,0.75rem)] font-mono">
+                {t}
+              </span>
+            ))}
+          </div>
+          {hasLink && (
+            <a
+              href={project.link}
+              target="_blank"
+              rel="noopener noreferrer"
+              aria-label={label}
+              className="card-link-btn"
+            >
+              <Icon />
+              <span className="card-link-label">{label}</span>
+            </a>
+          )}
+        </div>
+      </motion.div>
+    </motion.div>
+  )
+}
+
 // ── Section ────────────────────────────────────────────────────────────
 
 export function Projects() {
+  const [openIdx, setOpenIdx] = useState(-1)
+
   return (
     <section
       className="relative px-6 pb-28 pt-4 w-full max-w-6xl mx-auto"
@@ -223,9 +408,19 @@ export function Projects() {
       {/* Project grid */}
       <div className="grid sm:grid-cols-2 gap-5">
         {PROJECTS.map((p, i) => (
-          <ProjectCard key={p.title} project={p} delay={i * 0.07} />
+          <ProjectCard key={p.title} project={p} delay={i * 0.07} onOpen={() => setOpenIdx(i)} />
         ))}
       </div>
+
+      {/* Case-study modal */}
+      <AnimatePresence>
+        {openIdx >= 0 && (
+          <ProjectModal
+            project={PROJECTS[openIdx]}
+            onClose={() => setOpenIdx(-1)}
+          />
+        )}
+      </AnimatePresence>
     </section>
   )
 }

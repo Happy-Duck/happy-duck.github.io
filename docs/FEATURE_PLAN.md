@@ -212,7 +212,7 @@ little "!" bubble. Logs the crab in the dive log.
 **Status:** DONE. Startle state lives in a ref read by the walk loop; hop
 animation on the img (wrapper transforms are owned by the loop).
 
-## 9. Project Case-Study Modals — [ ] TODO
+## 9. Project Case-Study Modals — [x] DONE
 
 **Pitch:** Project cards open into a full case study: role, highlights, and
 *playable embeds* — Steam widget for Pelagos, itch.io widgets for Flarp and
@@ -234,9 +234,11 @@ Tide Toss. Real media, zero fabricated screenshots.
 
 **Files:** `Projects.jsx` (data + modal), `index.css`.
 
-**Status:** not started.
+**Status:** DONE. itch numeric ids resolved from the live pages (Flarp
+3890349, Tide Toss 3856158) and verified. Steam + itch widgets render in
+the modal. Highlights wording conservative — owner should review.
 
-## 10. Time-of-Day Surface — [ ] TODO
+## 10. Time-of-Day Surface — [x] DONE
 
 **Pitch:** The sunlit zone matches the visitor's clock: dawn glow early,
 bright turquoise midday, golden at dusk, dark moonlit surface at night.
@@ -256,9 +258,11 @@ bright turquoise midday, golden at dusk, dark moonlit surface at night.
 `index.css`, `index.html` (pre-paint script sets data-tod + initial bg to
 avoid flash).
 
-**Status:** not started.
+**Status:** DONE. Verified night palette (#35848c surface) via getHours
+override in headless Edge — hero text contrast holds. Terminal `time`
+reports surface conditions.
 
-## 11. GitHub Shipping Manifest — [ ] TODO
+## 11. GitHub Shipping Manifest — [x] DONE
 
 **Pitch:** "Recent transmissions from the engine room" — live list of recent
 public GitHub activity, styled like a cargo manifest inside the Captain's
@@ -274,7 +278,9 @@ Log card, mirroring the Discord presence pattern.
 
 **Files:** `src/hooks/useGithubActivity.js`, `About.jsx`, `index.css`.
 
-**Status:** not started.
+**Status:** DONE. Gotcha: GitHub strips the commits array from PushEvent
+payloads on unauthenticated browser-origin (CORS) requests — fall back to
+"pushed to <branch> @ <sha7>". Empty results aren't cached.
 
 ## 12. WebGL Caustics (stretch) — [ ] TODO
 
@@ -311,9 +317,9 @@ Fill in as features land:
 | 6 | Shipwreck | feat: shipwreck, floor stamp, bio trail, crab poke | headless Edge OK |
 | 7 | Bio Trail | with #6 | headless Edge OK |
 | 8 | Crab Poke | with #6 | headless Edge OK |
-| 9 | Case Studies | — | — |
-| 10 | Time of Day | — | — |
-| 11 | GH Manifest | — | — |
+| 9 | Case Studies | feat: case-study modals, time-of-day, gh manifest | headless Edge OK |
+| 10 | Time of Day | with #9 | headless Edge OK |
+| 11 | GH Manifest | with #9 | headless Edge OK |
 | 12 | Caustics | — | — |
 
 ## Notes / decisions made along the way
