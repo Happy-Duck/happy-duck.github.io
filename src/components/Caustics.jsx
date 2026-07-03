@@ -19,12 +19,12 @@ uniform float u_time;
 uniform vec2  u_res;
 out vec4 outColor;
 
-// Classic iterative water-turbulence caustics — thin bright filaments
-// with a near-zero baseline, so it reads as dancing light, not fog.
-void main() {
-  vec2 uv = gl_FragCoord.xy / u_res.y * 1.7;
-  float t = u_time * 0.6 + 23.0;
-
+// Iterative water-turbulence caustics — thin bright filaments with a
+// near-zero baseline. The pattern is inherently 2pi-periodic, so a
+// single layer tiles visibly; two layers at incommensurate scales are
+// multiplied so their repeats never align, plus a slow low-frequency
+// domain warp shifting each would-be tile differently.
+float turb(vec2 uv, float t) {
   vec2 p = mod(uv * 6.28318, 6.28318) - 250.0;
   vec2 i = p;
   float c = 1.0;
@@ -39,12 +39,26 @@ void main() {
   }
   c /= 4.0;
   c = 1.17 - pow(c, 1.4);
-  float b = clamp(pow(abs(c), 8.0), 0.0, 1.0);
+  return clamp(pow(abs(c), 8.0), 0.0, 1.0);
+}
+
+void main() {
+  vec2 uv = gl_FragCoord.xy / u_res.y;
+  float t = u_time * 0.55 + 23.0;
+
+  // Low-frequency cross-axis warp (x displaced by y and vice versa —
+  // a shear, not a squash) — incommensurate with the pattern period
+  vec2 warp = 1.3 * vec2(sin(uv.y * 0.83 + t * 0.10),
+                         cos(uv.x * 0.71 - t * 0.08));
+
+  float a1 = turb(uv * 1.45 + warp, t);
+  float a2 = turb(uv * 0.97 + vec2(5.2, 1.7) - warp * 0.6, t * 0.82 + 3.0);
+  float b = pow(clamp(a1 * a2 * 2.6, 0.0, 1.0), 0.8);
 
   // Strongest at the surface (top of canvas), gone by the bottom edge
   float fade = smoothstep(0.0, 0.8, gl_FragCoord.y / u_res.y);
 
-  float a = b * 0.4 * fade;
+  float a = b * 0.45 * fade;
   vec3 tint = vec3(0.8, 0.97, 1.0);
   outColor = vec4(tint * a, a); // premultiplied
 }`
