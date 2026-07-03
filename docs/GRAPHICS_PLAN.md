@@ -44,7 +44,7 @@ no-WebGL/reduced-motion). Touch devices: beam rests at the CSS default
 spot (50vw/38vh) — use the same fallback position.
 Files: `src/components/DeepParticles.jsx`, RovLight coordination, CSS.
 
-## 4. WebXR dive mode — [ ] TODO
+## 4. WebXR dive mode — [x] DONE
 
 `three` as a DYNAMIC import (code-split; loads only on entry). Scene:
 depth-gradient sky sphere, creature photo billboards drifting at their real
@@ -110,7 +110,7 @@ Files: raysRenderer.js, rays.worker.js, Caustics.jsx.
 | 1 | Boids | feat: webgpu boids | headless Edge + swiftshader flags — schools verified in screenshot |
 | 2 | Ripples | feat: interactive water ripples | ripple ring visible in zoomed screenshot; surface clicks no longer double-fire sonar |
 | 3 | Beam+Snow | feat: gpu marine snow | beam-lit particle cloud verified in screenshot |
-| 4 | WebXR | — | — |
+| 4 | WebXR | feat: webxr dive mode | chunk split verified (xrScene 527kB lazy); fab hidden without headset; needs a real Quest test by owner |
 | 5 | View Transitions | — | — |
 | 6 | Scroll timelines | — | — |
 | 7 | Gyro | — | — |

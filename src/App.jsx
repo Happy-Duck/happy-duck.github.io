@@ -20,6 +20,7 @@ import { About         } from './components/About'
 import { ContactSidebar } from './components/ContactSidebar'
 import { DiveLog       } from './components/DiveLog'
 import { Terminal      } from './components/Terminal'
+import { XRDive        } from './components/XRDive'
 import { Footer        } from './components/Footer'
 
 export default function App() {
@@ -40,6 +41,9 @@ export default function App() {
 
       {/* Submarine terminal — type "cmd" or press ` */}
       <Terminal />
+
+      {/* VR dive — appears only on XR-capable browsers */}
+      <XRDive />
 
       <div className="relative overflow-hidden">
 
