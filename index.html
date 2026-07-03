@@ -61,18 +61,24 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Caveat:wght@400;600;700&family=Share+Tech+Mono&display=swap" rel="stylesheet">
 
-    <!-- Set depth defaults before paint — depth 0 = surface = shallow-reef -->
+    <!-- Set depth defaults before paint — depth 0 = surface = shallow-reef.
+         Surface color follows local time of day (keep hex values in sync
+         with src/constants/timeOfDay.js). -->
     <script>
       var r = document.documentElement;
+      var h = new Date().getHours();
+      var tod = (h >= 5 && h < 8) ? 'dawn' : (h >= 8 && h < 17) ? 'day' : (h >= 17 && h < 20) ? 'dusk' : 'night';
+      var surf = { dawn: '#93b9b0', day: '#48b8b0', dusk: '#74a28c', night: '#48b8b0' };
       r.setAttribute('data-theme', 'shallow-reef');
-      r.style.setProperty('--ocean-bg-color', '#48b8b0');
+      r.setAttribute('data-tod', tod);
+      r.style.setProperty('--ocean-bg-color', surf[tod]);
       r.style.setProperty('--beach-op', '1');
       r.style.setProperty('--particle-opacity', '0');
       r.style.setProperty('--ambient-glow', '0');
       r.style.setProperty('--gauge-opacity', '1');
     </script>
-    <script type="module" crossorigin src="/assets/index-D3ogaLW2.js"></script>
-    <link rel="stylesheet" crossorigin href="/assets/index-CvYFvIlj.css">
+    <script type="module" crossorigin src="/assets/index-Bl4ftUik.js"></script>
+    <link rel="stylesheet" crossorigin href="/assets/index--IJoPUl7.css">
   </head>
   <body>
     <div id="root"></div>
