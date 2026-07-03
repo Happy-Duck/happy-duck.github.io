@@ -347,15 +347,29 @@ html::-webkit-scrollbar { display: none; }
   opacity: var(--overlay-deep-op);
 }
 .overlay-reef {
-  background: radial-gradient(ellipse at 50% 0%, var(--tod-overlay, rgba(255,240,180,0.25)) 0%, transparent 65%);
+  background: var(--tod-sky-grad,
+    radial-gradient(ellipse at 50% 0%, rgba(255,240,180,0.25) 0%, transparent 65%));
   opacity: var(--overlay-reef-op);
 }
 
-/* ── Time-of-day tints (data-tod set pre-paint in index.html) ──────────
-   Night has no rules — it intentionally renders as day. */
-:root[data-tod="dawn"]  { --tod-overlay: rgba(255,180,155,0.38); }
-:root[data-tod="day"]   { --tod-overlay: rgba(255,240,180,0.25); }
-:root[data-tod="dusk"]  { --tod-overlay: rgba(255,160,85,0.42); }
+/* ── Time-of-day sky gradients (data-tod set pre-paint in index.html) ──
+   Dawn/dusk: the sky's color pours down into the upper water and
+   dissolves into teal within the first viewport. Night has no rules —
+   it intentionally renders as day. */
+:root[data-tod="dawn"] {
+  --tod-sky-grad: linear-gradient(to bottom,
+    rgba(255, 172, 145, 0.60) 0%,
+    rgba(255, 178, 152, 0.32) 26%,
+    rgba(255, 185, 160, 0.12) 48%,
+    transparent 72%);
+}
+:root[data-tod="dusk"] {
+  --tod-sky-grad: linear-gradient(to bottom,
+    rgba(255, 148, 62, 0.62) 0%,
+    rgba(255, 158, 78, 0.34) 26%,
+    rgba(255, 170, 95, 0.13) 48%,
+    transparent 72%);
+}
 
 /* ── Marine snow — CSS-only, 20 divs ─────────────────────────────────── */
 .marine-snow-wrap {
@@ -2341,26 +2355,6 @@ html::-webkit-scrollbar { display: none; }
   0%   { opacity: 0.6; }
   100% { opacity: 0; }
 }
-
-/* Time-of-day debug switcher — dev builds only */
-.tod-debug {
-  position:        fixed;
-  top:             14px;
-  right:           14px;
-  z-index:         60;
-  padding:         6px 12px;
-  border-radius:   999px;
-  border:          1px dashed var(--card-border-hover);
-  background:      var(--card-bg);
-  color:           var(--card-link);
-  cursor:          pointer;
-  font-family:     ui-monospace, monospace;
-  font-size:       0.68rem;
-  letter-spacing:  0.08em;
-  backdrop-filter: blur(8px);
-  -webkit-backdrop-filter: blur(8px);
-}
-.tod-debug:hover { color: var(--card-link-hover); }
 
 /* Console button — bottom-left, mirrors the dive-log button */
 .term-fab {

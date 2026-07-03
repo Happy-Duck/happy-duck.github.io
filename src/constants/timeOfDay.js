@@ -16,9 +16,14 @@ export function todBucket(hour = new Date().getHours()) {
 // on the surface, not the abyss. Night intentionally renders as day:
 // a truly dark night sea would need light hero text (owner decision —
 // keep contrast simple, let dawn/dusk carry the feature).
+// At dawn/dusk the water warms toward the sky's color. The base stays
+// recognizably "water" — the strong top-down sky gradient lives in the
+// .overlay-reef layer (--tod-sky-grad), which blends warm → teal within
+// the first viewport. Red light dies in the first ~150 m, so the second
+// stop returns to the usual teal.
 export const TOD_SURFACE = {
-  dawn:  [{ r: 0x74, g: 0xc2, b: 0xc0 }, { r: 0x2a, g: 0x7a, b: 0x72 }],
+  dawn:  [{ r: 0x93, g: 0xb9, b: 0xb0 }, { r: 0x2f, g: 0x75, b: 0x70 }],
   day:   [{ r: 0x48, g: 0xb8, b: 0xb0 }, { r: 0x16, g: 0x6a, b: 0x60 }],
-  dusk:  [{ r: 0x5e, g: 0x9b, b: 0x8b }, { r: 0x1d, g: 0x5f, b: 0x57 }],
+  dusk:  [{ r: 0x74, g: 0xa2, b: 0x8c }, { r: 0x2e, g: 0x6a, b: 0x5e }],
   night: [{ r: 0x48, g: 0xb8, b: 0xb0 }, { r: 0x16, g: 0x6a, b: 0x60 }],
 }

@@ -17,7 +17,6 @@ import { About         } from './components/About'
 import { ContactSidebar } from './components/ContactSidebar'
 import { DiveLog       } from './components/DiveLog'
 import { Terminal      } from './components/Terminal'
-import { TodDebug      } from './components/TodDebug'
 import { Footer        } from './components/Footer'
 
 export default function App() {
@@ -38,9 +37,6 @@ export default function App() {
 
       {/* Submarine terminal — type "cmd" or press ` */}
       <Terminal />
-
-      {/* Time-of-day switcher — dev builds only */}
-      <TodDebug />
 
       <div className="relative overflow-hidden">
 

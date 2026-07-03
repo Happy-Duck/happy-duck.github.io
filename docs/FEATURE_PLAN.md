@@ -341,6 +341,12 @@ Fill in as features land:
   starts once you begin scrolling) — discovery requires slight descent.
 - ALL 12 FEATURES COMPLETE. Final sweep: 22 checks green, lint clean,
   build 412 kB / 132 kB gzip, zero console errors.
+- TOD round 3: flat warm base read as "orange page", two-tone read as a
+  seam. The answer is a vertical sky gradient (--tod-sky-grad on
+  .overlay-reef) pouring the sky color down into a mildly-warmed water
+  base, dissolving to teal within the first viewport. Debug button
+  removed — the terminal owns debug: tod / depth <m> / reset (see
+  `debug` command).
 - Feature 12 pivoted from caustics to GOD RAYS: caustic webs only exist
   where light lands ON a surface, so they made no sense in a side-on
   cross-section of the water column. The shader now renders slanted

@@ -16,6 +16,8 @@ function runCommand(raw, ctx) {
   const cmd = raw.trim().toLowerCase()
   if (!cmd) return []
 
+  // ── debug commands ──
+
   // tod [dawn|day|dusk|night|auto] — live-swap the surface palette
   if (cmd === 'tod' || cmd.startsWith('tod ')) {
     const arg = cmd.slice(3).trim()
@@ -34,6 +36,41 @@ function runCommand(raw, ctx) {
     return [`unknown time of day: ${arg}`]
   }
 
+  // depth <meters> — dive straight to a depth (0–6000)
+  if (cmd.startsWith('depth ')) {
+    const m = Number(cmd.slice(6).trim())
+    if (!Number.isFinite(m) || m < 0 || m > 6000) {
+      return ['usage: depth <0–6000>']
+    }
+    const max = document.documentElement.scrollHeight - window.innerHeight
+    window.scrollTo({ top: max * (m / 6000), behavior: 'smooth' })
+    setTimeout(ctx.close, 600)
+    return [`descending to ${Math.round(m).toLocaleString()} m…`]
+  }
+
+  // reset — wipe expedition data (dive log, dive count) and reload
+  if (cmd === 'reset') {
+    try {
+      for (const k of Object.keys(localStorage)) {
+        if (k.startsWith('ocean.')) localStorage.removeItem(k)
+      }
+      for (const k of Object.keys(sessionStorage)) {
+        if (k.startsWith('ocean.')) sessionStorage.removeItem(k)
+      }
+    } catch { /* private mode */ }
+    setTimeout(() => window.location.reload(), 900)
+    return ['expedition records wiped. resurfacing…']
+  }
+
+  if (cmd === 'debug') {
+    return [
+      'debug commands:',
+      '  tod dawn|day|dusk|night|auto   swap surface palette',
+      '  depth <0-6000>                 dive to a depth',
+      '  reset                          wipe dive log + counters, reload',
+    ]
+  }
+
   switch (cmd) {
     case 'help':
       return [
@@ -50,6 +87,7 @@ function runCommand(raw, ctx) {
         '  pelagos    open Pelagos on Steam',
         '  clear      clear the console',
         '  exit       close the console',
+        '  debug      engineering commands',
       ]
 
     case 'log':
