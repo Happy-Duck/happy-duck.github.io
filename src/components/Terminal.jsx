@@ -16,6 +16,24 @@ function runCommand(raw, ctx) {
   const cmd = raw.trim().toLowerCase()
   if (!cmd) return []
 
+  // tod [dawn|day|dusk|night|auto] — live-swap the surface palette
+  if (cmd === 'tod' || cmd.startsWith('tod ')) {
+    const arg = cmd.slice(3).trim()
+    const valid = ['dawn', 'day', 'dusk', 'night']
+    if (!arg) {
+      return [
+        `surface conditions: ${todBucket()}`,
+        'usage: tod dawn|day|dusk|night|auto',
+      ]
+    }
+    if (arg === 'auto' || valid.includes(arg)) {
+      const tod = arg === 'auto' ? todBucket() : arg
+      window.dispatchEvent(new CustomEvent('ocean:set-tod', { detail: { tod } }))
+      return [`surface conditions set: ${tod}${arg === 'auto' ? ' (auto)' : ''}`]
+    }
+    return [`unknown time of day: ${arg}`]
+  }
+
   switch (cmd) {
     case 'help':
       return [

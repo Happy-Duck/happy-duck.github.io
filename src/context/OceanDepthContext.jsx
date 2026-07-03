@@ -102,6 +102,18 @@ export function OceanDepthProvider({ children }) {
     const onMotionChange = (e) => { reducedRef.current = e.matches }
     motionQuery.addEventListener('change', onMotionChange)
 
+    // Debug/terminal override: swap the time-of-day palette live
+    const onSetTod = (e) => {
+      const tod = TOD_SURFACE[e.detail?.tod] ? e.detail.tod : todBucket()
+      const surf = TOD_SURFACE[tod]
+      Object.assign(BG_STOPS[0], surf[0])
+      Object.assign(BG_STOPS[1], surf[1])
+      root.setAttribute('data-tod', tod)
+      lastDepthRef.current = -1 // force color recompute next frame
+      dirtyRef.current = true
+    }
+    window.addEventListener('ocean:set-tod', onSetTod)
+
     const loop = (now) => {
       let depthChanged = false
 
@@ -186,6 +198,7 @@ export function OceanDepthProvider({ children }) {
     return () => {
       cancelAnimationFrame(frameRef.current)
       window.removeEventListener('scroll', onScroll)
+      window.removeEventListener('ocean:set-tod', onSetTod)
       motionQuery.removeEventListener('change', onMotionChange)
     }
   }, [])

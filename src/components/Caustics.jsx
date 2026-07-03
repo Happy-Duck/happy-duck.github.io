@@ -119,6 +119,15 @@ export function Caustics() {
 
     const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches
 
+    // Debug/terminal override: retint the rays live
+    const onSetTod = (e) => {
+      const r = TOD_RAYS[e.detail?.tod] || TOD_RAYS[todBucket()]
+      gl.uniform3fv(uTint, r.tint)
+      gl.uniform1f(uStrength, r.strength)
+      if (reduced) draw(0) // refresh the static frame
+    }
+    window.addEventListener('ocean:set-tod', onSetTod)
+
     const resize = () => {
       // Half-res: the pattern is soft, upscaling is invisible and cheap
       const w = Math.max(1, Math.floor(canvas.clientWidth / 2))
@@ -158,6 +167,7 @@ export function Caustics() {
     return () => {
       cancelAnimationFrame(rafId)
       window.removeEventListener('resize', resize)
+      window.removeEventListener('ocean:set-tod', onSetTod)
       gl.deleteProgram(prog)
       gl.deleteShader(vs)
       gl.deleteShader(fs)

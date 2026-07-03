@@ -2342,6 +2342,26 @@ html::-webkit-scrollbar { display: none; }
   100% { opacity: 0; }
 }
 
+/* Time-of-day debug switcher — dev builds only */
+.tod-debug {
+  position:        fixed;
+  top:             14px;
+  right:           14px;
+  z-index:         60;
+  padding:         6px 12px;
+  border-radius:   999px;
+  border:          1px dashed var(--card-border-hover);
+  background:      var(--card-bg);
+  color:           var(--card-link);
+  cursor:          pointer;
+  font-family:     ui-monospace, monospace;
+  font-size:       0.68rem;
+  letter-spacing:  0.08em;
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+}
+.tod-debug:hover { color: var(--card-link-hover); }
+
 /* Console button — bottom-left, mirrors the dive-log button */
 .term-fab {
   position:        fixed;
