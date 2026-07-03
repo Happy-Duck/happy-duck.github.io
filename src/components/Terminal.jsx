@@ -4,6 +4,7 @@ import { motion, AnimatePresence } from 'framer-motion'
 import { SPECIES, BONUS_SPECIES } from '../constants/species'
 import { getDiscovered } from '../lib/diveLog'
 import { todBucket } from '../constants/timeOfDay'
+import { depthAtMeters } from '../constants/depthZones'
 
 const BANNER = [
   'R.O.V. CONSOLE v2.6 — R/V HAPPY DUCK',
@@ -43,7 +44,7 @@ function runCommand(raw, ctx) {
       return ['usage: depth <0–6000>']
     }
     const max = document.documentElement.scrollHeight - window.innerHeight
-    window.scrollTo({ top: max * (m / 6000), behavior: 'smooth' })
+    window.scrollTo({ top: max * depthAtMeters(m), behavior: 'smooth' })
     setTimeout(ctx.close, 600)
     return [`descending to ${Math.round(m).toLocaleString()} m…`]
   }

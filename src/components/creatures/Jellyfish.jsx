@@ -8,7 +8,7 @@ import { tickSeen } from '../../lib/diveLog'
 import { pingImpulse } from '../../lib/sonar'
 
 const W = 120, H = 170
-const DEPTH_RANGE = { enter: 0.20, exit: 0.55 }
+const DEPTH_RANGE = { enter: 0.20, exit: 0.52 } // ≈200–1,050 m — twilight drifters
 
 const CONFIGS = [
   { xFrac: 0.20, yFrac: 0.40, scale: 1.0, driftSpeed: 0.22 },

@@ -4,7 +4,7 @@ import { useCreatureAI } from '../../hooks/useCreatureAI'
 
 const W = 250, H = 155
 
-const DEPTH_RANGE = { enter: 0.00, exit: 0.28 }
+const DEPTH_RANGE = { enter: 0.00, exit: 0.25 } // ≈0–330 m — turtles genuinely dive deep
 
 export function SeaTurtle() {
   const { wrapperRef } = useCreatureAI({

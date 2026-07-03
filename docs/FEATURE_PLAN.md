@@ -332,6 +332,14 @@ Fill in as features land:
 
 ## Notes / decisions made along the way
 
+- Depth system consistency fix: displayed meters are now PIECEWISE through
+  the zone boundaries (metersAt/depthAtMeters in depthZones.js) — scroll
+  0–0.2 ⇒ 0–200 m, 0.2–0.5 ⇒ 200–1,000 m, 0.5–0.72 ⇒ 1,000–4,000 m,
+  0.72–1.0 ⇒ 4,000–6,000 m. Scroll pacing unchanged; the gauge readout,
+  zone labels, dive-log registry claims, and real-world ranges now all
+  agree. Clownfish/turtle/jelly/squid exits trimmed to match. Anything
+  converting meters↔scroll must use those helpers, never x/6000.
+
 - Features 1+2 committed together (shared App.jsx/index.css edits).
 - Fixed a pre-existing CLS bug found while testing: TypewriterLog rendered
   empty until scrolled into view, growing the document 179px on first

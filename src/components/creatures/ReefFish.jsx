@@ -11,7 +11,7 @@ const CONFIGS = [
   { centerYFrac: 0.32, speed: 0.55, amplitude: 38, freq: 0.006, dir:  1, scale: 1.10 },
 ]
 
-const DEPTH_RANGE = { enter: 0.00, exit: 0.30 }
+const DEPTH_RANGE = { enter: 0.00, exit: 0.22 } // ≈0–250 m — clownfish are shallow
 
 function SingleFish({ cfg, idx, peers }) {
   const { wrapperRef } = useCreatureAI({
