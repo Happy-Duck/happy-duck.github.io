@@ -258,9 +258,13 @@ bright turquoise midday, golden at dusk, dark moonlit surface at night.
 `index.css`, `index.html` (pre-paint script sets data-tod + initial bg to
 avoid flash).
 
-**Status:** DONE. Verified night palette (#35848c surface) via getHours
-override in headless Edge — hero text contrast holds. Terminal `time`
-reports surface conditions.
+**Status:** DONE, then reworked per owner: the water shift was too subtle
+to read against the boldly-tinted god rays. Now dawn/dusk tint the water,
+waves, glow, overlay, and rays coherently (golden hour / rosy morning),
+and NIGHT INTENTIONALLY RENDERS AS DAY — a truly dark night sea would need
+light hero text; owner chose to sidestep. todBucket() still reports the
+true bucket (terminal flavor). Verified via getHours override: night is
+pixel-identical to day; dawn/dusk clearly distinct, text legible.
 
 ## 11. GitHub Shipping Manifest — [x] DONE
 

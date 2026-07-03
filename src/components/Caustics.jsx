@@ -64,12 +64,13 @@ void main() {
   outColor = vec4(u_tint * a, a); // premultiplied
 }`
 
-// Ray tint + intensity by time of day
+// Ray tint + intensity by time of day (night renders as day — the water
+// palette does too; see constants/timeOfDay.js)
 const TOD_RAYS = {
-  dawn:  { tint: [1.0, 0.86, 0.74], strength: 0.9 },
+  dawn:  { tint: [1.0, 0.84, 0.7], strength: 0.95 },
   day:   { tint: [0.85, 0.97, 1.0], strength: 1.0 },
-  dusk:  { tint: [1.0, 0.78, 0.58], strength: 0.9 },
-  night: { tint: [0.72, 0.84, 1.0], strength: 0.55 },
+  dusk:  { tint: [1.0, 0.74, 0.5], strength: 0.95 },
+  night: { tint: [0.85, 0.97, 1.0], strength: 1.0 },
 }
 
 function compile(gl, type, src) {

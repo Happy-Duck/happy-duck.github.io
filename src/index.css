@@ -351,11 +351,11 @@ html::-webkit-scrollbar { display: none; }
   opacity: var(--overlay-reef-op);
 }
 
-/* ── Time-of-day tints (data-tod set pre-paint in index.html) ────────── */
-:root[data-tod="dawn"]  { --tod-overlay: rgba(255,195,175,0.28); }
+/* ── Time-of-day tints (data-tod set pre-paint in index.html) ──────────
+   Night has no rules — it intentionally renders as day. */
+:root[data-tod="dawn"]  { --tod-overlay: rgba(255,180,155,0.38); }
 :root[data-tod="day"]   { --tod-overlay: rgba(255,240,180,0.25); }
-:root[data-tod="dusk"]  { --tod-overlay: rgba(255,170,110,0.32); }
-:root[data-tod="night"] { --tod-overlay: rgba(175,205,255,0.18); }
+:root[data-tod="dusk"]  { --tod-overlay: rgba(255,160,85,0.42); }
 
 /* ── Marine snow — CSS-only, 20 divs ─────────────────────────────────── */
 .marine-snow-wrap {
@@ -761,16 +761,18 @@ html::-webkit-scrollbar { display: none; }
 }
 
 :root[data-tod="dawn"] {
-  --tod-surf-a: rgba(255, 226, 205, 0.65);
-  --tod-surf-b: rgba(255, 190, 170, 0.30);
+  --tod-surf-a: rgba(255, 218, 195, 0.75);
+  --tod-surf-b: rgba(255, 178, 155, 0.40);
+  --tod-wave-1: rgba(255, 235, 220, 0.58);
+  --tod-wave-2: rgba(255, 205, 185, 0.40);
+  --tod-wave-3: rgba(255, 240, 230, 0.24);
 }
 :root[data-tod="dusk"] {
-  --tod-surf-a: rgba(255, 205, 140, 0.62);
-  --tod-surf-b: rgba(240, 160, 110, 0.30);
-}
-:root[data-tod="night"] {
-  --tod-surf-a: rgba(200, 220, 255, 0.42);
-  --tod-surf-b: rgba(150, 185, 240, 0.20);
+  --tod-surf-a: rgba(255, 196, 120, 0.72);
+  --tod-surf-b: rgba(242, 150, 90, 0.38);
+  --tod-wave-1: rgba(255, 226, 175, 0.58);
+  --tod-wave-2: rgba(255, 195, 130, 0.42);
+  --tod-wave-3: rgba(255, 235, 195, 0.24);
 }
 
 /* WebGL caustics — light-dance band under the surface */
@@ -810,19 +812,20 @@ html::-webkit-scrollbar { display: none; }
   will-change: transform;
 }
 
-/* Underwater surface wave colors — translucent white/cyan seen from below */
+/* Underwater surface wave colors — translucent white/cyan seen from
+   below, tinted warm at dawn/dusk via --tod-wave-* */
 .beach-wave-1 {
-  fill:            rgba(255, 255, 255, 0.55);
+  fill:            var(--tod-wave-1, rgba(255, 255, 255, 0.55));
   animation:       beach-wave-roll 8s linear infinite;
 }
 .beach-wave-2 {
-  fill:            rgba(180, 235, 255, 0.38);
+  fill:            var(--tod-wave-2, rgba(180, 235, 255, 0.38));
   animation:       beach-wave-roll 6.2s linear infinite;
   animation-delay: -2.5s;
   top:             8px;
 }
 .beach-wave-3 {
-  fill:            rgba(255, 255, 255, 0.22);
+  fill:            var(--tod-wave-3, rgba(255, 255, 255, 0.22));
   animation:       beach-wave-roll 10.5s linear infinite;
   animation-delay: -5.8s;
   top:             16px;

@@ -68,7 +68,7 @@
       var r = document.documentElement;
       var h = new Date().getHours();
       var tod = (h >= 5 && h < 8) ? 'dawn' : (h >= 8 && h < 17) ? 'day' : (h >= 17 && h < 20) ? 'dusk' : 'night';
-      var surf = { dawn: '#62b0b6', day: '#48b8b0', dusk: '#589e9a', night: '#35848c' };
+      var surf = { dawn: '#74c2c0', day: '#48b8b0', dusk: '#5e9b8b', night: '#48b8b0' };
       r.setAttribute('data-theme', 'shallow-reef');
       r.setAttribute('data-tod', tod);
       r.style.setProperty('--ocean-bg-color', surf[tod]);
