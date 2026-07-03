@@ -337,6 +337,11 @@ Fill in as features land:
   starts once you begin scrolling) — discovery requires slight descent.
 - ALL 12 FEATURES COMPLETE. Final sweep: 22 checks green, lint clean,
   build 412 kB / 132 kB gzip, zero console errors.
+- Feature 12 pivoted from caustics to GOD RAYS: caustic webs only exist
+  where light lands ON a surface, so they made no sense in a side-on
+  cross-section of the water column. The shader now renders slanted
+  volumetric light shafts (product-of-sines beam function, aperiodic),
+  tinted by time of day (golden dusk shafts, pale moonbeams at night).
 - Owner feedback round: terminal trigger is now typed "cmd" (not "dive");
   a persistent >_ console button sits bottom-left; the whale uses the
   owner-supplied public/creatures/blue-whale.png (faces left, so the

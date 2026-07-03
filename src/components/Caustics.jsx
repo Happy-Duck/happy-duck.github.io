@@ -1,10 +1,15 @@
-// ── WebGL caustics — real shader light-dance in the sunlit zone ────────
+// ── WebGL god rays — volumetric light shafts in the sunlit zone ────────
+// The site is a side-on cross-section of the water column, so the right
+// surface-light effect is slanted crepuscular rays scattering down from
+// the waves (caustic webs only exist where light lands ON a surface).
 // Raw WebGL2, zero dependencies. Half-res canvas across the top ~45vh,
 // opacity driven by --beach-op (set per-frame by OceanDepthContext), and
 // the render loop fully pauses below the sunlit band or when the tab is
 // hidden. No WebGL2 → renders nothing (the CSS look stands on its own).
+// Ray color follows the time-of-day palette.
 import { useEffect, useRef } from 'react'
 import { useOceanDepthContext } from '../context/OceanDepthContext'
+import { todBucket } from '../constants/timeOfDay'
 
 const VERT = `#version 300 es
 void main() {
@@ -17,51 +22,55 @@ const FRAG = `#version 300 es
 precision mediump float;
 uniform float u_time;
 uniform vec2  u_res;
+uniform vec3  u_tint;
+uniform float u_strength;
 out vec4 outColor;
 
-// Iterative water-turbulence caustics — thin bright filaments with a
-// near-zero baseline. The pattern is inherently 2pi-periodic, so a
-// single layer tiles visibly; two layers at incommensurate scales are
-// multiplied so their repeats never align, plus a slow low-frequency
-// domain warp shifting each would-be tile differently.
-float turb(vec2 uv, float t) {
-  vec2 p = mod(uv * 6.28318, 6.28318) - 250.0;
-  vec2 i = p;
-  float c = 1.0;
-  const float inten = 0.005;
-
-  for (int n = 0; n < 4; n++) {
-    float tt = t * (1.0 - (3.5 / float(n + 1)));
-    i = p + vec2(cos(tt - i.x) + sin(tt + i.y),
-                 sin(tt - i.y) + cos(tt + i.x));
-    c += 1.0 / length(vec2(p.x / (sin(i.x + tt) / inten),
-                           p.y / (cos(i.y + tt) / inten)));
-  }
-  c /= 4.0;
-  c = 1.17 - pow(c, 1.4);
-  return clamp(pow(abs(c), 8.0), 0.0, 1.0);
+// Beam brightness along the surface coordinate s: a product of drifting
+// sine octaves at incommensurate frequencies (aperiodic, no tiling),
+// sharpened into distinct shafts.
+float beams(float s, float t) {
+  float b = sin(s * 4.7 - t * 0.26) * 0.5 + 0.5;
+  b *= sin(s * 9.1 + t * 0.17) * 0.5 + 0.5;
+  b *= sin(s * 2.3 + t * 0.09) * 0.5 + 0.5;
+  b *= sin(s * 15.7 - t * 0.31) * 0.35 + 0.65;
+  return pow(b, 1.8) * 3.2;
 }
 
 void main() {
-  vec2 uv = gl_FragCoord.xy / u_res.y;
-  float t = u_time * 0.55 + 23.0;
+  vec2 uv = gl_FragCoord.xy / u_res; // y: 0 = deep edge, 1 = surface
+  float t = u_time;
 
-  // Low-frequency cross-axis warp (x displaced by y and vice versa —
-  // a shear, not a squash) — incommensurate with the pattern period
-  vec2 warp = 1.3 * vec2(sin(uv.y * 0.83 + t * 0.10),
-                         cos(uv.x * 0.71 - t * 0.08));
+  // Rays lean like afternoon sun; each fragment maps back to the point
+  // on the surface its light came through. Two slightly different
+  // slants layered = soft parallax between shafts.
+  float depth = 1.0 - uv.y;
+  float aspect = u_res.x / u_res.y;
+  float s1 = (uv.x + depth * 0.28) * aspect;
+  float s2 = (uv.x + depth * 0.38) * aspect;
 
-  float a1 = turb(uv * 1.45 + warp, t);
-  float a2 = turb(uv * 0.97 + vec2(5.2, 1.7) - warp * 0.6, t * 0.82 + 3.0);
-  float b = pow(clamp(a1 * a2 * 2.6, 0.0, 1.0), 0.8);
+  // Rays sway gently as the waves above refocus them
+  float sway = sin(t * 0.12 + uv.y * 1.7) * 0.045;
+  float b = beams(s1 + sway, t) + 0.6 * beams(s2 * 1.31 + 4.7 - sway, t * 0.85);
 
-  // Strongest at the surface (top of canvas), gone by the bottom edge
-  float fade = smoothstep(0.0, 0.8, gl_FragCoord.y / u_res.y);
+  // Strongest at the surface, dissolving with depth; a touch of
+  // glancing-angle shimmer hugging the wave underside.
+  float fade = pow(uv.y, 1.7);
+  float shimmer = smoothstep(0.90, 1.0, uv.y)
+                * (sin(uv.x * aspect * 38.0 + t * 1.1)
+                 * sin(uv.x * aspect * 23.0 - t * 0.7) * 0.5 + 0.5);
 
-  float a = b * 0.45 * fade;
-  vec3 tint = vec3(0.8, 0.97, 1.0);
-  outColor = vec4(tint * a, a); // premultiplied
+  float a = clamp(b * fade * 0.32 + shimmer * 0.22, 0.0, 1.0) * u_strength;
+  outColor = vec4(u_tint * a, a); // premultiplied
 }`
+
+// Ray tint + intensity by time of day
+const TOD_RAYS = {
+  dawn:  { tint: [1.0, 0.86, 0.74], strength: 0.9 },
+  day:   { tint: [0.85, 0.97, 1.0], strength: 1.0 },
+  dusk:  { tint: [1.0, 0.78, 0.58], strength: 0.9 },
+  night: { tint: [0.72, 0.84, 1.0], strength: 0.55 },
+}
 
 function compile(gl, type, src) {
   const sh = gl.createShader(type)
@@ -100,6 +109,12 @@ export function Caustics() {
 
     const uTime = gl.getUniformLocation(prog, 'u_time')
     const uRes = gl.getUniformLocation(prog, 'u_res')
+    const uTint = gl.getUniformLocation(prog, 'u_tint')
+    const uStrength = gl.getUniformLocation(prog, 'u_strength')
+
+    const rays = TOD_RAYS[todBucket()]
+    gl.uniform3fv(uTint, rays.tint)
+    gl.uniform1f(uStrength, rays.strength)
 
     const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches
 
