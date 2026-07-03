@@ -3,7 +3,7 @@
 // Easter egg for ocean biology enthusiasts.
 import { useEffect, useRef } from 'react'
 import { useOceanDepthContext } from '../../context/OceanDepthContext'
-import { creatureOpacity } from '../../constants/depthZones'
+import { creatureOpacity, depthTraverse } from '../../constants/depthZones'
 import { tickSeen } from '../../lib/diveLog'
 
 const W = 200, H = 67
@@ -40,9 +40,8 @@ export function SnailFish() {
 
       if (p.x > VW + W) { p.x = -W; p.y = VH * (0.5 + Math.random() * 0.3) }
 
-      const maxScroll = document.documentElement.scrollHeight - window.innerHeight
-      const scrollOffset = Math.min(VH * 0.35, Math.max(0, window.scrollY - DEPTH_RANGE.enter * maxScroll) * 0.15)
-      const ny = p.y - scrollOffset
+      const traverse = depthTraverse(depth, DEPTH_RANGE, VH)
+      const ny = p.y - traverse
       el.style.transform = `translate(${p.x - W / 2}px, ${ny - H / 2}px)`
       el.style.opacity   = opacity.toFixed(3)
     })

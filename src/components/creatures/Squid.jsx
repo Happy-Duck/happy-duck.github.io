@@ -3,7 +3,7 @@
 import { useEffect, useRef } from 'react'
 import { useMouse } from '../../context/MouseContext'
 import { useOceanDepthContext } from '../../context/OceanDepthContext'
-import { creatureOpacity } from '../../constants/depthZones'
+import { creatureOpacity, depthTraverse } from '../../constants/depthZones'
 import { tickSeen } from '../../lib/diveLog'
 import { pingImpulse } from '../../lib/sonar'
 
@@ -11,8 +11,8 @@ const W = 100, H = 138
 const DEPTH_RANGE = { enter: 0.23, exit: 0.52 } // ≈280–1,050 m — twilight darters
 
 const CONFIGS = [
-  { yFrac: 0.28, speedMul: 1.0, sinAmp: 45, startOffset: 0.15, dartOffset: 0 },
-  { yFrac: 0.62, speedMul: 0.75, sinAmp: 35, startOffset: 0.70, dartOffset: 67 },
+  { yFrac: 0.38, speedMul: 1.0, sinAmp: 45, startOffset: 0.15, dartOffset: 0 },
+  { yFrac: 0.65, speedMul: 0.75, sinAmp: 35, startOffset: 0.70, dartOffset: 67 },
 ]
 
 function SingleSquid({ cfg, idx, peers }) {
@@ -111,10 +111,9 @@ function SingleSquid({ cfg, idx, peers }) {
       p.dodgeY *= 0.97
       p.dodgeY = Math.max(-120, Math.min(120, p.dodgeY))
 
-      const maxScroll = document.documentElement.scrollHeight - window.innerHeight
-      const scrollOffset = Math.min(VH * 0.35, Math.max(0, window.scrollY - DEPTH_RANGE.enter * maxScroll) * 0.15)
+      const traverse = depthTraverse(depth, DEPTH_RANGE, VH)
       const nx = p.x
-      const ny = Math.max(-H, Math.min(VH + H, pathY + p.dodgeY - scrollOffset))
+      const ny = Math.max(-H, Math.min(VH + H, pathY + p.dodgeY - traverse))
 
       if (peers) {
         peers.current[idx] = { x: nx, y: ny }

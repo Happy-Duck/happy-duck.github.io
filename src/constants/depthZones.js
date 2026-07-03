@@ -40,6 +40,16 @@ export function depthAtMeters(m) {
   return 1
 }
 
+// Vertical traverse: a creature enters its depth window swimming low in
+// the frame and leaves it high — the diver sinks past it. Returns the px
+// offset to SUBTRACT from the creature's base Y (negative below base at
+// the start of its window, positive above base at the end).
+const TRAVERSE_FRAC = 0.30
+export function depthTraverse(depth, range, viewportH) {
+  const p = Math.max(0, Math.min(1, (depth - range.enter) / (range.exit - range.enter)))
+  return (2 * p - 1) * TRAVERSE_FRAC * viewportH
+}
+
 // Smooth ease-in-out for opacity ramps
 export function easeInOut(t) {
   const c = Math.max(0, Math.min(1, t))

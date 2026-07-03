@@ -3,7 +3,7 @@
 import { useEffect, useRef } from 'react'
 import { useMouse } from '../../context/MouseContext'
 import { useOceanDepthContext } from '../../context/OceanDepthContext'
-import { creatureOpacity } from '../../constants/depthZones'
+import { creatureOpacity, depthTraverse } from '../../constants/depthZones'
 import { tickSeen } from '../../lib/diveLog'
 import { pingImpulse } from '../../lib/sonar'
 
@@ -99,10 +99,9 @@ export function GiantSquid() {
       p.dodgeY *= 0.97
       p.dodgeY = Math.max(-120, Math.min(120, p.dodgeY))
 
-      const maxScroll = document.documentElement.scrollHeight - window.innerHeight
-      const scrollOffset = Math.min(VH * 0.35, Math.max(0, window.scrollY - DEPTH_RANGE.enter * maxScroll) * 0.15)
+      const traverse = depthTraverse(depth, DEPTH_RANGE, VH)
       const nx = p.x
-      const ny = Math.max(-H, Math.min(VH + H, p.y + p.dodgeY - scrollOffset))
+      const ny = Math.max(-H, Math.min(VH + H, p.y + p.dodgeY - traverse))
       const flip = p.dir === 1 ? '' : ' scaleX(-1)'
 
       el.style.transform = `translate(${nx - W / 2}px, ${ny - H / 2}px)${flip}`

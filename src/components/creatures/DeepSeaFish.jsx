@@ -6,8 +6,8 @@ import { useCreatureAI } from '../../hooks/useCreatureAI'
 const W = 150, H = 63
 
 const CONFIGS = [
-  { centerYFrac: 0.32, speed: 0.55, amplitude: 38, freq: 0.007, dir:  1 },
-  { centerYFrac: 0.70, speed: 0.40, amplitude: 28, freq: 0.009, dir: -1 },
+  { centerYFrac: 0.35, speed: 0.55, amplitude: 38, freq: 0.007, dir:  1 },
+  { centerYFrac: 0.68, speed: 0.40, amplitude: 28, freq: 0.009, dir: -1 },
 ]
 
 const DEPTH_RANGE = { enter: 0.42, exit: 0.75 }

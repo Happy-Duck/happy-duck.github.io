@@ -5,7 +5,7 @@
 import { useEffect, useRef } from 'react'
 import { useMouse } from '../context/MouseContext'
 import { useOceanDepthContext } from '../context/OceanDepthContext'
-import { creatureOpacity } from '../constants/depthZones'
+import { creatureOpacity, depthTraverse } from '../constants/depthZones'
 import { tickSeen } from '../lib/diveLog'
 import { pingImpulse } from '../lib/sonar'
 
@@ -118,11 +118,11 @@ export function useCreatureAI({
       p.dodgeY *= 0.97
       p.dodgeY = Math.max(-120, Math.min(120, p.dodgeY))
 
-      const maxScroll = document.documentElement.scrollHeight - window.innerHeight
-      const enterScrollY = depthRange.enter * maxScroll
-      const scrollOffset = Math.min(window.innerHeight * 0.35, Math.max(0, window.scrollY - enterScrollY) * 0.15)
+      // Rise through the frame across the depth window — enters low,
+      // leaves high, as the diver sinks past it
+      const traverse = depthTraverse(depth, depthRange, H)
       const newX = p.pathX
-      const newY = Math.max(-H_SVG, Math.min(H + H_SVG, pathY + p.dodgeY - scrollOffset))
+      const newY = Math.max(-H_SVG, Math.min(H + H_SVG, pathY + p.dodgeY - traverse))
 
       // Write position for peer repulsion
       if (peers) {

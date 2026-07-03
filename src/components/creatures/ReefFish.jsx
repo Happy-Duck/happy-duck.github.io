@@ -5,10 +5,12 @@ import { useCreatureAI } from '../../hooks/useCreatureAI'
 
 const W = 48, H = 44
 
+// Lanes spread across the frame; the depth traverse sweeps each ±30vh,
+// so bases live in the 0.3–0.75 band to stay mostly on screen
 const CONFIGS = [
-  { centerYFrac: 0.15, speed: 0.60, amplitude: 32, freq: 0.008, dir:  1, scale: 1.00 },
-  { centerYFrac: 0.50, speed: 0.42, amplitude: 22, freq: 0.010, dir: -1, scale: 0.85 },
-  { centerYFrac: 0.32, speed: 0.55, amplitude: 38, freq: 0.006, dir:  1, scale: 1.10 },
+  { centerYFrac: 0.32, speed: 0.60, amplitude: 32, freq: 0.008, dir:  1, scale: 1.00 },
+  { centerYFrac: 0.55, speed: 0.42, amplitude: 22, freq: 0.010, dir: -1, scale: 0.85 },
+  { centerYFrac: 0.75, speed: 0.55, amplitude: 38, freq: 0.006, dir:  1, scale: 1.10 },
 ]
 
 const DEPTH_RANGE = { enter: 0.00, exit: 0.22 } // ≈0–250 m — clownfish are shallow

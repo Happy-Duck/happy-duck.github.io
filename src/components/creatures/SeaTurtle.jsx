@@ -9,7 +9,7 @@ const DEPTH_RANGE = { enter: 0.00, exit: 0.25 } // ≈0–330 m — turtles genu
 export function SeaTurtle() {
   const { wrapperRef } = useCreatureAI({
     W_SVG: W, H_SVG: H,
-    centerYFrac: 0.28,
+    centerYFrac: 0.45,
     speed:       0.18,
     amplitude:   28,
     freq:        0.004,

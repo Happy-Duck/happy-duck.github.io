@@ -332,6 +332,13 @@ Fill in as features land:
 
 ## Notes / decisions made along the way
 
+- Creature vertical traverse: the old parallax lifted creatures up-only
+  (capped 0.35vh), stranding everything in the top half. Now
+  depthTraverse() (depthZones.js) sweeps each creature bottom→top across
+  its own enter→exit window (±30vh around its lane) — you sink past them.
+  Lanes re-centered to the 0.3–0.75 band. Jellyfish keep their own
+  bottom-reset drift loops. Measured distribution: ~even upper/lower half.
+
 - Depth system consistency fix: displayed meters are now PIECEWISE through
   the zone boundaries (metersAt/depthAtMeters in depthZones.js) — scroll
   0–0.2 ⇒ 0–200 m, 0.2–0.5 ⇒ 200–1,000 m, 0.5–0.72 ⇒ 1,000–4,000 m,
