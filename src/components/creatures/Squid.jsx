@@ -30,6 +30,7 @@ function SingleSquid({ cfg, idx, peers }) {
     dartTimer: cfg.dartOffset,
     glideLen: 0,        // seeded on first tick — render stays pure
     dartLen:  0,
+    trav: null,
   })
 
   useEffect(() => {
@@ -111,9 +112,10 @@ function SingleSquid({ cfg, idx, peers }) {
       p.dodgeY *= 0.97
       p.dodgeY = Math.max(-120, Math.min(120, p.dodgeY))
 
-      const traverse = depthTraverse(depth, DEPTH_RANGE, VH)
+      const travTarget = depthTraverse(depth, DEPTH_RANGE, VH)
+      p.trav = p.trav === null ? travTarget : p.trav + (travTarget - p.trav) * 0.07
       const nx = p.x
-      const ny = Math.max(-H, Math.min(VH + H, pathY + p.dodgeY - traverse))
+      const ny = Math.max(-H, Math.min(VH + H, pathY + p.dodgeY - p.trav))
 
       if (peers) {
         peers.current[idx] = { x: nx, y: ny }

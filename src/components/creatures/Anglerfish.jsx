@@ -20,6 +20,7 @@ export function Anglerfish() {
     t: 0,
     speedBoost: 0,
     dodgeY: 0,
+    trav: null,
   })
 
   useEffect(() => {
@@ -77,9 +78,10 @@ export function Anglerfish() {
       p.dodgeY *= 0.97
       p.dodgeY = Math.max(-100, Math.min(100, p.dodgeY))
 
-      const traverse = depthTraverse(depth, DEPTH_RANGE, VH)
+      const travTarget = depthTraverse(depth, DEPTH_RANGE, VH)
+      p.trav = p.trav === null ? travTarget : p.trav + (travTarget - p.trav) * 0.07
       const nx = Math.max(W / 2, Math.min(VW - W / 2, p.x))
-      const ny = Math.max(-H, Math.min(VH + H, p.y + p.dodgeY - traverse))
+      const ny = Math.max(-H, Math.min(VH + H, p.y + p.dodgeY - p.trav))
 
       el.style.transform = `translate(${nx - W / 2}px, ${ny - H / 2}px)`
       el.style.opacity   = opacity.toFixed(3)

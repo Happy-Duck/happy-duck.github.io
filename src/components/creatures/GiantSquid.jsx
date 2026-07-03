@@ -25,6 +25,7 @@ export function GiantSquid() {
     pauseT:  0,
     speedBoost: 0,
     dodgeY: 0,
+    trav: null,
   })
 
   useEffect(() => {
@@ -99,9 +100,10 @@ export function GiantSquid() {
       p.dodgeY *= 0.97
       p.dodgeY = Math.max(-120, Math.min(120, p.dodgeY))
 
-      const traverse = depthTraverse(depth, DEPTH_RANGE, VH)
+      const travTarget = depthTraverse(depth, DEPTH_RANGE, VH)
+      p.trav = p.trav === null ? travTarget : p.trav + (travTarget - p.trav) * 0.07
       const nx = p.x
-      const ny = Math.max(-H, Math.min(VH + H, p.y + p.dodgeY - traverse))
+      const ny = Math.max(-H, Math.min(VH + H, p.y + p.dodgeY - p.trav))
       const flip = p.dir === 1 ? '' : ' scaleX(-1)'
 
       el.style.transform = `translate(${nx - W / 2}px, ${ny - H / 2}px)${flip}`

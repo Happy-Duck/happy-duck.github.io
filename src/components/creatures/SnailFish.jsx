@@ -13,7 +13,7 @@ export function SnailFish() {
   const wrapperRef = useRef(null)
   const { subscribe } = useOceanDepthContext()
 
-  const s = useRef({ x: null, y: null, t: 0 })
+  const s = useRef({ x: null, y: null, t: 0, trav: null })
 
   useEffect(() => {
     const unsubscribe = subscribe((depth) => {
@@ -40,8 +40,9 @@ export function SnailFish() {
 
       if (p.x > VW + W) { p.x = -W; p.y = VH * (0.5 + Math.random() * 0.3) }
 
-      const traverse = depthTraverse(depth, DEPTH_RANGE, VH)
-      const ny = p.y - traverse
+      const travTarget = depthTraverse(depth, DEPTH_RANGE, VH)
+      p.trav = p.trav === null ? travTarget : p.trav + (travTarget - p.trav) * 0.07
+      const ny = p.y - p.trav
       el.style.transform = `translate(${p.x - W / 2}px, ${ny - H / 2}px)`
       el.style.opacity   = opacity.toFixed(3)
     })

@@ -45,6 +45,7 @@ export function useCreatureAI({
         speedBoost: 0,
         dodgeY:     0,
         baseY:      H * centerYFrac,
+        trav:       null, // smoothed depth-traverse offset
       }
     }
 
@@ -119,10 +120,13 @@ export function useCreatureAI({
       p.dodgeY = Math.max(-120, Math.min(120, p.dodgeY))
 
       // Rise through the frame across the depth window — enters low,
-      // leaves high, as the diver sinks past it
-      const traverse = depthTraverse(depth, depthRange, H)
+      // leaves high, as the diver sinks past it. Low-pass filtered so
+      // fast scrolling reads as swimming, not teleporting (snap on the
+      // first visible frame).
+      const travTarget = depthTraverse(depth, depthRange, H)
+      p.trav = p.trav === null ? travTarget : p.trav + (travTarget - p.trav) * 0.07
       const newX = p.pathX
-      const newY = Math.max(-H_SVG, Math.min(H + H_SVG, pathY + p.dodgeY - traverse))
+      const newY = Math.max(-H_SVG, Math.min(H + H_SVG, pathY + p.dodgeY - p.trav))
 
       // Write position for peer repulsion
       if (peers) {
