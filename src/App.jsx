@@ -1,4 +1,5 @@
 import { MarineSnow    } from './components/MarineSnow'
+import { DeepParticles } from './components/DeepParticles'
 import { Plankton      } from './components/Plankton'
 import { RovLight      } from './components/RovLight'
 import { SonarPing     } from './components/SonarPing'
@@ -69,6 +70,9 @@ export default function App() {
 
         {/* Marine snow — CSS-only, fades in at depth > 0.35 */}
         <MarineSnow />
+
+        {/* GPU marine snow — lit volumetrically by the ROV beam */}
+        <DeepParticles />
 
         {/* ROV headlight — darkness + cursor light cone in deep zones */}
         <RovLight />

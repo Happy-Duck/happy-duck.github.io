@@ -31,7 +31,7 @@ highlights, transparent elsewhere. Needs `EXT_color_buffer_float` → without
 it render nothing. Reduced motion → skip. z-index 1 with the water surface.
 Files: `src/components/WaterSim.jsx`, App, CSS.
 
-## 3. Volumetric ROV beam + GPU marine snow — [ ] TODO
+## 3. Volumetric ROV beam + GPU marine snow — [x] DONE
 
 WebGL2 point sprites (~2000) whose positions are computed IN THE VERTEX
 SHADER from seed+time (zero per-frame buffer uploads), drifting down with
@@ -109,7 +109,7 @@ Files: raysRenderer.js, rays.worker.js, Caustics.jsx.
 |---|---------|--------|----------|
 | 1 | Boids | feat: webgpu boids | headless Edge + swiftshader flags — schools verified in screenshot |
 | 2 | Ripples | feat: interactive water ripples | ripple ring visible in zoomed screenshot; surface clicks no longer double-fire sonar |
-| 3 | Beam+Snow | — | — |
+| 3 | Beam+Snow | feat: gpu marine snow | beam-lit particle cloud verified in screenshot |
 | 4 | WebXR | — | — |
 | 5 | View Transitions | — | — |
 | 6 | Scroll timelines | — | — |
