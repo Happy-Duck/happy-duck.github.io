@@ -1,6 +1,11 @@
 import { useRef, useState, useEffect } from 'react'
-import { createPortal } from 'react-dom'
+import { createPortal, flushSync } from 'react-dom'
 import { motion, AnimatePresence } from 'framer-motion'
+
+// View Transitions: card ↔ modal shared-element morph where supported.
+// With VT active the framer mount/exit animations stand down so the two
+// systems don't fight over the same elements.
+const supportsVT = typeof document !== 'undefined' && 'startViewTransition' in document
 import GithubOriginal from 'devicons-react/lib/icons/GithubOriginal'
 
 // Wrapper to force fill color on icons that don't accept a color prop
@@ -172,7 +177,7 @@ const headerItem = {
 
 // ── Parallax card shell ────────────────────────────────────────────────
 
-function ParallaxCard({ children, delay = 0, onOpen, label }) {
+function ParallaxCard({ children, delay = 0, onOpen, label, vtName }) {
   const innerRef = useRef(null)
 
   const onMouseMove = (e) => {
@@ -211,6 +216,7 @@ function ParallaxCard({ children, delay = 0, onOpen, label }) {
       <div
         ref={innerRef}
         className="project-card project-card--clickable h-full"
+        style={vtName ? { viewTransitionName: vtName } : undefined}
         data-no-ping
         role="button"
         tabIndex={0}
@@ -228,11 +234,11 @@ function ParallaxCard({ children, delay = 0, onOpen, label }) {
 
 // ── Standard card ──────────────────────────────────────────────────────
 
-function ProjectCard({ project, delay, onOpen }) {
+function ProjectCard({ project, delay, onOpen, vtName }) {
   const { Icon, label } = linkIcon(project.link)
   const hasLink = project.link && project.link !== '#'
   return (
-    <ParallaxCard delay={delay} onOpen={onOpen} label={project.title}>
+    <ParallaxCard delay={delay} onOpen={onOpen} label={project.title} vtName={vtName}>
       <div className="flex flex-col gap-3 h-full">
 
         {/* Header row */}
@@ -280,7 +286,7 @@ function ProjectCard({ project, delay, onOpen }) {
 
 // ── Case-study modal ───────────────────────────────────────────────────
 
-function ProjectModal({ project, onClose }) {
+function ProjectModal({ project, onClose, vt }) {
   const closeRef = useRef(null)
   const { Icon, label } = linkIcon(project.link)
   const hasLink = project.link && project.link !== '#'
@@ -306,7 +312,7 @@ function ProjectModal({ project, onClose }) {
     <motion.div
       className="pmodal-backdrop"
       data-no-ping
-      initial={{ opacity: 0 }}
+      initial={vt ? false : { opacity: 0 }}
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
       transition={{ duration: 0.18 }}
@@ -314,10 +320,11 @@ function ProjectModal({ project, onClose }) {
     >
       <motion.div
         className="pmodal"
+        style={vt ? { viewTransitionName: 'case-study' } : undefined}
         role="dialog"
         aria-modal="true"
         aria-label={project.title}
-        initial={{ opacity: 0, y: 26, scale: 0.97 }}
+        initial={vt ? false : { opacity: 0, y: 26, scale: 0.97 }}
         animate={{ opacity: 1, y: 0, scale: 1 }}
         exit={{ opacity: 0, y: 18, scale: 0.97 }}
         transition={{ duration: 0.24, ease: [0.22, 1, 0.36, 1] }}
@@ -389,6 +396,27 @@ function ProjectModal({ project, onClose }) {
 
 export function Projects() {
   const [openIdx, setOpenIdx] = useState(-1)
+  // Which card owns the shared view-transition name (the last one opened)
+  const [vtIdx, setVtIdx] = useState(-1)
+
+  const vtActive = () =>
+    supportsVT && !window.matchMedia('(prefers-reduced-motion: reduce)').matches
+
+  const openModal = (i) => {
+    if (!vtActive()) { setOpenIdx(i); return }
+    // The card must carry the name in the OLD snapshot, the modal in the NEW
+    flushSync(() => setVtIdx(i))
+    document.startViewTransition(() => {
+      flushSync(() => setOpenIdx(i))
+    })
+  }
+
+  const closeModal = () => {
+    if (!vtActive()) { setOpenIdx(-1); return }
+    document.startViewTransition(() => {
+      flushSync(() => setOpenIdx(-1))
+    })
+  }
 
   return (
     <section
@@ -412,19 +440,29 @@ export function Projects() {
       {/* Project grid */}
       <div className="grid sm:grid-cols-2 gap-5">
         {PROJECTS.map((p, i) => (
-          <ProjectCard key={p.title} project={p} delay={i * 0.07} onOpen={() => setOpenIdx(i)} />
+          <ProjectCard
+            key={p.title}
+            project={p}
+            delay={i * 0.07}
+            onOpen={() => openModal(i)}
+            vtName={vtIdx === i && openIdx !== i ? 'case-study' : undefined}
+          />
         ))}
       </div>
 
-      {/* Case-study modal */}
-      <AnimatePresence>
-        {openIdx >= 0 && (
-          <ProjectModal
-            project={PROJECTS[openIdx]}
-            onClose={() => setOpenIdx(-1)}
-          />
-        )}
-      </AnimatePresence>
+      {/* Case-study modal — with View Transitions the morph replaces the
+          framer mount/exit, so AnimatePresence must not delay unmount */}
+      {supportsVT ? (
+        openIdx >= 0 && (
+          <ProjectModal project={PROJECTS[openIdx]} onClose={closeModal} vt />
+        )
+      ) : (
+        <AnimatePresence>
+          {openIdx >= 0 && (
+            <ProjectModal project={PROJECTS[openIdx]} onClose={closeModal} />
+          )}
+        </AnimatePresence>
+      )}
     </section>
   )
 }

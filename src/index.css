@@ -636,6 +636,18 @@ html::-webkit-scrollbar { display: none; }
   color:   var(--card-link-hover);
 }
 
+/* Card ↔ modal shared-element morph */
+::view-transition-group(case-study) {
+  animation-duration: 0.32s;
+  animation-timing-function: cubic-bezier(0.22, 1, 0.36, 1);
+}
+::view-transition-old(case-study),
+::view-transition-new(case-study) {
+  animation-duration: 0.32s;
+  height: 100%;
+  overflow: clip;
+}
+
 .pmodal-backdrop {
   position:        fixed;
   inset:           0;

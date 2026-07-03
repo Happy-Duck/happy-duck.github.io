@@ -57,7 +57,7 @@ the build, and that unsupported browsers never see the button.
 Files: `src/components/XRDive.jsx` (+ lazy `src/lib/xrScene.js`), Terminal,
 App, CSS, package.json (three).
 
-## 5. View Transitions modal morph — [ ] TODO
+## 5. View Transitions modal morph — [x] DONE
 
 Case-study card ↔ modal morph via `document.startViewTransition` +
 `flushSync`; assign a shared `view-transition-name: case-study` to the
@@ -111,7 +111,7 @@ Files: raysRenderer.js, rays.worker.js, Caustics.jsx.
 | 2 | Ripples | feat: interactive water ripples | ripple ring visible in zoomed screenshot; surface clicks no longer double-fire sonar |
 | 3 | Beam+Snow | feat: gpu marine snow | beam-lit particle cloud verified in screenshot |
 | 4 | WebXR | feat: webxr dive mode | chunk split verified (xrScene 527kB lazy); fab hidden without headset; needs a real Quest test by owner |
-| 5 | View Transitions | — | — |
+| 5 | View Transitions | feat: view-transition morph | morph captured mid-flight in screenshot; open/close/reopen verified |
 | 6 | Scroll timelines | — | — |
 | 7 | Gyro | — | — |
 | 8 | Worker rays | — | — |
