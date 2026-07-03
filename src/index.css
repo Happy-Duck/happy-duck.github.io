@@ -1753,6 +1753,38 @@ html::-webkit-scrollbar { display: none; }
   font-variant-numeric: tabular-nums;
 }
 
+/* Tooltip — appears to the left of the button (mirrors .term-fab-tip) */
+.divelog-tip {
+  position:       absolute;
+  right:          calc(100% + 10px);
+  top:            50%;
+  transform:      translateY(-50%);
+  white-space:    nowrap;
+  font-family:    ui-monospace, monospace;
+  font-size:      0.65rem;
+  letter-spacing: 0.06em;
+  padding:        4px 10px;
+  border-radius:  6px;
+  background:     rgba(0, 10, 24, 0.85);
+  color:          rgba(170, 230, 255, 0.95);
+  opacity:        0;
+  pointer-events: none;
+  transition:     opacity 0.2s ease;
+}
+.divelog-btn:hover .divelog-tip,
+.divelog-btn:focus-visible .divelog-tip {
+  opacity: 1;
+}
+
+@media (max-width: 640px) {
+  .divelog-tip {
+    right:     0;
+    top:       auto;
+    bottom:    calc(100% + 8px);
+    transform: none;
+  }
+}
+
 .divelog-panel {
   position:        fixed;
   right:           16px;

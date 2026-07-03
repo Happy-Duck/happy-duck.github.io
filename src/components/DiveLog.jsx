@@ -78,6 +78,7 @@ export function DiveLog() {
       >
         <BookIcon />
         <span className="divelog-count">{count}/{SPECIES.length}</span>
+        <span className="divelog-tip">dive log — species you've spotted</span>
       </button>
 
       <AnimatePresence>
