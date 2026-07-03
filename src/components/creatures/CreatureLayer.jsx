@@ -12,6 +12,7 @@ import { SnailFish        } from './SnailFish'
 export function CreatureLayer() {
   return (
     <div
+      className="creature-layer"
       style={{
         position:      'fixed',
         inset:         0,

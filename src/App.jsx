@@ -21,6 +21,7 @@ import { ContactSidebar } from './components/ContactSidebar'
 import { DiveLog       } from './components/DiveLog'
 import { Terminal      } from './components/Terminal'
 import { XRDive        } from './components/XRDive'
+import { GyroParallax  } from './components/GyroParallax'
 import { Footer        } from './components/Footer'
 
 export default function App() {
@@ -44,6 +45,9 @@ export default function App() {
 
       {/* VR dive — appears only on XR-capable browsers */}
       <XRDive />
+
+      {/* Tilt parallax — coarse pointers only */}
+      <GyroParallax />
 
       <div className="relative overflow-hidden">
 

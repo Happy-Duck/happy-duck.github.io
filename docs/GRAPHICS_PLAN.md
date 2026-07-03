@@ -77,7 +77,7 @@ remains as the universal fallback (JS keeps running — it feeds other
 consumers). Verify: computed opacity at depths matches previous behavior.
 Files: `src/index.css` only.
 
-## 7. Gyroscope parallax (mobile) — [ ] TODO
+## 7. Gyroscope parallax (mobile) — [x] DONE
 
 `src/components/GyroParallax.jsx`: on `(pointer: coarse)` devices, listen
 to `deviceorientation` (iOS: request permission on first touchend —
@@ -113,7 +113,7 @@ Files: raysRenderer.js, rays.worker.js, Caustics.jsx.
 | 4 | WebXR | feat: webxr dive mode | chunk split verified (xrScene 527kB lazy); fab hidden without headset; needs a real Quest test by owner |
 | 5 | View Transitions | feat: view-transition morph | morph captured mid-flight in screenshot; open/close/reopen verified |
 | 6 | Scroll timelines | feat: scroll-driven fades | computed opacities match JS ramps exactly at 4 depths |
-| 7 | Gyro | — | — |
+| 7 | Gyro | feat: gyro parallax | synthetic DeviceOrientationEvent shifts layers under mobile emulation |
 | 8 | Worker rays | — | — |
 
 ## Notes / decisions
