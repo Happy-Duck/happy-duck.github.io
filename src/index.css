@@ -457,6 +457,69 @@ html::-webkit-scrollbar { display: none; }
 }
 
 /* ═══════════════════════════════════════════════════════════════════
+   SCROLL-DRIVEN ANIMATIONS — compositor-driven depth fades
+   Where supported, these outrank the var-based opacity declarations in
+   the cascade, so the fades run entirely off the main thread. The JS
+   var path (OceanDepthContext) keeps running as the universal fallback
+   and still feeds non-CSS consumers. Keyframe percentages mirror the JS
+   ramps exactly.
+   ═══════════════════════════════════════════════════════════════════ */
+
+@supports (animation-timeline: scroll()) {
+  /* particle-opacity: 0 below 45%, → 0.7 by 65% */
+  .marine-snow-wrap {
+    animation-name: sda-snow;
+    animation-timing-function: linear;
+    animation-fill-mode: both;
+    animation-duration: auto;
+    animation-timeline: scroll(root);
+  }
+  /* plankton: 0.8 until 5%, → 0 by 40% */
+  .plankton-wrap {
+    animation-name: sda-plankton;
+    animation-timing-function: linear;
+    animation-fill-mode: both;
+    animation-duration: auto;
+    animation-timeline: scroll(root);
+  }
+  /* beach-op: 1 until 12%, → 0 by 25% */
+  .water-surface,
+  .watersim-canvas,
+  .caustics-canvas {
+    animation-name: sda-beach;
+    animation-timing-function: linear;
+    animation-fill-mode: both;
+    animation-duration: auto;
+    animation-timeline: scroll(root);
+  }
+  /* rov darkness: 0 at 55%, → 0.9 by 75% */
+  .rov-dark {
+    animation-name: sda-rov;
+    animation-timing-function: linear;
+    animation-fill-mode: both;
+    animation-duration: auto;
+    animation-timeline: scroll(root);
+  }
+}
+
+@keyframes sda-snow {
+  0%, 45% { opacity: 0; }
+  65%, 100% { opacity: 0.7; }
+}
+@keyframes sda-plankton {
+  0%, 5% { opacity: 0.8; }
+  40%, 100% { opacity: 0; }
+}
+@keyframes sda-beach {
+  0%, 12% { opacity: 1; }
+  25%, 100% { opacity: 0; }
+}
+@keyframes sda-rov {
+  0%, 55% { opacity: 0; }
+  75%, 100% { opacity: 0.9; }
+}
+
+/* ═══════════════════════════════════════════════════════════════════
    HERO
    ═══════════════════════════════════════════════════════════════════ */
 

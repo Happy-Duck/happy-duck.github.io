@@ -66,7 +66,7 @@ suppress the framer scale/fade so animations don't double; without support,
 current framer behavior unchanged. Respect reduced motion (skip VT).
 Files: `src/components/Projects.jsx`, CSS (`::view-transition-*` tuning).
 
-## 6. CSS scroll-driven animations — [ ] TODO
+## 6. CSS scroll-driven animations — [x] DONE
 
 Inside `@supports (animation-timeline: scroll())`: drive `.marine-snow-wrap`,
 `.plankton-wrap`, `.water-surface`, `.caustics-canvas`, and `.rov-dark`
@@ -112,7 +112,7 @@ Files: raysRenderer.js, rays.worker.js, Caustics.jsx.
 | 3 | Beam+Snow | feat: gpu marine snow | beam-lit particle cloud verified in screenshot |
 | 4 | WebXR | feat: webxr dive mode | chunk split verified (xrScene 527kB lazy); fab hidden without headset; needs a real Quest test by owner |
 | 5 | View Transitions | feat: view-transition morph | morph captured mid-flight in screenshot; open/close/reopen verified |
-| 6 | Scroll timelines | — | — |
+| 6 | Scroll timelines | feat: scroll-driven fades | computed opacities match JS ramps exactly at 4 depths |
 | 7 | Gyro | — | — |
 | 8 | Worker rays | — | — |
 
