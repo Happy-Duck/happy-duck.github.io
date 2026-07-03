@@ -800,6 +800,20 @@ html::-webkit-scrollbar { display: none; }
   --tod-wave-3: rgba(255, 235, 195, 0.24);
 }
 
+/* Interactive water ripple sim — the very surface band */
+.watersim-canvas {
+  position:       fixed;
+  top:            0;
+  left:           0;
+  right:          0;
+  width:          100%;
+  height:         22vh;
+  z-index:        1;
+  pointer-events: none;
+  opacity:        var(--beach-op, 1);
+  /* No transition — JS drives --beach-op per-frame */
+}
+
 /* WebGL caustics — light-dance band under the surface */
 .caustics-canvas {
   position:       fixed;

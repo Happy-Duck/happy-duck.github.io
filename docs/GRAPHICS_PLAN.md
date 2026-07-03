@@ -21,7 +21,7 @@ NOTE: headless Edge may lack WebGPU — try launch flags
 `--enable-unsafe-webgpu --use-webgpu-adapter=swiftshader`; if unavailable,
 verify the no-WebGPU path headless and screenshot on best effort.
 
-## 2. Interactive water ripples — [ ] TODO
+## 2. Interactive water ripples — [x] DONE
 
 WebGL2 height-field wave sim (ping-pong float FBOs: next = 2·curr − prev +
 c²·∇²curr, damped) across the top ~22vh, opacity tied to `--beach-op`.
@@ -108,7 +108,7 @@ Files: raysRenderer.js, rays.worker.js, Caustics.jsx.
 | # | Feature | Commit | Verified |
 |---|---------|--------|----------|
 | 1 | Boids | feat: webgpu boids | headless Edge + swiftshader flags — schools verified in screenshot |
-| 2 | Ripples | — | — |
+| 2 | Ripples | feat: interactive water ripples | ripple ring visible in zoomed screenshot; surface clicks no longer double-fire sonar |
 | 3 | Beam+Snow | — | — |
 | 4 | WebXR | — | — |
 | 5 | View Transitions | — | — |

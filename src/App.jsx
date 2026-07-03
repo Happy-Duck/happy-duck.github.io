@@ -5,6 +5,7 @@ import { SonarPing     } from './components/SonarPing'
 import { BioTrail      } from './components/BioTrail'
 import { FloorStamp    } from './components/FloorStamp'
 import { WaterSurface  } from './components/WaterSurface'
+import { WaterSim      } from './components/WaterSim'
 import { Caustics      } from './components/Caustics'
 import { CreatureLayer } from './components/creatures/CreatureLayer'
 import { BoidSchool    } from './components/creatures/BoidSchool'
@@ -46,6 +47,9 @@ export default function App() {
 
         {/* Water surface — underwater perspective, only near surface (depth < 0.20) */}
         <WaterSurface />
+
+        {/* Interactive ripple sim — cursor wakes + click drops */}
+        <WaterSim />
 
         {/* Depth overlay gradients */}
         <div className="overlay-deep" />
