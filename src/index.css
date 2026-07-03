@@ -487,6 +487,17 @@ html::-webkit-scrollbar { display: none; }
 .creature-deep { opacity: var(--creature-deep-op); transition: opacity 0.8s ease; }
 .creature-reef { opacity: var(--creature-reef-op); transition: opacity 0.8s ease; }
 
+/* WebGPU boid school — creature layer, band opacity set by JS */
+.boid-canvas {
+  position:       fixed;
+  inset:          0;
+  width:          100%;
+  height:         100%;
+  z-index:        3;
+  pointer-events: none;
+  opacity:        0;
+}
+
 /* ═══════════════════════════════════════════════════════════════════
    PROJECTS
    ═══════════════════════════════════════════════════════════════════ */

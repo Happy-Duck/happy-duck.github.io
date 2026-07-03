@@ -10,6 +10,11 @@ export function firePing(x, y) {
   ping.t = performance.now()
 }
 
+// Raw ping state — for GPU consumers that upload it as uniforms
+export function getPing() {
+  return ping
+}
+
 // Returns null if no active ping is in range of (x, y); otherwise the
 // normalized away-vector and strength 0..1.
 export function pingImpulse(x, y, radius = 320) {

@@ -7,7 +7,7 @@ as you go. Conventions from CLAUDE.md apply everywhere: zero lint, reduced
 motion, `data-no-ping` on interactive surfaces, real-photo art only,
 feature-detect + graceful absence for every new API.
 
-## 1. WebGPU boids — school of fish — [ ] TODO
+## 1. WebGPU boids — school of fish — [x] DONE
 
 Compute-shader flocking (separation/alignment/cohesion) for ~400 fish,
 rendered as instanced oriented triangles on a transparent canvas at the
@@ -107,7 +107,7 @@ Files: raysRenderer.js, rays.worker.js, Caustics.jsx.
 
 | # | Feature | Commit | Verified |
 |---|---------|--------|----------|
-| 1 | Boids | — | — |
+| 1 | Boids | feat: webgpu boids | headless Edge + swiftshader flags — schools verified in screenshot |
 | 2 | Ripples | — | — |
 | 3 | Beam+Snow | — | — |
 | 4 | WebXR | — | — |
@@ -118,4 +118,7 @@ Files: raysRenderer.js, rays.worker.js, Caustics.jsx.
 
 ## Notes / decisions
 
-- (append as you go)
+- WebGPU IS testable headless: launch Edge with `--enable-unsafe-webgpu
+  --enable-features=Vulkan --use-webgpu-adapter=swiftshader`. drawImage
+  readback from a WebGPU canvas returns blank between frames — judge via
+  page.screenshot (composited) instead.

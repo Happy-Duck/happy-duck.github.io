@@ -7,6 +7,7 @@ import { FloorStamp    } from './components/FloorStamp'
 import { WaterSurface  } from './components/WaterSurface'
 import { Caustics      } from './components/Caustics'
 import { CreatureLayer } from './components/creatures/CreatureLayer'
+import { BoidSchool    } from './components/creatures/BoidSchool'
 import { Whale         } from './components/creatures/Whale'
 import { DepthGauge    } from './components/DepthGauge'
 import { Hero          } from './components/Hero'
@@ -55,6 +56,9 @@ export default function App() {
 
         {/* Sea creatures — depth-zone aware */}
         <CreatureLayer />
+
+        {/* WebGPU fish school — additive; absent without navigator.gpu */}
+        <BoidSchool />
 
         {/* Plankton — CSS-only, visible near surface (depth < 0.30) */}
         <Plankton />
