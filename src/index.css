@@ -562,13 +562,15 @@ html::-webkit-scrollbar { display: none; }
 /* While GPU snow is alive, the CSS snow stands down */
 :root.gpu-snow .marine-snow-wrap { display: none; }
 
-/* WebGPU boid school — creature layer, band opacity set by JS */
+/* WebGPU boid school — background schooling layer, BEHIND the sprite
+   creatures (z-3) so the hero animals always read in front; band
+   opacity set by JS */
 .boid-canvas {
   position:       fixed;
   inset:          0;
   width:          100%;
   height:         100%;
-  z-index:        3;
+  z-index:        2;
   pointer-events: none;
   opacity:        0;
 }

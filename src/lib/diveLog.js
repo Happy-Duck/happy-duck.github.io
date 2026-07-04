@@ -63,10 +63,11 @@ export function inspectSeen(id, x, y, r, mouse) {
   // Count contact ticks, resetting on a GAP in contact rather than on
   // every miss — multi-instance species (two jellies, two squid, three
   // clownfish) share an id, and the far twin's misses would otherwise
-  // zero the counter every frame.
+  // zero the counter every frame. The gap allows for slow inspectors:
+  // the boid school only polls every 4th frame (GPU readback).
   const now = performance.now()
   const h = hover[id] || (hover[id] = { n: 0, last: 0 })
-  h.n = now - h.last < 90 ? h.n + 1 : 1
+  h.n = now - h.last < 150 ? h.n + 1 : 1
   h.last = now
   if (h.n >= HOVER_FRAMES) markSeen(id)
 }

@@ -1,7 +1,18 @@
 // ── Species registry — dive log entries ───────────────────────────────
-// ids match the tickSeen()/markSeen() calls inside each creature.
+// ids match the inspectSeen()/markSeen() calls inside each creature.
+
+// The anchovy school is WebGPU-only and stands down under reduced motion
+// (see BoidSchool.jsx) — its entry is only listed where the school can
+// actually render, so the journal stays completable everywhere else.
+const HAS_SCHOOL =
+  typeof navigator !== 'undefined' && Boolean(navigator.gpu) &&
+  typeof window !== 'undefined' &&
+  !window.matchMedia('(prefers-reduced-motion: reduce)').matches
 
 export const SPECIES = [
+  ...(HAS_SCHOOL ? [
+    { id: 'anchovy',        name: 'Anchovy School',    zone: 'Sunlit Zone',   depth: '0–1,000 m',     note: 'Moves as one. Thinks as none.' },
+  ] : []),
   { id: 'reefFish',         name: 'Clownfish',         zone: 'Sunlit Zone',   depth: '0–200 m',       note: 'Travels in threes. Refuses to discuss the anemone incident.' },
   { id: 'seaTurtle',        name: 'Green Sea Turtle',  zone: 'Sunlit Zone',   depth: '0–200 m',       note: 'Unbothered. Moisturized. In its lane.' },
   { id: 'jellyfish',        name: 'Moon Jellyfish',    zone: 'Twilight Zone', depth: '200–1,000 m',   note: '95% water, 100% vibes.' },
