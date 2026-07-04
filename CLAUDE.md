@@ -3,8 +3,9 @@
 Rishi Garhyan's deep-sea portfolio (happy-duck.github.io). React 19 + Vite 8
 + Tailwind v4 + Framer Motion. The page is a side-on cross-section of the
 ocean: scrolling = diving 0–6,000 m. Read this whole file before touching
-the ocean systems; `docs/FEATURE_PLAN.md` holds the feature-by-feature
-history, specs, and hard-won gotchas.
+the ocean systems; `docs/FEATURE_PLAN.md` (wave 1) and
+`docs/GRAPHICS_PLAN.md` (wave 2: WebGPU/WebGL/XR features) hold the
+feature-by-feature history, specs, and hard-won gotchas.
 
 ## Commands
 
@@ -79,6 +80,44 @@ history, specs, and hard-won gotchas.
   for a side view. Never call `WEBGL_lose_context.loseContext()` in effect
   cleanup: StrictMode remounts inherit a dead context that paints opaque
   white.
+
+## GPU / advanced-web systems (wave 2)
+
+- **BoidSchool** (`creatures/BoidSchool.jsx`): WebGPU compute boids,
+  ~380 fish, band 0.04–0.48. Rendered as textured quads carrying
+  `public/creatures/anchovy.png` (real photo cutout, CC BY-SA 4.0
+  Ebachiller/Wikimedia — keep the attribution comment); mips are uploaded
+  as pre-scaled ImageBitmaps (no auto mipgen in WebGPU); v-flip when
+  dir.x<0 or leftward fish swim belly-up. No `navigator.gpu` OR failed
+  sprite fetch → transparent canvas, sprites carry the scene.
+  Headless-testable with Edge flags `--enable-unsafe-webgpu
+  --enable-features=Vulkan --use-webgpu-adapter=swiftshader`; judge
+  WebGPU/WebGL canvases via page.screenshot — drawImage readback is
+  blank between frames.
+- **Water ripples: REMOVED, don't rebuild.** Two attempts died in wave
+  2/2.1 (top-down 2D field: wrong physics for a side view; edge-on 1D
+  waterline splash: owner tried it live and cut it). The SVG waves own
+  the surface; sonar owns ALL open-water clicks. History + wave-sim
+  laws (FBO clears, NaN scrub, dimension-dependent c² limits) live in
+  docs/GRAPHICS_PLAN.md §2.
+- **DeepParticles** (`DeepParticles.jsx`): GPU snow, motion computed in
+  the vertex shader from seeds+time; brightens inside the beam; adds
+  `:root.gpu-snow` which stands the CSS snow down.
+- **Rays worker** (`lib/raysRenderer.js` + `workers/rays.worker.js` +
+  `Caustics.jsx`): OffscreenCanvas rendering off-main-thread. NEVER
+  re-transfer or terminate: worker is stashed on the canvas element and
+  reused across StrictMode remounts; post transitions only.
+- **XRDive** (`XRDive.jsx` + `lib/xrScene.js`): three.js via dynamic
+  import (own lazy chunk — keep it that way); fab renders only where
+  immersive-vr is supported; terminal `vr` command.
+- **View Transitions** (`Projects.jsx`): card↔modal morph; the vt name is
+  owned by ONE element per snapshot (card when closed, modal when open);
+  framer/AnimatePresence stand down when VT is active.
+- **Scroll-driven animations** (`index.css` @supports block): depth fades
+  on the compositor; keyframe percentages MUST mirror the JS ramps —
+  update both together.
+- **GyroParallax** (`GyroParallax.jsx`): tilt → `--tilt-x/-y` on coarse
+  pointers; CSS consumes under `(pointer: coarse)`.
 
 ## z-index map
 

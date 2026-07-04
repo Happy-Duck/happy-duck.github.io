@@ -1,4 +1,5 @@
 import { MarineSnow    } from './components/MarineSnow'
+import { DeepParticles } from './components/DeepParticles'
 import { Plankton      } from './components/Plankton'
 import { RovLight      } from './components/RovLight'
 import { SonarPing     } from './components/SonarPing'
@@ -7,6 +8,7 @@ import { FloorStamp    } from './components/FloorStamp'
 import { WaterSurface  } from './components/WaterSurface'
 import { Caustics      } from './components/Caustics'
 import { CreatureLayer } from './components/creatures/CreatureLayer'
+import { BoidSchool    } from './components/creatures/BoidSchool'
 import { Whale         } from './components/creatures/Whale'
 import { DepthGauge    } from './components/DepthGauge'
 import { Hero          } from './components/Hero'
@@ -17,6 +19,8 @@ import { About         } from './components/About'
 import { ContactSidebar } from './components/ContactSidebar'
 import { DiveLog       } from './components/DiveLog'
 import { Terminal      } from './components/Terminal'
+import { XRDive        } from './components/XRDive'
+import { GyroParallax  } from './components/GyroParallax'
 import { Footer        } from './components/Footer'
 
 export default function App() {
@@ -38,6 +42,12 @@ export default function App() {
       {/* Submarine terminal — type "cmd" or press ` */}
       <Terminal />
 
+      {/* VR dive — appears only on XR-capable browsers */}
+      <XRDive />
+
+      {/* Tilt parallax — coarse pointers only */}
+      <GyroParallax />
+
       <div className="relative overflow-hidden">
 
         {/* WebGL caustics — shader light-dance in the sunlit zone */}
@@ -56,11 +66,17 @@ export default function App() {
         {/* Sea creatures — depth-zone aware */}
         <CreatureLayer />
 
+        {/* WebGPU fish school — additive; absent without navigator.gpu */}
+        <BoidSchool />
+
         {/* Plankton — CSS-only, visible near surface (depth < 0.30) */}
         <Plankton />
 
         {/* Marine snow — CSS-only, fades in at depth > 0.35 */}
         <MarineSnow />
+
+        {/* GPU marine snow — lit volumetrically by the ROV beam */}
+        <DeepParticles />
 
         {/* ROV headlight — darkness + cursor light cone in deep zones */}
         <RovLight />

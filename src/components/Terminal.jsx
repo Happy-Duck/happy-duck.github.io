@@ -161,6 +161,12 @@ function runCommand(raw, ctx) {
       window.open('https://store.steampowered.com/app/2645390/Pelagos_A_Marine_Adventure', '_blank', 'noopener')
       return ['surfacing Steam page…']
 
+    case 'vr':
+      if (!('xr' in navigator)) return ['no immersive rig detected on this vessel.']
+      window.dispatchEvent(new CustomEvent('ocean:enter-vr'))
+      setTimeout(ctx.close, 800)
+      return ['donning the headset…']
+
     case 'clear':
       ctx.clear()
       return []
