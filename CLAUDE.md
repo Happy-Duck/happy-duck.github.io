@@ -89,7 +89,10 @@ feature-by-feature history, specs, and hard-won gotchas.
   ~380 fish, band 0.04–0.275 (≈40–400 m — anchovies are epipelagic,
   keep the claim realistic), z-2 — a hazy BACKGROUND layer behind the
   sprite creatures (owner wants it subtle and unhurried; schools stream
-  as ribbons via anisotropic cohesion + speed floor, never discs). Rendered as textured
+  as ribbons via anisotropic cohesion + speed floor, never discs). The
+  sim integrates with a dt `step` uniform normalized to 60 fps — without
+  it, high-refresh displays fast-forward the school (found live: fish
+  "sped up" whenever scroll jank stopped). Rendered as textured
   quads carrying `public/creatures/anchovy.png` (real photo cutout,
   CC BY-SA 4.0 Ebachiller/Wikimedia — keep the attribution comment);
   mips are uploaded as pre-scaled ImageBitmaps (no auto mipgen in

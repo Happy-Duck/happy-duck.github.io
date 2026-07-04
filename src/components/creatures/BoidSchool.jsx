@@ -33,7 +33,8 @@ struct Params {
   pingStr: f32,
   count:   u32,
   time:    f32,
-  _pad:    f32,
+  step:    f32, // elapsed frame time in 60fps units — sim constants are
+                // tuned per-60fps-step, so integration scales by this
 }
 
 @group(0) @binding(0) var<storage, read> boidsIn: array<Boid>;
@@ -94,14 +95,14 @@ fn cs(@builtin(global_invocation_id) gid: vec3u) {
   if (pos.y < top) { acc.y += (top - pos.y) * 0.008; }
   if (pos.y > bot) { acc.y -= (pos.y - bot) * 0.008; }
 
-  vel += acc;
+  vel += acc * P.step;
   let speed = length(vel);
   if (speed > 1.7) { vel = vel / speed * 1.7; }
   // High floor (relative to the cap): milling in place is what lets a
   // school collapse into a disc — everyone keeps swimming, so shapes
   // stay drawn out
   if (speed < 1.0) { vel = vel / max(speed, 0.001) * 1.0; }
-  pos += vel;
+  pos += vel * P.step;
 
   // Horizontal wrap with a margin so fish don't pop at the edges
   if (pos.x < -24.0)          { pos.x += P.res.x + 48.0; }
@@ -327,12 +328,21 @@ export function BoidSchool() {
       resize()
       window.addEventListener('resize', resize, { passive: true })
 
+      let lastT = 0
       const frame = () => {
         rafId = requestAnimationFrame(frame)
-        if (document.hidden || opacityRef.current <= 0.01) return
+        if (document.hidden || opacityRef.current <= 0.01) { lastT = 0; return }
+
+        // The sim is stepped per rendered frame, so without dt-scaling a
+        // 120/144 Hz display fast-forwards the school (and main-thread
+        // jank while scrolling slows it). Normalize to 60 fps units,
+        // clamped so tab-switch gaps don't teleport the fish.
+        const now = performance.now()
+        const step = lastT > 0 ? Math.min(2.5, Math.max(0.25, (now - lastT) / (1000 / 60))) : 1
+        lastT = now
 
         const ping = getPing()
-        const pingAge = performance.now() - ping.t
+        const pingAge = now - ping.t
         params[0] = window.innerWidth
         params[1] = window.innerHeight
         params[2] = mouseRef.current.x
@@ -341,7 +351,8 @@ export function BoidSchool() {
         params[5] = ping.y
         params[6] = pingAge < 600 ? 1 - pingAge / 600 : 0
         paramsU32[7] = COUNT
-        params[8] = performance.now() / 1000
+        params[8] = now / 1000
+        params[9] = step
         device.queue.writeBuffer(paramBuf, 0, params)
 
         const useAB = !flip
