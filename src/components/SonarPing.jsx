@@ -11,7 +11,7 @@ export function SonarPing() {
       firePing(x, y)
       const id = idRef.current++
       setRings(r => [...r, { id, x, y }])
-      setTimeout(() => setRings(r => r.filter(q => q.id !== id)), 1900)
+      setTimeout(() => setRings(r => r.filter(q => q.id !== id)), 1600)
     }
 
     const onClick = (e) => {
