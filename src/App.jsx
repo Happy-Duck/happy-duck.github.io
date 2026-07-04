@@ -15,6 +15,7 @@ import { Hero          } from './components/Hero'
 import { Experience    } from './components/Experience'
 import { Skills        } from './components/Skills'
 import { Projects      } from './components/Projects'
+import { Education     } from './components/Education'
 import { About         } from './components/About'
 import { ContactSidebar } from './components/ContactSidebar'
 import { DiveLog       } from './components/DiveLog'
@@ -94,11 +95,14 @@ export default function App() {
         <DepthGauge />
 
         {/* ── Page content (z 10) ────────────────────────────────── */}
+        {/* Recruiter's dive: internships first, then what got shipped,
+            the toolbox, credentials, and the personal log at the floor */}
         <main id="main">
           <Hero />
-          <Projects />
           <Experience />
+          <Projects />
           <Skills />
+          <Education />
           <About />
         </main>
 
