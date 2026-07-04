@@ -89,7 +89,7 @@ mousemove on touch, so CSS transform isn't overridden there). Verify by
 dispatching synthetic DeviceOrientationEvents headless.
 Files: GyroParallax.jsx, App, CreatureLayer (className hook), CSS.
 
-## 8. OffscreenCanvas worker for the god rays — [ ] TODO
+## 8. OffscreenCanvas worker for the god rays — [x] DONE
 
 Extract the ray renderer into `src/lib/raysRenderer.js` (takes canvas-like +
 returns { setTod, setVisible, resize, drawOnce }). `Caustics.jsx` feature-
@@ -114,7 +114,7 @@ Files: raysRenderer.js, rays.worker.js, Caustics.jsx.
 | 5 | View Transitions | feat: view-transition morph | morph captured mid-flight in screenshot; open/close/reopen verified |
 | 6 | Scroll timelines | feat: scroll-driven fades | computed opacities match JS ramps exactly at 4 depths |
 | 7 | Gyro | feat: gyro parallax | synthetic DeviceOrientationEvent shifts layers under mobile emulation |
-| 8 | Worker rays | — | — |
+| 8 | Worker rays | feat: worker rays + water sim hardening | worker path confirmed; tod messaging works |
 
 ## Notes / decisions
 
@@ -122,3 +122,9 @@ Files: raysRenderer.js, rays.worker.js, Caustics.jsx.
   --enable-features=Vulkan --use-webgpu-adapter=swiftshader`. drawImage
   readback from a WebGPU canvas returns blank between frames — judge via
   page.screenshot (composited) instead.
+- Wave-sim hard lessons: (1) texImage2D(null) is NOT reliably zero-filled
+  on every driver — clear FBOs explicitly after allocation, and scrub
+  NaN in the sim shader (NaN × damping = NaN forever). (2) c² = 0.5 is
+  the exact 2D FDTD stability limit — run at 0.42 or the field saturates
+  with ringing. (3) R16F is LINEAR-filterable in core WebGL2 — NEAREST at
+  low sim res reads as blocky confetti.

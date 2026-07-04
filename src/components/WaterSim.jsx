@@ -34,13 +34,19 @@ void main() {
     + texture(u_curr, v_uv + vec2(u_texel.x, 0.0)).r
     + texture(u_curr, v_uv - vec2(0.0, u_texel.y)).r
     + texture(u_curr, v_uv + vec2(0.0, u_texel.y)).r;
-  float next = (c * 2.0 - p) + (sum - 4.0 * c) * 0.5;
-  next *= 0.982;
+  // c^2 = 0.42 stays safely under the 2D FDTD stability limit of 0.5 —
+  // at the limit, rounding growth saturates the field with ringing
+  float next = (c * 2.0 - p) + (sum - 4.0 * c) * 0.42;
+  next *= 0.965;
   if (u_drop.z != 0.0) {
     vec2 dpx = (v_uv - u_drop.xy) / u_texel;
     float d2 = dot(dpx, dpx);
     next += u_drop.z * exp(-d2 / (u_radius * u_radius));
   }
+  // Scrub NaN/Inf (uninitialized driver memory would otherwise persist
+  // forever: NaN * damping = NaN) and clamp against half-float overflow
+  if (!(next == next)) { next = 0.0; }
+  next = clamp(next, -4.0, 4.0);
   o = vec4(next, 0.0, 0.0, 1.0);
 }`
 
@@ -55,10 +61,10 @@ void main() {
   float hr = texture(u_h, v_uv + vec2(u_texel.x, 0.0)).r;
   float hd = texture(u_h, v_uv - vec2(0.0, u_texel.y)).r;
   float hu = texture(u_h, v_uv + vec2(0.0, u_texel.y)).r;
-  vec3 n = normalize(vec3(hl - hr, hd - hu, 0.30));
-  float spec = pow(max(dot(n, normalize(vec3(-0.3, 0.55, 0.78))), 0.0), 20.0);
-  float fres = pow(1.0 - abs(n.z), 1.6);
-  float a = clamp(spec * 0.85 + fres * 1.1, 0.0, 1.0);
+  vec3 n = normalize(vec3(hl - hr, hd - hu, 0.5));
+  float spec = pow(max(dot(n, normalize(vec3(-0.3, 0.55, 0.78))), 0.0), 22.0);
+  float fres = pow(1.0 - abs(n.z), 1.5);
+  float a = clamp(spec * 0.55 + fres * 0.6, 0.0, 1.0);
   a *= smoothstep(0.0, 0.45, v_uv.y); // dissolve toward the band's bottom
   o = vec4(vec3(0.86, 0.97, 1.0) * a, a); // premultiplied
 }`
@@ -120,8 +126,10 @@ export function WaterSim() {
       const t = gl.createTexture()
       gl.bindTexture(gl.TEXTURE_2D, t)
       gl.texImage2D(gl.TEXTURE_2D, 0, gl.R16F, simW, simH, 0, gl.RED, gl.HALF_FLOAT, null)
-      gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST)
-      gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST)
+      // R16F is texture-filterable in core WebGL2 — LINEAR keeps the
+      // upscaled display pass smooth instead of blocky
+      gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR)
+      gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR)
       gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE)
       gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE)
       return t
@@ -135,6 +143,10 @@ export function WaterSim() {
         const f = gl.createFramebuffer()
         gl.bindFramebuffer(gl.FRAMEBUFFER, f)
         gl.framebufferTexture2D(gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0, gl.TEXTURE_2D, t, 0)
+        // texImage2D(null) is NOT reliably zero-filled on every driver —
+        // clear explicitly or garbage NaNs live in the sim forever
+        gl.clearColor(0, 0, 0, 0)
+        gl.clear(gl.COLOR_BUFFER_BIT)
         return f
       })
       gl.bindFramebuffer(gl.FRAMEBUFFER, null)
@@ -143,8 +155,8 @@ export function WaterSim() {
     const resize = () => {
       canvas.width = window.innerWidth
       canvas.height = Math.round(window.innerHeight * 0.22)
-      simW = Math.max(64, canvas.width >> 2)
-      simH = Math.max(32, canvas.height >> 2)
+      simW = Math.max(128, canvas.width >> 1)
+      simH = Math.max(48, canvas.height >> 1)
       alloc()
     }
     resize()
@@ -175,13 +187,13 @@ export function WaterSim() {
       if (now - lastT < 34 || Math.abs(e.clientX - lastX) < 8) return
       lastT = now
       lastX = e.clientX
-      queueDrop(e.clientX, e.clientY, 0.35, 2.4)
+      queueDrop(e.clientX, e.clientY, 0.55, 5.0)
     }
     const onClick = (e) => {
       if (e.target.closest('a,button,input,textarea,[data-no-ping]')) return
-      queueDrop(e.clientX, e.clientY, 1.6, 3.5)
+      queueDrop(e.clientX, e.clientY, 2.8, 7.0)
     }
-    const onPing = (e) => queueDrop(e.detail.x, e.detail.y, 1.6, 3.5)
+    const onPing = (e) => queueDrop(e.detail.x, e.detail.y, 2.8, 7.0)
     window.addEventListener('mousemove', onMove, { passive: true })
     window.addEventListener('click', onClick)
     window.addEventListener('ocean:ping', onPing)
@@ -189,7 +201,7 @@ export function WaterSim() {
     // Ambient drip so calm water still lives
     const drip = setInterval(() => {
       if (document.hidden || depthRef.current > 0.3) return
-      queueDrop(Math.random() * canvas.width, Math.random() * canvas.clientHeight * 0.7, 0.5, 2.2)
+      queueDrop(Math.random() * canvas.clientWidth, Math.random() * canvas.clientHeight * 0.7, 0.2, 4.5)
     }, 2600)
 
     let rafId = 0
