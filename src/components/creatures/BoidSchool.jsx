@@ -24,7 +24,8 @@ struct Params {
   ping:    vec2f,
   pingStr: f32,
   count:   u32,
-  _pad:    vec2f,
+  time:    f32,
+  _pad:    f32,
 }
 
 @group(0) @binding(0) var<storage, read> boidsIn: array<Boid>;
@@ -109,8 +110,11 @@ fn vs(@builtin(vertex_index) vi: u32, @builtin(instance_index) ii: u32) -> VSOut
   // Quad corners: lx −1 = tail, +1 = nose; ly across the body
   let lx = select(-1.0, 1.0, (vi & 1u) == 1u);
   let ly = select(-1.0, 1.0, (vi & 2u) == 2u);
-  let halfLen = 8.0 + f32(ii % 5u) * 1.5;
-  let p = b.pos + dir * (lx * halfLen) + perp * (ly * halfLen * FISH_ASPECT);
+  let halfLen = 11.0 + f32(ii % 5u) * 2.0;
+  // Tail wag — the quad can't bend, but skewing the tail corners across
+  // the body axis (zero at the nose) reads as swimming at this distance
+  let wag = sin(RP.time * 7.0 + f32(ii) * 1.7) * halfLen * 0.12 * (0.5 - lx * 0.5);
+  let p = b.pos + dir * (lx * halfLen) + perp * (ly * halfLen * FISH_ASPECT + wag);
   // Photo faces left (head at u=0, dorsal at v=0): nose samples u=0, and
   // when swimming leftward the quad is rotated ~180° — flip v so the
   // fish is never belly-up
@@ -129,7 +133,7 @@ fn fs(in: VSOut) -> @location(0) vec4f {
   // color so the school reads as distant baitfish, not foreground decals
   let t = textureSample(fishTex, fishSamp, in.uv);
   let haze = vec3f(0.24, 0.44, 0.52);
-  let rgb = mix(t.rgb, haze * t.a, 0.32);
+  let rgb = mix(t.rgb, haze * t.a, 0.24);
   return vec4f(rgb * in.alpha, t.a * in.alpha);
 }
 `
@@ -305,6 +309,7 @@ export function BoidSchool() {
         params[5] = ping.y
         params[6] = pingAge < 600 ? 1 - pingAge / 600 : 0
         paramsU32[7] = COUNT
+        params[8] = performance.now() / 1000
         device.queue.writeBuffer(paramBuf, 0, params)
 
         const bind = flip ? bindBA : bindAB
