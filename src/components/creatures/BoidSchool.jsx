@@ -400,11 +400,11 @@ export function BoidSchool() {
               const dp = (x - ping.x) ** 2 + (y - ping.y) ** 2
               if (dp < pd) { pd = dp; pi = i }
             }
-            // Generous radius + short dwell: the school actively flees
-            // the cursor, so chasing CLOSE to it must count — a direct
+            // Generous radius + ~1/3s chase: the school actively flees
+            // the cursor, so pursuing CLOSE to it must count — a direct
             // hit on a 3 px fish would be nearly impossible
-            inspectSeen('anchovy', a[mi * 4], a[mi * 4 + 1], 110, m, 5)
-            if (pi !== mi) inspectSeen('anchovy', a[pi * 4], a[pi * 4 + 1], 110, m, 5)
+            inspectSeen('anchovy', a[mi * 4], a[mi * 4 + 1], 110, m, 350)
+            if (pi !== mi) inspectSeen('anchovy', a[pi * 4], a[pi * 4 + 1], 110, m, 350)
             staging.unmap()
             stagingBusy = false
           }).catch(() => { stagingBusy = false })

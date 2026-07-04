@@ -31,7 +31,7 @@ export function GiantSquid() {
   useEffect(() => {
     const isMobile = window.matchMedia('(pointer: coarse)').matches
 
-    const unsubscribe = subscribe((depth) => {
+    const unsubscribe = subscribe((depth, dt) => {
       const opacity = creatureOpacity(depth, DEPTH_RANGE)
       const el = wrapperRef.current
       if (!el) return
@@ -50,9 +50,9 @@ export function GiantSquid() {
       }
 
       if (p.phase === 'traverse') {
-        p.x += (TRAVERSE_SPEED + p.speedBoost) * p.dir
+        p.x += (TRAVERSE_SPEED + p.speedBoost) * p.dir * dt
         // Slow Y drift
-        p.y += Math.sin(p.x * 0.005) * 0.3
+        p.y += Math.sin(p.x * 0.005) * 0.3 * dt
 
         // Crossed viewport — start pause
         if (p.dir === 1 && p.x > VW + W + 20) {
@@ -69,7 +69,7 @@ export function GiantSquid() {
           p.y      = VH * 0.5 + (Math.random() - 0.5) * VH * 0.2
         }
       } else {
-        p.pauseT++
+        p.pauseT += dt
         if (p.pauseT > PAUSE_FRAMES) p.phase = 'traverse'
       }
 
@@ -84,7 +84,7 @@ export function GiantSquid() {
           // Speed burst in traverse direction
           p.speedBoost = Math.max(p.speedBoost, str * TRAVERSE_SPEED * 5)
           // Mild vertical dodge
-          p.dodgeY += -(dy / dist) * str * 2.0
+          p.dodgeY += -(dy / dist) * str * 2.0 * dt
         }
       }
 
@@ -92,15 +92,15 @@ export function GiantSquid() {
       const imp = pingImpulse(p.x, p.y + p.dodgeY)
       if (imp) {
         p.speedBoost = Math.max(p.speedBoost, imp.str * TRAVERSE_SPEED * 6)
-        p.dodgeY += imp.uy * imp.str * 2.5
+        p.dodgeY += imp.uy * imp.str * 2.5 * dt
       }
 
-      p.speedBoost *= 0.94
-      p.dodgeY *= 0.97
+      p.speedBoost *= Math.pow(0.94, dt)
+      p.dodgeY *= Math.pow(0.97, dt)
       p.dodgeY = Math.max(-120, Math.min(120, p.dodgeY))
 
       const travTarget = depthTraverse(depth, DEPTH_RANGE, VH)
-      p.trav = p.trav === null ? travTarget : p.trav + (travTarget - p.trav) * 0.07
+      p.trav = p.trav === null ? travTarget : p.trav + (travTarget - p.trav) * (1 - Math.pow(0.93, dt))
       const nx = p.x
       const ny = Math.max(-H, Math.min(VH + H, p.y + p.dodgeY - p.trav))
       const flip = p.dir === 1 ? '' : ' scaleX(-1)'

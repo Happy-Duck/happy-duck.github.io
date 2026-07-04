@@ -36,7 +36,7 @@ function SingleSquid({ cfg, idx, peers }) {
   useEffect(() => {
     const isMobile = window.matchMedia('(pointer: coarse)').matches
 
-    const unsubscribe = subscribe((depth) => {
+    const unsubscribe = subscribe((depth, dt) => {
       const opacity = creatureOpacity(depth, DEPTH_RANGE)
       const el = wrapperRef.current
       if (!el) return
@@ -55,8 +55,8 @@ function SingleSquid({ cfg, idx, peers }) {
         p.dartLen  = 18 + Math.random() * 15    // randomized dart duration
       }
 
-      // Dart / glide cycle with randomized intervals
-      p.dartTimer++
+      // Dart / glide cycle with randomized intervals (timers in 60fps frames)
+      p.dartTimer += dt
       if (p.dartTimer > p.glideLen && p.dartPhase === 0) {
         p.dartPhase = 1; p.dartTimer = 0
         p.dartLen = 18 + Math.random() * 15
@@ -67,9 +67,9 @@ function SingleSquid({ cfg, idx, peers }) {
       }
 
       const baseSpeed = (p.dartPhase === 1 ? 3.5 : 0.45) * cfg.speedMul
-      p.t++
-      p.pathRawX += (baseSpeed + p.speedBoost) * -1  // squids move left
-      p.speedBoost *= 0.94
+      p.t += dt
+      p.pathRawX += (baseSpeed + p.speedBoost) * -1 * dt  // squids move left
+      p.speedBoost *= Math.pow(0.94, dt)
       p.x = ((p.pathRawX % VW) + VW) % VW
       const pathY = VH * cfg.yFrac + Math.sin(p.t * 0.009) * cfg.sinAmp
 
@@ -81,7 +81,7 @@ function SingleSquid({ cfg, idx, peers }) {
         if (dist < 130 && dist > 0) {
           const str = (130 - dist) / 130
           p.speedBoost = Math.max(p.speedBoost, str * baseSpeed * 4)
-          p.dodgeY += -(dy / dist) * str * 2.0
+          p.dodgeY += -(dy / dist) * str * 2.0 * dt
         }
       }
 
@@ -89,7 +89,7 @@ function SingleSquid({ cfg, idx, peers }) {
       const imp = pingImpulse(p.x, pathY + p.dodgeY)
       if (imp) {
         p.speedBoost = Math.max(p.speedBoost, imp.str * baseSpeed * 5)
-        p.dodgeY += imp.uy * imp.str * 2.5
+        p.dodgeY += imp.uy * imp.str * 2.5 * dt
       }
 
       // Peer repulsion
@@ -103,16 +103,16 @@ function SingleSquid({ cfg, idx, peers }) {
           const repelRadius = Math.max(W, H) * 1.8
           if (pdist < repelRadius && pdist > 0) {
             const force = (repelRadius - pdist) / repelRadius
-            p.dodgeY += (pdy / pdist) * force * 1.2
+            p.dodgeY += (pdy / pdist) * force * 1.2 * dt
           }
         }
       }
 
-      p.dodgeY *= 0.97
+      p.dodgeY *= Math.pow(0.97, dt)
       p.dodgeY = Math.max(-120, Math.min(120, p.dodgeY))
 
       const travTarget = depthTraverse(depth, DEPTH_RANGE, VH)
-      p.trav = p.trav === null ? travTarget : p.trav + (travTarget - p.trav) * 0.07
+      p.trav = p.trav === null ? travTarget : p.trav + (travTarget - p.trav) * (1 - Math.pow(0.93, dt))
       const nx = p.x
       const ny = Math.max(-H, Math.min(VH + H, pathY + p.dodgeY - p.trav))
 

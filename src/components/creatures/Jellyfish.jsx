@@ -32,7 +32,7 @@ function SingleJelly({ cfg, idx, peers }) {
   useEffect(() => {
     const isMobile = window.matchMedia('(pointer: coarse)').matches
 
-    const unsubscribe = subscribe((depth) => {
+    const unsubscribe = subscribe((depth, dt) => {
       const opacity = creatureOpacity(depth, DEPTH_RANGE)
       const el = wrapperRef.current
       if (!el) return
@@ -49,9 +49,9 @@ function SingleJelly({ cfg, idx, peers }) {
       }
 
       // Drift upward + slow horizontal sway
-      p.y -= cfg.driftSpeed + p.driftBoost
-      p.driftBoost *= 0.94
-      p.x += Math.sin(p.y * 0.012 + idx * 1.4) * 0.35
+      p.y -= (cfg.driftSpeed + p.driftBoost) * dt
+      p.driftBoost *= Math.pow(0.94, dt)
+      p.x += Math.sin(p.y * 0.012 + idx * 1.4) * 0.35 * dt
 
       // Parallax — compute early so reset uses rendered position
       const maxScroll = document.documentElement.scrollHeight - window.innerHeight
@@ -71,7 +71,7 @@ function SingleJelly({ cfg, idx, peers }) {
         if (dist < 120 && dist > 0) {
           const str = (120 - dist) / 120
           p.driftBoost = Math.max(p.driftBoost, str * 1.5)
-          p.dodgeX += -(dx / dist) * str * 1.5
+          p.dodgeX += -(dx / dist) * str * 1.5 * dt
         }
       }
 
@@ -79,10 +79,10 @@ function SingleJelly({ cfg, idx, peers }) {
       const imp = pingImpulse(p.x + p.dodgeX, p.y)
       if (imp) {
         p.driftBoost = Math.max(p.driftBoost, imp.str * 2.2)
-        p.dodgeX += imp.ux * imp.str * 2.0
+        p.dodgeX += imp.ux * imp.str * 2.0 * dt
       }
 
-      p.dodgeX *= 0.96
+      p.dodgeX *= Math.pow(0.96, dt)
       p.dodgeX = Math.max(-80, Math.min(80, p.dodgeX))
 
       // Peer repulsion
@@ -95,7 +95,7 @@ function SingleJelly({ cfg, idx, peers }) {
           const repelRadius = Math.max(sw, sh) * 1.8
           if (pdist < repelRadius && pdist > 0) {
             const force = (repelRadius - pdist) / repelRadius
-            p.dodgeX += (pdx / pdist) * force * 1.0
+            p.dodgeX += (pdx / pdist) * force * 1.0 * dt
           }
         }
       }

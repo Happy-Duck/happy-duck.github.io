@@ -30,6 +30,15 @@ feature-by-feature history, specs, and hard-won gotchas.
   canvas). Under `prefers-reduced-motion`, subscribers only tick while
   depth changes; pure-CSS loops are stilled by the media-query block in
   `index.css`; Framer respects it via `MotionConfig reducedMotion="user"`.
+- **Everything animates in delta time.** Subscribers receive
+  `fn(depth, dt)` where dt is elapsed frame time in 60fps units (clamped
+  0.25–2.5); loops with their own rAF (crab, GyroParallax, BoidSchool)
+  compute the same dt themselves. EVERY per-frame motion constant must
+  scale by dt — additive steps `* dt`, decays `Math.pow(k, dt)`, lerps
+  `1 - Math.pow(1 - k, dt)` — or high-refresh displays fast-forward the
+  animation (found live: fish ran 2× except while scroll jank held the
+  page at 60fps). Time-driven systems (shader u_time, CSS animations,
+  THREE.Clock) are already safe.
 - **Meters ↔ scroll is PIECEWISE, not linear.** Zone scroll fractions are
   tuned for pacing (sunlit 0–0.20, twilight 0.20–0.50, midnight 0.50–0.72,
   abyssal 0.72–1.0) while meters follow the real ranges (0–200, 200–1,000,
@@ -61,9 +70,10 @@ feature-by-feature history, specs, and hard-won gotchas.
 - **Dive log** (`src/lib/diveLog.js`): persistence in localStorage under
   the `ocean.*` namespace, always try/catch (private mode). Discovery
   fires `window` CustomEvent `ocean:discovery`. Discovery is DELIBERATE:
-  `inspectSeen(id, x, y, r, mouse)` per visible frame — cursor dwell
-  (~8 frames) on the body, or a sonar ping (click/tap) within 1.4r.
-  Passive visibility does NOT count; `markSeen()` stays immediate.
+  `inspectSeen(id, x, y, r, mouse)` per visible frame — ~130 ms of
+  wall-clock cursor dwell on the body, or a sonar ping (click/tap)
+  within 1.4r. Passive visibility does NOT count; `markSeen()` stays
+  immediate.
 - **Terminal** (`src/components/Terminal.jsx`): opens on typed `cmd` or
   backtick or the `>_` fab. Commands dispatch events other systems listen
   for: `ocean:ping` (sonar), `ocean:summon-whale`, `ocean:set-tod` (live

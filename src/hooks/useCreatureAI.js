@@ -49,7 +49,10 @@ export function useCreatureAI({
       }
     }
 
-    const unsubscribe = subscribe((depth) => {
+    // dt is the depth loop's elapsed frame time in 60 fps units — every
+    // per-frame constant scales by it (decays via Math.pow) so motion
+    // speed is refresh-rate independent
+    const unsubscribe = subscribe((depth, dt) => {
       const opacity = creatureOpacity(depth, depthRange)
       const el = wrapperRef.current
       if (!el) return
@@ -64,9 +67,9 @@ export function useCreatureAI({
       const H = window.innerHeight
       const p = s.current
 
-      p.t         += 1
-      p.pathRawX  += (speed + p.speedBoost) * dir
-      p.speedBoost *= 0.94  // decay speed burst
+      p.t         += dt
+      p.pathRawX  += (speed + p.speedBoost) * dir * dt
+      p.speedBoost *= Math.pow(0.94, dt)  // decay speed burst
       p.pathX      = ((p.pathRawX % W) + W) % W
 
       const pathY = p.baseY + Math.sin(p.t * freq) * amplitude
@@ -86,7 +89,7 @@ export function useCreatureAI({
           // Speed burst — swim faster in current direction
           p.speedBoost = Math.max(p.speedBoost, str * speed * 5)
           // Mild vertical dodge away from cursor
-          p.dodgeY += -(dy / dist) * str * 2.0
+          p.dodgeY += -(dy / dist) * str * 2.0 * dt
         }
       }
 
@@ -94,7 +97,7 @@ export function useCreatureAI({
       const imp = pingImpulse(p.pathX, pathY + p.dodgeY)
       if (imp) {
         p.speedBoost = Math.max(p.speedBoost, imp.str * speed * 6)
-        p.dodgeY += imp.uy * imp.str * 2.5
+        p.dodgeY += imp.uy * imp.str * 2.5 * dt
       }
 
       // Peer repulsion — gentle vertical separation
@@ -108,13 +111,13 @@ export function useCreatureAI({
           const repelRadius = Math.max(W_SVG, H_SVG) * 1.8
           if (pdist < repelRadius && pdist > 0) {
             const force = (repelRadius - pdist) / repelRadius
-            p.dodgeY += (pdy / pdist) * force * 1.2
+            p.dodgeY += (pdy / pdist) * force * 1.2 * dt
           }
         }
       }
 
       // Decay dodge and clamp
-      p.dodgeY *= 0.97
+      p.dodgeY *= Math.pow(0.97, dt)
       p.dodgeY = Math.max(-120, Math.min(120, p.dodgeY))
 
       // Rise through the frame across the depth window — enters low,
@@ -122,7 +125,7 @@ export function useCreatureAI({
       // fast scrolling reads as swimming, not teleporting (snap on the
       // first visible frame).
       const travTarget = depthTraverse(depth, depthRange, H)
-      p.trav = p.trav === null ? travTarget : p.trav + (travTarget - p.trav) * 0.07
+      p.trav = p.trav === null ? travTarget : p.trav + (travTarget - p.trav) * (1 - Math.pow(0.93, dt))
       const newX = p.pathX
       const newY = Math.max(-H_SVG, Math.min(H + H_SVG, pathY + p.dodgeY - p.trav))
 

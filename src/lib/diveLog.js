@@ -10,7 +10,8 @@
 import { getPing } from './sonar'
 
 const KEY = 'ocean.diveLog'
-const HOVER_FRAMES = 8 // ~0.13s of cursor contact — a graze, not a fly-by
+const DWELL_MS = 130 // continuous cursor contact required — a graze, not a fly-by
+const CONTACT_GAP_MS = 150 // ticks farther apart than this break contact
 const CLICK_MS = 300 // a ping this fresh counts as a click at that spot
 
 function loadStore() {
@@ -22,7 +23,7 @@ function loadStore() {
 }
 
 const store = loadStore() // { [speciesId]: { ts } }
-const hover = Object.create(null) // { [speciesId]: { n, last } }
+const hover = Object.create(null) // { [speciesId]: { ms, last } }
 
 export function getDiscovered() {
   return store
@@ -46,8 +47,10 @@ export function markSeen(id) {
 // Per-frame pointer check: hover (with a short dwell so sweeping the
 // cursor across the screen doesn't log every fish it crosses) or a
 // click/tap — the sonar ping doubles as the touch path on mobile.
-// `dwell` overrides the contact-tick count for slow-polling callers.
-export function inspectSeen(id, x, y, r, mouse, dwell = HOVER_FRAMES) {
+// The dwell is WALL-CLOCK time, not ticks, so the tick rate (60 vs
+// 144 Hz displays, or the boid school's every-4th-frame GPU readback)
+// never changes discovery difficulty. `dwellMs` overrides per caller.
+export function inspectSeen(id, x, y, r, mouse, dwellMs = DWELL_MS) {
   if (store[id]) return
 
   const ping = getPing()
@@ -61,14 +64,14 @@ export function inspectSeen(id, x, y, r, mouse, dwell = HOVER_FRAMES) {
 
   if (!mouse || Math.hypot(mouse.x - x, mouse.y - y) >= r) return
 
-  // Count contact ticks, resetting on a GAP in contact rather than on
-  // every miss — multi-instance species (two jellies, two squid, three
-  // clownfish) share an id, and the far twin's misses would otherwise
-  // zero the counter every frame. The gap allows for slow inspectors:
-  // the boid school only polls every 4th frame (GPU readback).
+  // Accumulate contact time, resetting on a GAP in contact rather than
+  // on every miss — multi-instance species (two jellies, two squid,
+  // three clownfish) share an id, and the far twin's misses would
+  // otherwise zero the clock every frame.
   const now = performance.now()
-  const h = hover[id] || (hover[id] = { n: 0, last: 0 })
-  h.n = now - h.last < 150 ? h.n + 1 : 1
+  const h = hover[id] || (hover[id] = { ms: 0, last: 0 })
+  const gap = now - h.last
+  h.ms = gap < CONTACT_GAP_MS ? h.ms + gap : 0
   h.last = now
-  if (h.n >= dwell) markSeen(id)
+  if (h.ms >= dwellMs) markSeen(id)
 }

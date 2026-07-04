@@ -26,7 +26,7 @@ export function Anglerfish() {
   useEffect(() => {
     const isMobile = window.matchMedia('(pointer: coarse)').matches
 
-    const unsubscribe = subscribe((depth) => {
+    const unsubscribe = subscribe((depth, dt) => {
       const opacity = creatureOpacity(depth, DEPTH_RANGE)
       const el = wrapperRef.current
       if (!el) return
@@ -43,12 +43,12 @@ export function Anglerfish() {
       }
 
       // Very slow drift
-      p.t++
+      p.t += dt
       const targetX = VW * 0.35 + Math.sin(p.t * 0.003) * 120
       const targetY = VH * 0.52 + Math.sin(p.t * 0.005) * 60
 
-      p.x += (targetX - p.x) * 0.008 + p.speedBoost
-      p.y += (targetY - p.y) * 0.008
+      p.x += ((targetX - p.x) * 0.008 + p.speedBoost) * dt
+      p.y += (targetY - p.y) * 0.008 * dt
 
       // Mouse flee — gentle drift-away + vertical dodge
       if (!isMobile) {
@@ -59,26 +59,26 @@ export function Anglerfish() {
         if (dist < 180 && dist > 0) {
           const str = (180 - dist) / 180
           // Drift away horizontally (away from cursor)
-          p.speedBoost += -(dx / dist) * str * 0.3
+          p.speedBoost += -(dx / dist) * str * 0.3 * dt
           // Mild vertical dodge
-          p.dodgeY += -(dy / dist) * str * 1.5
+          p.dodgeY += -(dy / dist) * str * 1.5 * dt
         }
       }
 
       // Sonar ping — drift away, mildly annoyed
       const imp = pingImpulse(p.x, p.y + p.dodgeY)
       if (imp) {
-        p.speedBoost += imp.ux * imp.str * 0.5
-        p.dodgeY += imp.uy * imp.str * 3.0
+        p.speedBoost += imp.ux * imp.str * 0.5 * dt
+        p.dodgeY += imp.uy * imp.str * 3.0 * dt
       }
 
-      p.speedBoost *= 0.96
+      p.speedBoost *= Math.pow(0.96, dt)
       p.speedBoost = Math.max(-3, Math.min(3, p.speedBoost))
-      p.dodgeY *= 0.97
+      p.dodgeY *= Math.pow(0.97, dt)
       p.dodgeY = Math.max(-100, Math.min(100, p.dodgeY))
 
       const travTarget = depthTraverse(depth, DEPTH_RANGE, VH)
-      p.trav = p.trav === null ? travTarget : p.trav + (travTarget - p.trav) * 0.07
+      p.trav = p.trav === null ? travTarget : p.trav + (travTarget - p.trav) * (1 - Math.pow(0.93, dt))
       const nx = Math.max(W / 2, Math.min(VW - W / 2, p.x))
       const ny = Math.max(-H, Math.min(VH + H, p.y + p.dodgeY - p.trav))
 

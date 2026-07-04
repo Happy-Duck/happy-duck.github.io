@@ -18,7 +18,7 @@ export function SnailFish() {
   const s = useRef({ x: null, y: null, t: 0, trav: null })
 
   useEffect(() => {
-    const unsubscribe = subscribe((depth) => {
+    const unsubscribe = subscribe((depth, dt) => {
       const opacity = creatureOpacity(depth, DEPTH_RANGE)
       const el = wrapperRef.current
       if (!el) return
@@ -35,14 +35,14 @@ export function SnailFish() {
       }
 
       // Barely moves — very slow drift
-      p.t++
-      p.x += 0.08
-      p.y += Math.sin(p.t * 0.003) * 0.15
+      p.t += dt
+      p.x += 0.08 * dt
+      p.y += Math.sin(p.t * 0.003) * 0.15 * dt
 
       if (p.x > VW + W) { p.x = -W; p.y = VH * (0.5 + Math.random() * 0.3) }
 
       const travTarget = depthTraverse(depth, DEPTH_RANGE, VH)
-      p.trav = p.trav === null ? travTarget : p.trav + (travTarget - p.trav) * 0.07
+      p.trav = p.trav === null ? travTarget : p.trav + (travTarget - p.trav) * (1 - Math.pow(0.93, dt))
       const ny = p.y - p.trav
 
       if (opacity >= 0.5) inspectSeen('snailfish', p.x, ny, Math.max(W, H) * 0.55, mouseRef.current)

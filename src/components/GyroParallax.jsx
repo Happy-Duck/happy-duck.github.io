@@ -27,10 +27,16 @@ export function GyroParallax() {
       ty = Math.max(-1, Math.min(1, (e.beta - 40) / 25))
     }
 
-    const loop = () => {
+    let lastT = 0
+    const loop = (now) => {
       rafId = requestAnimationFrame(loop)
-      cx += (tx - cx) * 0.08
-      cy += (ty - cy) * 0.08
+      // Normalize the lerp to 60fps units — same tilt response at any
+      // display refresh rate
+      const dt = lastT > 0 ? Math.min(2.5, Math.max(0.25, (now - lastT) / (1000 / 60))) : 1
+      lastT = now
+      const k = 1 - Math.pow(0.92, dt)
+      cx += (tx - cx) * k
+      cy += (ty - cy) * k
       root.style.setProperty('--tilt-x', cx.toFixed(4))
       root.style.setProperty('--tilt-y', cy.toFixed(4))
     }

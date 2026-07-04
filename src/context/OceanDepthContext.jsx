@@ -117,6 +117,14 @@ export function OceanDepthProvider({ children }) {
     const loop = (now) => {
       let depthChanged = false
 
+      // Elapsed frame time, normalized to 60 fps units and clamped —
+      // subscribers scale ALL per-frame motion constants by this so
+      // display refresh rate and main-thread jank change smoothness,
+      // never speed (and tab-switch gaps can't teleport creatures)
+      const frameMs = lastNowRef.current > 0 ? now - lastNowRef.current : 1000 / 60
+      const dt = Math.min(2.5, Math.max(0.25, frameMs / (1000 / 60)))
+      lastNowRef.current = now
+
       // ── Depth update (scroll-dirty) ──────────────────────────────
       if (dirtyRef.current) {
         dirtyRef.current = false
@@ -175,20 +183,16 @@ export function OceanDepthProvider({ children }) {
       //    prefers reduced motion (then only tick while depth changes) ──
       const depth = depthRef.current
       if (!reducedRef.current || depthChanged) {
-        subscribers.current.forEach(fn => fn(depth))
+        subscribers.current.forEach(fn => fn(depth, dt))
       }
 
       // ── Performance monitor ────────────────────────────────────────
-      if (lastNowRef.current > 0) {
-        const dt = now - lastNowRef.current
-        if (dt > 20 && import.meta.env.DEV) {
-          const zone = getZone(depth)
-          console.warn(
-            `[ocean] Frame drop ~${Math.round(1000 / dt)}fps — likely: ${ZONE_CULPRIT[zone.key]}`
-          )
-        }
+      if (frameMs > 20 && import.meta.env.DEV) {
+        const zone = getZone(depth)
+        console.warn(
+          `[ocean] Frame drop ~${Math.round(1000 / frameMs)}fps — likely: ${ZONE_CULPRIT[zone.key]}`
+        )
       }
-      lastNowRef.current = now
 
       frameRef.current = requestAnimationFrame(loop)
     }

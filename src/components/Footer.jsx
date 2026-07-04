@@ -53,12 +53,18 @@ function Crab() {
     let fleeX   = 0
     let facing  = 1               // 1 = right, -1 = left
     let rafId
+    let lastT   = 0
 
     // The shipwreck occupies the bottom-left corner — the crab's beach
     // starts to its right
     const wreckEdge = () => Math.min(floorW * 0.28, 380)
 
-    const tick = () => {
+    const tick = (now) => {
+      // Own rAF loop, so normalize elapsed time to 60fps units itself —
+      // motion constants below are tuned per-60fps-step
+      const dt = lastT > 0 ? Math.min(2.5, Math.max(0.25, (now - lastT) / (1000 / 60))) : 1
+      lastT = now
+
       const mouse = mouseRef.current
 
       // Crab centre in screen space — read floor position live each frame
@@ -72,7 +78,7 @@ function Crab() {
       const dy   = cy - mouse.y
       const dist = Math.sqrt(dx * dx + dy * dy)
       if (dist < 150 && dist > 0) {
-        fleeX += (dx / dist) * ((150 - dist) / 150) * 6.5
+        fleeX += (dx / dist) * ((150 - dist) / 150) * 6.5 * dt
       }
 
       // Dive-log discovery — catching it with the cursor counts (it
@@ -81,14 +87,14 @@ function Crab() {
 
       // Startled by a poke — sprint away
       if (performance.now() < pokeRef.current.until) {
-        fleeX += pokeRef.current.dir * 4.5
+        fleeX += pokeRef.current.dir * 4.5 * dt
       }
 
-      fleeX *= 0.90
+      fleeX *= Math.pow(0.90, dt)
 
       // Move + clamp (left wall = the wreck)
       const minX = wreckEdge()
-      x = Math.max(minX, Math.min(floorW - CRAB_W, x + vx + fleeX))
+      x = Math.max(minX, Math.min(floorW - CRAB_W, x + (vx + fleeX) * dt))
 
       // Bounce at walls
       if (x <= minX)            vx =  Math.abs(vx)
@@ -104,7 +110,7 @@ function Crab() {
       rafId = requestAnimationFrame(tick)
     }
 
-    tick()
+    tick(performance.now())
     return () => {
       cancelAnimationFrame(rafId)
       window.removeEventListener('resize', onResize)

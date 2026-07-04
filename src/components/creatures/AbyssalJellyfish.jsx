@@ -24,7 +24,7 @@ export function AbyssalJellyfish() {
   useEffect(() => {
     const isMobile = window.matchMedia('(pointer: coarse)').matches
 
-    const unsubscribe = subscribe((depth) => {
+    const unsubscribe = subscribe((depth, dt) => {
       const opacity = creatureOpacity(depth, DEPTH_RANGE)
       const el = wrapperRef.current
       if (!el) return
@@ -45,9 +45,9 @@ export function AbyssalJellyfish() {
       const scrollOffset = Math.min(VH * 0.35, Math.max(0, window.scrollY - DEPTH_RANGE.enter * maxScroll) * 0.15)
 
       // Drift upward very slowly
-      p.y -= 0.16 + p.driftBoost
-      p.driftBoost *= 0.94
-      p.x += Math.sin(p.y * 0.008) * 0.25
+      p.y -= (0.16 + p.driftBoost) * dt
+      p.driftBoost *= Math.pow(0.94, dt)
+      p.x += Math.sin(p.y * 0.008) * 0.25 * dt
 
       // Reset to bottom (use rendered position so parallax can't strand them)
       if (p.y - scrollOffset < -H - 20) {
@@ -63,7 +63,7 @@ export function AbyssalJellyfish() {
         if (dist < 140 && dist > 0) {
           const str = (140 - dist) / 140
           p.driftBoost = Math.max(p.driftBoost, str * 1.2)
-          p.dodgeX += -(dx / dist) * str * 1.2
+          p.dodgeX += -(dx / dist) * str * 1.2 * dt
         }
       }
 
@@ -71,10 +71,10 @@ export function AbyssalJellyfish() {
       const imp = pingImpulse(p.x + p.dodgeX, p.y)
       if (imp) {
         p.driftBoost = Math.max(p.driftBoost, imp.str * 1.8)
-        p.dodgeX += imp.ux * imp.str * 1.8
+        p.dodgeX += imp.ux * imp.str * 1.8 * dt
       }
 
-      p.dodgeX *= 0.96
+      p.dodgeX *= Math.pow(0.96, dt)
       p.dodgeX = Math.max(-80, Math.min(80, p.dodgeX))
 
       const nx = Math.max(W / 2, Math.min(VW - W / 2, p.x + p.dodgeX))
