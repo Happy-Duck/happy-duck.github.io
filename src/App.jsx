@@ -15,7 +15,9 @@ import { Hero          } from './components/Hero'
 import { Experience    } from './components/Experience'
 import { Skills        } from './components/Skills'
 import { Projects      } from './components/Projects'
-import { Education     } from './components/Education'
+// Education is shelved for now — restore by uncommenting this import and
+// the <Education /> line in <main>
+// import { Education     } from './components/Education'
 import { About         } from './components/About'
 import { ContactSidebar } from './components/ContactSidebar'
 import { DiveLog       } from './components/DiveLog'
@@ -96,13 +98,13 @@ export default function App() {
 
         {/* ── Page content (z 10) ────────────────────────────────── */}
         {/* Recruiter's dive: internships first, then what got shipped,
-            the toolbox, credentials, and the personal log at the floor */}
+            the toolbox, and the personal log at the floor */}
         <main id="main">
           <Hero />
           <Experience />
           <Projects />
           <Skills />
-          <Education />
+          {/* <Education /> — shelved for now, uncomment with its import */}
           <About />
         </main>
 
