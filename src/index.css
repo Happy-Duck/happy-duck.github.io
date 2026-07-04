@@ -93,9 +93,9 @@ html::-webkit-scrollbar { display: none; }
   --section-rule:        rgba(0,212,255,0.18);
   --card-bg:             rgba(2,12,38,0.78);
   --card-border:         rgba(0,212,255,0.13);
-  --card-border-hover:   rgba(0,212,255,0.38);
+  --card-border-hover:   rgba(0,212,255,0.65);
   --card-shadow:         0 4px 28px rgba(0,0,0,0.55);
-  --card-shadow-hover:   0 18px 52px rgba(0,0,0,0.65), 0 0 0 1px rgba(0,212,255,0.30);
+  --card-shadow-hover:   0 18px 52px rgba(0,0,0,0.65), 0 0 0 1px rgba(0,212,255,0.50), 0 0 22px rgba(0,212,255,0.20);
   --card-title:          rgba(168,216,240,0.96);
   --card-body:           rgba(140,192,225,0.58);
   --card-link:           rgba(0,212,255,0.60);
@@ -210,9 +210,9 @@ html::-webkit-scrollbar { display: none; }
   --section-rule:        rgba(0,100,160,0.20);
   --card-bg:             rgba(255,245,218,0.72);
   --card-border:         rgba(0,120,180,0.18);
-  --card-border-hover:   rgba(255,110,60,0.45);
+  --card-border-hover:   rgba(255,110,60,0.70);
   --card-shadow:         0 4px 28px rgba(0,60,100,0.18);
-  --card-shadow-hover:   0 18px 52px rgba(0,60,100,0.30), 0 0 0 1px rgba(255,110,60,0.35);
+  --card-shadow-hover:   0 18px 52px rgba(0,60,100,0.30), 0 0 0 1px rgba(255,110,60,0.55), 0 0 22px rgba(255,110,60,0.22);
   --card-title:          rgba(5,28,50,0.96);
   --card-body:           rgba(5,28,50,0.72);
   --card-link:           rgba(0,80,140,0.95);
@@ -682,21 +682,6 @@ html::-webkit-scrollbar { display: none; }
    ═══════════════════════════════════════════════════════════════════ */
 
 .project-card--clickable { cursor: pointer; }
-
-.card-expand {
-  display:         inline-flex;
-  align-items:     center;
-  justify-content: center;
-  min-width:       28px;
-  min-height:      44px;
-  color:           var(--card-link);
-  opacity:         0.55;
-  transition:      opacity 0.2s ease, color 0.2s ease;
-}
-.project-card--clickable:hover .card-expand {
-  opacity: 1;
-  color:   var(--card-link-hover);
-}
 
 /* Card ↔ modal shared-element morph */
 ::view-transition-group(case-study) {
@@ -2477,33 +2462,33 @@ html::-webkit-scrollbar { display: none; }
 
 .sonar-ring {
   position:      absolute;
-  left:          -6px;
-  top:           -6px;
-  width:         12px;
-  height:        12px;
+  left:          -5px;
+  top:           -5px;
+  width:         10px;
+  height:        10px;
   border-radius: 50%;
-  border:        1.5px solid currentColor;
+  border:        1px solid currentColor;
   opacity:       0;
-  animation:     sonar-expand 1.6s ease-out forwards;
+  animation:     sonar-expand 1.3s ease-out forwards;
 }
 
 .sonar-ring--late { animation-delay: 0.16s; }
 
 @keyframes sonar-expand {
-  0%   { transform: scale(0.4); opacity: 0.85; }
-  100% { transform: scale(52);  opacity: 0; }
+  0%   { transform: scale(0.4); opacity: 0.5; }
+  100% { transform: scale(26);  opacity: 0; }
 }
 
 @media (prefers-reduced-motion: reduce) {
   .sonar-ring {
     animation: sonar-fade 1s ease-out forwards;
-    transform: scale(18);
+    transform: scale(10);
   }
   .sonar-ring--late { display: none; }
 }
 
 @keyframes sonar-fade {
-  0%   { opacity: 0.6; }
+  0%   { opacity: 0.4; }
   100% { opacity: 0; }
 }
 

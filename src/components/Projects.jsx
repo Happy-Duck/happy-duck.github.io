@@ -135,18 +135,6 @@ function ExternalLinkIcon() {
   )
 }
 
-function ExpandIcon() {
-  return (
-    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-      strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-      <polyline points="15 3 21 3 21 9" />
-      <polyline points="9 21 3 21 3 15" />
-      <line x1="21" y1="3" x2="14" y2="10" />
-      <line x1="3" y1="21" x2="10" y2="14" />
-    </svg>
-  )
-}
-
 function linkIcon(url) {
   if (url.includes('steampowered.com')) return { Icon: SteamIcon, label: 'Steam' }
   if (url.includes('itch.io'))          return { Icon: ItchIcon,  label: 'itch.io' }
@@ -246,24 +234,19 @@ function ProjectCard({ project, delay, onOpen, vtName }) {
           <h3 className="card-title font-semibold leading-snug text-base sm:text-lg">
             {project.title}
           </h3>
-          <div className="flex items-center gap-1">
-            {hasLink && (
-              <a
-                href={project.link}
-                target="_blank"
-                rel="noopener noreferrer"
-                aria-label={label}
-                className="card-link-btn"
-                onClick={(e) => e.stopPropagation()}
-              >
-                <Icon />
-                <span className="card-link-label">{label}</span>
-              </a>
-            )}
-            <span className="card-expand" aria-hidden="true">
-              <ExpandIcon />
-            </span>
-          </div>
+          {hasLink && (
+            <a
+              href={project.link}
+              target="_blank"
+              rel="noopener noreferrer"
+              aria-label={label}
+              className="card-link-btn"
+              onClick={(e) => e.stopPropagation()}
+            >
+              <Icon />
+              <span className="card-link-label">{label}</span>
+            </a>
+          )}
         </div>
 
         {/* Description */}
