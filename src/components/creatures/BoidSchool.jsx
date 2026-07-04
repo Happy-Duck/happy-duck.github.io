@@ -52,7 +52,19 @@ fn cs(@builtin(global_invocation_id) gid: vec3u) {
   }
   if (n > 0.0) { ali /= n; coh /= n; }
 
-  var acc = sep * 0.55 + (ali - vel) * 0.05 + coh * 0.011;
+  // Isotropic cohesion relaxes schools into discs. Real baitfish shoals
+  // are polarized streams, so cohesion pulls at full strength ALONG the
+  // travel axis (follow / catch up) and only weakly sideways — clumps
+  // stretch into ribbons instead of balls — and alignment is stronger
+  // so groups polarize rather than mill.
+  let head = normalize(vel + vec2f(0.0001, 0.0));
+  let cohAlong = dot(coh, head);
+  let cohSide = coh - head * cohAlong;
+  var acc = sep * 0.55 + (ali - vel) * 0.09 + head * cohAlong * 0.011 + cohSide * 0.003;
+
+  // Per-fish wander breaks the symmetry that rounds school edges off
+  let wob = sin(P.time * 0.9 + f32(i) * 0.61) + sin(P.time * 1.7 + f32(i) * 2.3);
+  acc += vec2f(-head.y, head.x) * wob * 0.012;
 
   // Cursor repel
   let md = pos - P.mouse;
@@ -77,7 +89,9 @@ fn cs(@builtin(global_invocation_id) gid: vec3u) {
   vel += acc;
   let speed = length(vel);
   if (speed > 2.4) { vel = vel / speed * 2.4; }
-  if (speed < 0.7) { vel = vel / max(speed, 0.001) * 0.7; }
+  // High floor: milling in place is what lets a school collapse into a
+  // disc — everyone keeps swimming, so shapes stay drawn out
+  if (speed < 1.4) { vel = vel / max(speed, 0.001) * 1.4; }
   pos += vel;
 
   // Horizontal wrap with a margin so fish don't pop at the edges
