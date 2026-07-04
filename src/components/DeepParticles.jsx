@@ -107,11 +107,23 @@ export function DeepParticles() {
     window.addEventListener('resize', resize, { passive: true })
 
     let rafId = 0
+    let painted = false
     const start = performance.now()
     const frame = () => {
       rafId = requestAnimationFrame(frame)
       const depth = depthRef.current
-      if (document.hidden || depth < 0.40) return
+      if (document.hidden) return
+      if (depth < 0.40) {
+        // Scrolled up out of the band — wipe the last frame once, or the
+        // beam-lit snow stays frozen wherever the cursor was
+        if (painted) {
+          gl.clearColor(0, 0, 0, 0)
+          gl.clear(gl.COLOR_BUFFER_BIT)
+          painted = false
+        }
+        return
+      }
+      painted = true
 
       const fade = Math.min(0.9, Math.max(0, (depth - 0.42) / 0.15))
       const lightOn = document.documentElement.classList.contains('rov-off') ? 0 : 1

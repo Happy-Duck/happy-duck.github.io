@@ -4,7 +4,7 @@ import { useEffect, useRef } from 'react'
 import { useMouse } from '../../context/MouseContext'
 import { useOceanDepthContext } from '../../context/OceanDepthContext'
 import { creatureOpacity } from '../../constants/depthZones'
-import { tickSeen } from '../../lib/diveLog'
+import { inspectSeen } from '../../lib/diveLog'
 import { pingImpulse } from '../../lib/sonar'
 
 const W = 120, H = 170
@@ -38,7 +38,6 @@ function SingleJelly({ cfg, idx, peers }) {
       if (!el) return
 
       if (opacity < 0.01) { el.style.opacity = '0'; return }
-      if (opacity >= 0.5) tickSeen('jellyfish')
 
       const VW = window.innerWidth
       const VH = window.innerHeight
@@ -107,6 +106,8 @@ function SingleJelly({ cfg, idx, peers }) {
       if (peers) {
         peers.current[idx] = { x: nx, y: ny }
       }
+
+      if (opacity >= 0.5) inspectSeen('jellyfish', nx, ny, Math.max(sw, sh) * 0.55, mouseRef.current)
 
       el.style.transform = `translate(${nx - sw / 2}px, ${ny - sh / 2}px)`
       el.style.opacity = opacity.toFixed(3)

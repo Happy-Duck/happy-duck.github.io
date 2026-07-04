@@ -4,7 +4,7 @@ import { useEffect, useRef } from 'react'
 import { useMouse } from '../../context/MouseContext'
 import { useOceanDepthContext } from '../../context/OceanDepthContext'
 import { creatureOpacity, depthTraverse } from '../../constants/depthZones'
-import { tickSeen } from '../../lib/diveLog'
+import { inspectSeen } from '../../lib/diveLog'
 import { pingImpulse } from '../../lib/sonar'
 
 const W = 350, H = 175
@@ -37,7 +37,6 @@ export function GiantSquid() {
       if (!el) return
 
       if (opacity < 0.01) { el.style.opacity = '0'; return }
-      if (opacity >= 0.5) tickSeen('giantSquid')
 
       const VW = window.innerWidth
       const VH = window.innerHeight
@@ -105,6 +104,8 @@ export function GiantSquid() {
       const nx = p.x
       const ny = Math.max(-H, Math.min(VH + H, p.y + p.dodgeY - p.trav))
       const flip = p.dir === 1 ? '' : ' scaleX(-1)'
+
+      if (opacity >= 0.5) inspectSeen('giantSquid', nx, ny, Math.max(W, H) * 0.5, mouseRef.current)
 
       el.style.transform = `translate(${nx - W / 2}px, ${ny - H / 2}px)${flip}`
       el.style.opacity   = opacity.toFixed(3)

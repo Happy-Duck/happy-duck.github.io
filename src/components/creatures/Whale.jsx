@@ -1,8 +1,8 @@
 // ── Whale — rare ambient crossing event ────────────────────────────────
 // ~1-in-6 visits: while the diver is in the twilight band (depth 0.2–0.5),
 // a huge low-contrast silhouette crosses far in the background over ~35s.
-// The terminal's `whale` command force-summons it. Seeing it logs the
-// secret "Leviathan" dive-log entry.
+// The terminal's `whale` command force-summons it. Pointing at it (or
+// clicking it) while it crosses logs the secret "Leviathan" entry.
 import { useState, useEffect, useRef } from 'react'
 import { useOceanDepthContext } from '../../context/OceanDepthContext'
 import { markSeen } from '../../lib/diveLog'
@@ -18,7 +18,7 @@ export function Whale() {
   const [phase, setPhase] = useState('idle')
   const { depthRef } = useOceanDepthContext()
   const startedRef = useRef(false)
-  const loggedRef = useRef(false)
+  const imgRef = useRef(null)
 
   // Roll once per session; arm the depth watcher if it hits
   useEffect(() => {
@@ -66,17 +66,28 @@ export function Whale() {
     return () => window.removeEventListener('ocean:summon-whale', onSummon)
   }, [])
 
-  // Crossing lifecycle: log the sighting, end after the animation
+  // Crossing lifecycle: pointing at / clicking the whale logs the
+  // sighting (discovery is deliberate — passive viewing doesn't count),
+  // and the crossing ends after the animation
   useEffect(() => {
     if (phase !== 'crossing') return
-    const logTimer = setTimeout(() => {
-      if (!loggedRef.current) {
-        loggedRef.current = true
+    const hit = (e) => {
+      const img = imgRef.current
+      if (!img) return
+      const r = img.getBoundingClientRect()
+      if (e.clientX >= r.left && e.clientX <= r.right &&
+          e.clientY >= r.top && e.clientY <= r.bottom) {
         markSeen('whale')
       }
-    }, 6000) // logged once it's well on screen
+    }
+    window.addEventListener('mousemove', hit, { passive: true })
+    window.addEventListener('click', hit)
     const endTimer = setTimeout(() => setPhase('idle'), CROSS_MS + 500)
-    return () => { clearTimeout(logTimer); clearTimeout(endTimer) }
+    return () => {
+      window.removeEventListener('mousemove', hit)
+      window.removeEventListener('click', hit)
+      clearTimeout(endTimer)
+    }
   }, [phase])
 
   if (phase !== 'crossing') return null
@@ -84,7 +95,7 @@ export function Whale() {
   return (
     <div className="whale-track" aria-hidden="true">
       <div className="whale">
-        <img src="/creatures/blue-whale.png" alt="" draggable={false} />
+        <img ref={imgRef} src="/creatures/blue-whale.png" alt="" draggable={false} />
       </div>
     </div>
   )

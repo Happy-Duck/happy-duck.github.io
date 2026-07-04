@@ -29,23 +29,6 @@ function Crab() {
     markSeen('crab')
   }
 
-  // Dive-log discovery — 1.5s of the crab on screen counts as a sighting
-  useEffect(() => {
-    const outer = outerRef.current
-    if (!outer) return
-
-    let dwell = null
-    const obs = new IntersectionObserver(([entry]) => {
-      if (entry.isIntersecting) {
-        dwell = setTimeout(() => { markSeen('crab'); obs.disconnect() }, 1500)
-      } else {
-        clearTimeout(dwell)
-      }
-    }, { threshold: 0.5 })
-    obs.observe(outer)
-    return () => { clearTimeout(dwell); obs.disconnect() }
-  }, [])
-
   useEffect(() => {
     const outer = outerRef.current
     const inner = innerRef.current
@@ -91,6 +74,10 @@ function Crab() {
       if (dist < 150 && dist > 0) {
         fleeX += (dx / dist) * ((150 - dist) / 150) * 6.5
       }
+
+      // Dive-log discovery — catching it with the cursor counts (it
+      // flees, so this is earned); the poke click logs it too
+      if (dist < 60) markSeen('crab')
 
       // Startled by a poke — sprint away
       if (performance.now() < pokeRef.current.until) {

@@ -2,15 +2,17 @@
 // Deepest known fish. Ghostly, translucent, barely moves.
 // Easter egg for ocean biology enthusiasts.
 import { useEffect, useRef } from 'react'
+import { useMouse } from '../../context/MouseContext'
 import { useOceanDepthContext } from '../../context/OceanDepthContext'
 import { creatureOpacity, depthTraverse } from '../../constants/depthZones'
-import { tickSeen } from '../../lib/diveLog'
+import { inspectSeen } from '../../lib/diveLog'
 
 const W = 200, H = 67
 const DEPTH_RANGE = { enter: 0.82, exit: 1.02 }
 
 export function SnailFish() {
   const wrapperRef = useRef(null)
+  const mouseRef   = useMouse()
   const { subscribe } = useOceanDepthContext()
 
   const s = useRef({ x: null, y: null, t: 0, trav: null })
@@ -22,7 +24,6 @@ export function SnailFish() {
       if (!el) return
 
       if (opacity < 0.01) { el.style.opacity = '0'; return }
-      if (opacity >= 0.5) tickSeen('snailfish')
 
       const VW = window.innerWidth
       const VH = window.innerHeight
@@ -43,12 +44,15 @@ export function SnailFish() {
       const travTarget = depthTraverse(depth, DEPTH_RANGE, VH)
       p.trav = p.trav === null ? travTarget : p.trav + (travTarget - p.trav) * 0.07
       const ny = p.y - p.trav
+
+      if (opacity >= 0.5) inspectSeen('snailfish', p.x, ny, Math.max(W, H) * 0.55, mouseRef.current)
+
       el.style.transform = `translate(${p.x - W / 2}px, ${ny - H / 2}px)`
       el.style.opacity   = opacity.toFixed(3)
     })
 
     return unsubscribe
-  }, [subscribe])
+  }, [subscribe, mouseRef])
 
   return (
     <div

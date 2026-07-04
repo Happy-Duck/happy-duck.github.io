@@ -6,7 +6,7 @@ import { useEffect, useRef } from 'react'
 import { useMouse } from '../context/MouseContext'
 import { useOceanDepthContext } from '../context/OceanDepthContext'
 import { creatureOpacity, depthTraverse } from '../constants/depthZones'
-import { tickSeen } from '../lib/diveLog'
+import { inspectSeen } from '../lib/diveLog'
 import { pingImpulse } from '../lib/sonar'
 
 export function useCreatureAI({
@@ -59,8 +59,6 @@ export function useCreatureAI({
         el.style.opacity = '0'
         return
       }
-
-      if (speciesId && opacity >= 0.5) tickSeen(speciesId)
 
       const W = window.innerWidth
       const H = window.innerHeight
@@ -131,6 +129,11 @@ export function useCreatureAI({
       // Write position for peer repulsion
       if (peers) {
         peers.current[peerIndex] = { x: newX, y: newY }
+      }
+
+      // Deliberate discovery — cursor on the body, or a click/tap ping
+      if (speciesId && opacity >= 0.5) {
+        inspectSeen(speciesId, newX, newY, Math.max(W_SVG, H_SVG) * 0.6 + 14, mouseRef.current)
       }
 
       // Consistent centering for both directions

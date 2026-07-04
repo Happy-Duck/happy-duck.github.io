@@ -77,9 +77,15 @@ tracks 10 species. Persisted across visits. Completion = certificate stamp.
 `src/components/DiveLog.jsx` (journal + toast), hooks into creature files +
 `useCreatureAI.js`, `App.jsx`, `index.css`.
 
-**Status:** DONE. tickSeen is frame-count based (90 frames ≈ 1.5s). Crab
-uses an IntersectionObserver dwell in Footer. Verified all 10 discoverable +
-EXPEDITION COMPLETE stamp + persistence + zero console errors.
+**Status:** DONE. Originally tickSeen accumulated ~1.5s of passive
+visibility; owner later made discovery DELIBERATE (July 2026): creatures
+now call `inspectSeen(id, x, y, r, mouse)` per visible frame — the cursor
+must dwell ~8 frames on the body (they flee, so it's a chase) or a
+click/tap sonar ping must land within 1.4r (this is the touch path).
+Whale logs on pointing at/clicking the crossing silhouette; crab on
+cursor contact or poke (IntersectionObserver dwell removed). Verified all
+10 discoverable + EXPEDITION COMPLETE stamp + persistence + zero console
+errors.
 
 ## 3. Submarine Terminal — [x] DONE
 

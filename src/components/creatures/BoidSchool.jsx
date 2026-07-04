@@ -3,18 +3,26 @@
 // computed on the GPU each frame, rendered as instanced quads carrying a
 // real anchovy photo cutout (Engraulis encrasicolus, Ebachiller /
 // Wikimedia Commons, CC BY-SA 4.0), oriented along velocity. The cursor
-// repels the school; sonar pings scatter it. Purely additive: no
-// navigator.gpu (or reduced motion, or a failed sprite fetch) → the
-// canvas stays transparent and the sprite creatures remain the whole
-// experience.
+// repels the school; sonar pings scatter it. Positions live only on the
+// GPU, so the dive-log entry ('anchovy' — gated in species.js to match
+// this component's render conditions) is earned via a tiny readback:
+// every 4th frame the fresh positions are copied to a staging buffer and
+// the nearest fish is scanned against the cursor / latest ping. Purely
+// additive: no navigator.gpu (or reduced motion, or a failed sprite
+// fetch) → the canvas stays transparent and the sprite creatures remain
+// the whole experience.
 import { useEffect, useRef } from 'react'
 import { useOceanDepthContext } from '../../context/OceanDepthContext'
 import { useMouse } from '../../context/MouseContext'
 import { creatureOpacity } from '../../constants/depthZones'
+import { inspectSeen } from '../../lib/diveLog'
 import { getPing } from '../../lib/sonar'
 
 const COUNT = 384
-const DEPTH_RANGE = { enter: 0.04, exit: 0.48 }
+// ≈40–400 m: anchovies are epipelagic — surface schools that don't dive
+// much past ~400 m (0.275 = depthAtMeters(400)), so the school is gone
+// well before the twilight deep
+const DEPTH_RANGE = { enter: 0.04, exit: 0.275 }
 
 const WGSL = /* wgsl */ `
 struct Boid { pos: vec2f, vel: vec2f }
@@ -24,7 +32,8 @@ struct Params {
   ping:    vec2f,
   pingStr: f32,
   count:   u32,
-  _pad:    vec2f,
+  time:    f32,
+  _pad:    f32,
 }
 
 @group(0) @binding(0) var<storage, read> boidsIn: array<Boid>;
@@ -51,7 +60,19 @@ fn cs(@builtin(global_invocation_id) gid: vec3u) {
   }
   if (n > 0.0) { ali /= n; coh /= n; }
 
-  var acc = sep * 0.55 + (ali - vel) * 0.05 + coh * 0.011;
+  // Isotropic cohesion relaxes schools into discs. Real baitfish shoals
+  // are polarized streams, so cohesion pulls at full strength ALONG the
+  // travel axis (follow / catch up) and only weakly sideways — clumps
+  // stretch into ribbons instead of balls — and alignment is stronger
+  // so groups polarize rather than mill.
+  let head = normalize(vel + vec2f(0.0001, 0.0));
+  let cohAlong = dot(coh, head);
+  let cohSide = coh - head * cohAlong;
+  var acc = sep * 0.55 + (ali - vel) * 0.09 + head * cohAlong * 0.011 + cohSide * 0.003;
+
+  // Per-fish wander breaks the symmetry that rounds school edges off
+  let wob = sin(P.time * 0.9 + f32(i) * 0.61) + sin(P.time * 1.7 + f32(i) * 2.3);
+  acc += vec2f(-head.y, head.x) * wob * 0.012;
 
   // Cursor repel
   let md = pos - P.mouse;
@@ -75,8 +96,11 @@ fn cs(@builtin(global_invocation_id) gid: vec3u) {
 
   vel += acc;
   let speed = length(vel);
-  if (speed > 2.4) { vel = vel / speed * 2.4; }
-  if (speed < 0.7) { vel = vel / max(speed, 0.001) * 0.7; }
+  if (speed > 1.7) { vel = vel / speed * 1.7; }
+  // High floor (relative to the cap): milling in place is what lets a
+  // school collapse into a disc — everyone keeps swimming, so shapes
+  // stay drawn out
+  if (speed < 1.0) { vel = vel / max(speed, 0.001) * 1.0; }
   pos += vel;
 
   // Horizontal wrap with a margin so fish don't pop at the edges
@@ -109,8 +133,11 @@ fn vs(@builtin(vertex_index) vi: u32, @builtin(instance_index) ii: u32) -> VSOut
   // Quad corners: lx −1 = tail, +1 = nose; ly across the body
   let lx = select(-1.0, 1.0, (vi & 1u) == 1u);
   let ly = select(-1.0, 1.0, (vi & 2u) == 2u);
-  let halfLen = 8.0 + f32(ii % 5u) * 1.5;
-  let p = b.pos + dir * (lx * halfLen) + perp * (ly * halfLen * FISH_ASPECT);
+  let halfLen = 11.0 + f32(ii % 5u) * 2.0;
+  // Tail wag — the quad can't bend, but skewing the tail corners across
+  // the body axis (zero at the nose) reads as swimming at this distance
+  let wag = sin(RP.time * 5.0 + f32(ii) * 1.7) * halfLen * 0.12 * (0.5 - lx * 0.5);
+  let p = b.pos + dir * (lx * halfLen) + perp * (ly * halfLen * FISH_ASPECT + wag);
   // Photo faces left (head at u=0, dorsal at v=0): nose samples u=0, and
   // when swimming leftward the quad is rotated ~180° — flip v so the
   // fish is never belly-up
@@ -118,7 +145,7 @@ fn vs(@builtin(vertex_index) vi: u32, @builtin(instance_index) ii: u32) -> VSOut
   if (dir.x < 0.0) { tv = 1.0 - tv; }
   var out: VSOut;
   out.pos = vec4f(p.x / RP.res.x * 2.0 - 1.0, 1.0 - p.y / RP.res.y * 2.0, 0.0, 1.0);
-  out.alpha = 0.55 + f32(ii % 7u) * 0.05;
+  out.alpha = 0.34 + f32(ii % 7u) * 0.03;
   out.uv = vec2f((1.0 - lx) * 0.5, tv);
   return out;
 }
@@ -129,7 +156,7 @@ fn fs(in: VSOut) -> @location(0) vec4f {
   // color so the school reads as distant baitfish, not foreground decals
   let t = textureSample(fishTex, fishSamp, in.uv);
   let haze = vec3f(0.24, 0.44, 0.52);
-  let rgb = mix(t.rgb, haze * t.a, 0.32);
+  let rgb = mix(t.rgb, haze * t.a, 0.42);
   return vec4f(rgb * in.alpha, t.a * in.alpha);
 }
 `
@@ -224,12 +251,21 @@ export function BoidSchool() {
       const bufSize = COUNT * 16
       const mkBuf = () => device.createBuffer({
         size: bufSize,
-        usage: GPUBufferUsage.STORAGE | GPUBufferUsage.COPY_DST,
+        usage: GPUBufferUsage.STORAGE | GPUBufferUsage.COPY_DST |
+               GPUBufferUsage.COPY_SRC,
       })
       const bufA = mkBuf()
       const bufB = mkBuf()
       device.queue.writeBuffer(bufA, 0, seed)
       device.queue.writeBuffer(bufB, 0, seed)
+
+      // Dive-log readback target — 6 kB, mapped at most once in flight
+      const staging = device.createBuffer({
+        size: bufSize,
+        usage: GPUBufferUsage.MAP_READ | GPUBufferUsage.COPY_DST,
+      })
+      let stagingBusy = false
+      let frameN = 0
 
       const paramBuf = device.createBuffer({
         size: 48,
@@ -305,9 +341,12 @@ export function BoidSchool() {
         params[5] = ping.y
         params[6] = pingAge < 600 ? 1 - pingAge / 600 : 0
         paramsU32[7] = COUNT
+        params[8] = performance.now() / 1000
         device.queue.writeBuffer(paramBuf, 0, params)
 
-        const bind = flip ? bindBA : bindAB
+        const useAB = !flip
+        const bind = useAB ? bindAB : bindBA
+        const dstBuf = useAB ? bufB : bufA
         flip = !flip
 
         const encoder = device.createCommandEncoder()
@@ -329,7 +368,36 @@ export function BoidSchool() {
         rp.setBindGroup(0, bind.render)
         rp.draw(4, COUNT)
         rp.end()
+
+        // Dive-log inspection — same deliberate-discovery contract as the
+        // sprite creatures, fed by a position readback
+        frameN++
+        const inspect = !stagingBusy && frameN % 4 === 0 && opacityRef.current >= 0.5
+        if (inspect) encoder.copyBufferToBuffer(dstBuf, 0, staging, 0, bufSize)
         device.queue.submit([encoder.finish()])
+        if (inspect) {
+          stagingBusy = true
+          staging.mapAsync(GPUMapMode.READ).then(() => {
+            const a = new Float32Array(staging.getMappedRange())
+            const m = mouseRef.current
+            const ping = getPing()
+            let mi = 0, md = Infinity, pi = 0, pd = Infinity
+            for (let i = 0; i < COUNT; i++) {
+              const x = a[i * 4], y = a[i * 4 + 1]
+              const dm = (x - m.x) ** 2 + (y - m.y) ** 2
+              if (dm < md) { md = dm; mi = i }
+              const dp = (x - ping.x) ** 2 + (y - ping.y) ** 2
+              if (dp < pd) { pd = dp; pi = i }
+            }
+            // Generous radius + short dwell: the school actively flees
+            // the cursor, so chasing CLOSE to it must count — a direct
+            // hit on a 3 px fish would be nearly impossible
+            inspectSeen('anchovy', a[mi * 4], a[mi * 4 + 1], 110, m, 5)
+            if (pi !== mi) inspectSeen('anchovy', a[pi * 4], a[pi * 4 + 1], 110, m, 5)
+            staging.unmap()
+            stagingBusy = false
+          }).catch(() => { stagingBusy = false })
+        }
       }
       rafId = requestAnimationFrame(frame)
 

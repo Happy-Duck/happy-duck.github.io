@@ -50,9 +50,9 @@ feature-by-feature history, specs, and hard-won gotchas.
   (`p.trav += (target - p.trav) * 0.07`, snap when null) or fast scrolling
   teleports them. Jellyfish manage their own bottom-reset drift instead.
 - A new creature needs: DEPTH_RANGE fractions consistent with its claimed
-  meters (use the helpers), `tickSeen('<id>')` when opacity ≥ 0.5 (dive
-  log), `pingImpulse()` scatter reaction (sonar), an entry in
-  `src/constants/species.js`, and a real photo cutout in
+  meters (use the helpers), `inspectSeen('<id>', x, y, r, mouse)` when
+  opacity ≥ 0.5 (dive log), `pingImpulse()` scatter reaction (sonar), an
+  entry in `src/constants/species.js`, and a real photo cutout in
   `public/creatures/` — the owner strongly prefers real photos over
   drawn/generated art everywhere (whale + shipwreck are graded photos).
 
@@ -60,8 +60,10 @@ feature-by-feature history, specs, and hard-won gotchas.
 
 - **Dive log** (`src/lib/diveLog.js`): persistence in localStorage under
   the `ocean.*` namespace, always try/catch (private mode). Discovery
-  fires `window` CustomEvent `ocean:discovery`. ~1.5 s cumulative
-  visibility (90 ticks) = discovered; `markSeen()` is immediate.
+  fires `window` CustomEvent `ocean:discovery`. Discovery is DELIBERATE:
+  `inspectSeen(id, x, y, r, mouse)` per visible frame — cursor dwell
+  (~8 frames) on the body, or a sonar ping (click/tap) within 1.4r.
+  Passive visibility does NOT count; `markSeen()` stays immediate.
 - **Terminal** (`src/components/Terminal.jsx`): opens on typed `cmd` or
   backtick or the `>_` fab. Commands dispatch events other systems listen
   for: `ocean:ping` (sonar), `ocean:summon-whale`, `ocean:set-tod` (live
@@ -84,12 +86,18 @@ feature-by-feature history, specs, and hard-won gotchas.
 ## GPU / advanced-web systems (wave 2)
 
 - **BoidSchool** (`creatures/BoidSchool.jsx`): WebGPU compute boids,
-  ~380 fish, band 0.04–0.48. Rendered as textured quads carrying
-  `public/creatures/anchovy.png` (real photo cutout, CC BY-SA 4.0
-  Ebachiller/Wikimedia — keep the attribution comment); mips are uploaded
-  as pre-scaled ImageBitmaps (no auto mipgen in WebGPU); v-flip when
-  dir.x<0 or leftward fish swim belly-up. No `navigator.gpu` OR failed
-  sprite fetch → transparent canvas, sprites carry the scene.
+  ~380 fish, band 0.04–0.275 (≈40–400 m — anchovies are epipelagic,
+  keep the claim realistic), z-2 — a hazy BACKGROUND layer behind the
+  sprite creatures (owner wants it subtle and unhurried; schools stream
+  as ribbons via anisotropic cohesion + speed floor, never discs). Rendered as textured
+  quads carrying `public/creatures/anchovy.png` (real photo cutout,
+  CC BY-SA 4.0 Ebachiller/Wikimedia — keep the attribution comment);
+  mips are uploaded as pre-scaled ImageBitmaps (no auto mipgen in
+  WebGPU); v-flip when dir.x<0 or leftward fish swim belly-up. Dive-log
+  entry 'anchovy' is earned via a 6 kB position readback every 4th frame
+  and GATED in species.js to WebGPU+motion so the journal stays
+  completable. No `navigator.gpu` OR failed sprite fetch → transparent
+  canvas, sprites carry the scene.
   Headless-testable with Edge flags `--enable-unsafe-webgpu
   --enable-features=Vulkan --use-webgpu-adapter=swiftshader`; judge
   WebGPU/WebGL canvases via page.screenshot — drawImage readback is
@@ -121,8 +129,9 @@ feature-by-feature history, specs, and hard-won gotchas.
 
 ## z-index map
 
-0 backdrop · 1 caustics+water surface · 2 overlays, whale(reef) ·
-3 creatures · 4 snow/plankton · 5 ROV darkness · 6 sonar rings, bio trail ·
+0 backdrop · 1 caustics+water surface · 2 overlays, whale(reef), boid
+school · 3 creatures · 4 snow/plankton · 5 ROV darkness · 6 sonar rings,
+bio trail ·
 10 content · 11 whale(deep, glides OVER content) · 50 sidebar/gauge ·
 60 fabs (dive log, console) · 65 floor stamp · 70 toasts · 80 terminal ·
 90 case-study modal (PORTALED to body — sections create stacking contexts
