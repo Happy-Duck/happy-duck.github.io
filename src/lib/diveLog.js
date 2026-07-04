@@ -1,11 +1,17 @@
-// ── Dive log store — discovery accumulation + persistence ─────────────
-// Creatures call tickSeen(id) every visible frame; ~1.5s of cumulative
-// visibility marks the species discovered. markSeen(id) is immediate
-// (crab poke, whale sighting). Discovery fires a window CustomEvent
-// 'ocean:discovery' that the DiveLog UI listens for.
+// ── Dive log store — discovery + persistence ──────────────────────────
+// Discovery is deliberate: the diver has to point at a creature (cursor
+// dwelling on its body) or click/tap it (a sonar ping landing on it) —
+// passive visibility doesn't count. Creatures call inspectSeen(id, x, y,
+// r, mouse) every visible frame with their screen-space center and hit
+// radius. markSeen(id) is immediate (crab poke, whale sighting).
+// Discovery fires a window CustomEvent 'ocean:discovery' that the
+// DiveLog UI listens for.
+
+import { getPing } from './sonar'
 
 const KEY = 'ocean.diveLog'
-const NEED_FRAMES = 90 // ~1.5s at 60fps
+const HOVER_FRAMES = 8 // ~0.13s of cursor contact — a graze, not a fly-by
+const CLICK_MS = 300 // a ping this fresh counts as a click at that spot
 
 function loadStore() {
   try {
@@ -16,7 +22,7 @@ function loadStore() {
 }
 
 const store = loadStore() // { [speciesId]: { ts } }
-const frames = Object.create(null)
+const hover = Object.create(null) // { [speciesId]: { n, last } }
 
 export function getDiscovered() {
   return store
@@ -37,8 +43,30 @@ export function markSeen(id) {
   window.dispatchEvent(new CustomEvent('ocean:discovery', { detail: { id } }))
 }
 
-export function tickSeen(id) {
+// Per-frame pointer check: hover (with a short dwell so sweeping the
+// cursor across the screen doesn't log every fish it crosses) or a
+// click/tap — the sonar ping doubles as the touch path on mobile.
+export function inspectSeen(id, x, y, r, mouse) {
   if (store[id]) return
-  frames[id] = (frames[id] || 0) + 1
-  if (frames[id] >= NEED_FRAMES) markSeen(id)
+
+  const ping = getPing()
+  if (
+    performance.now() - ping.t < CLICK_MS &&
+    Math.hypot(ping.x - x, ping.y - y) < r * 1.4
+  ) {
+    markSeen(id)
+    return
+  }
+
+  if (!mouse || Math.hypot(mouse.x - x, mouse.y - y) >= r) return
+
+  // Count contact ticks, resetting on a GAP in contact rather than on
+  // every miss — multi-instance species (two jellies, two squid, three
+  // clownfish) share an id, and the far twin's misses would otherwise
+  // zero the counter every frame.
+  const now = performance.now()
+  const h = hover[id] || (hover[id] = { n: 0, last: 0 })
+  h.n = now - h.last < 90 ? h.n + 1 : 1
+  h.last = now
+  if (h.n >= HOVER_FRAMES) markSeen(id)
 }

@@ -4,7 +4,7 @@ import { useEffect, useRef } from 'react'
 import { useMouse } from '../../context/MouseContext'
 import { useOceanDepthContext } from '../../context/OceanDepthContext'
 import { creatureOpacity, depthTraverse } from '../../constants/depthZones'
-import { tickSeen } from '../../lib/diveLog'
+import { inspectSeen } from '../../lib/diveLog'
 import { pingImpulse } from '../../lib/sonar'
 
 const W = 225, H = 170
@@ -32,7 +32,6 @@ export function Anglerfish() {
       if (!el) return
 
       if (opacity < 0.01) { el.style.opacity = '0'; return }
-      if (opacity >= 0.5) tickSeen('anglerfish')
 
       const VW = window.innerWidth
       const VH = window.innerHeight
@@ -82,6 +81,8 @@ export function Anglerfish() {
       p.trav = p.trav === null ? travTarget : p.trav + (travTarget - p.trav) * 0.07
       const nx = Math.max(W / 2, Math.min(VW - W / 2, p.x))
       const ny = Math.max(-H, Math.min(VH + H, p.y + p.dodgeY - p.trav))
+
+      if (opacity >= 0.5) inspectSeen('anglerfish', nx, ny, Math.max(W, H) * 0.55, mouseRef.current)
 
       el.style.transform = `translate(${nx - W / 2}px, ${ny - H / 2}px)`
       el.style.opacity   = opacity.toFixed(3)
