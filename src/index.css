@@ -484,7 +484,6 @@ html::-webkit-scrollbar { display: none; }
   }
   /* beach-op: 1 until 12%, → 0 by 25% */
   .water-surface,
-  .watersim-canvas,
   .caustics-canvas {
     animation-name: sda-beach;
     animation-timing-function: linear;
@@ -886,20 +885,6 @@ html::-webkit-scrollbar { display: none; }
   --tod-wave-1: rgba(255, 226, 175, 0.58);
   --tod-wave-2: rgba(255, 195, 130, 0.42);
   --tod-wave-3: rgba(255, 235, 195, 0.24);
-}
-
-/* Interactive splash sim — edge-on strip straddling the waterline */
-.watersim-canvas {
-  position:       fixed;
-  top:            0;
-  left:           0;
-  right:          0;
-  width:          100%;
-  height:         150px;
-  z-index:        1;
-  pointer-events: none;
-  opacity:        var(--beach-op, 1);
-  /* No transition — JS drives --beach-op per-frame */
 }
 
 /* WebGL caustics — light-dance band under the surface */

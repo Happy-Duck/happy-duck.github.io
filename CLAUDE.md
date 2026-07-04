@@ -94,14 +94,12 @@ feature-by-feature history, specs, and hard-won gotchas.
   --enable-features=Vulkan --use-webgpu-adapter=swiftshader`; judge
   WebGPU/WebGL canvases via page.screenshot — drawImage readback is
   blank between frames.
-- **WaterSim** (`WaterSim.jsx`): 1D wave sim ALONG the waterline, drawn
-  edge-on in a fixed 150px strip (side view — top-down ripple fields are
-  wrong physics here, like caustic webs). Wave-sim law: clear FBOs after
-  allocation (texImage2D(null) isn't reliably zeroed; NaN × damping =
-  NaN forever), stability limit is dimension-dependent (2D: c² ≤ 0.42 of
-  the 0.5 limit; 1D: 0.9 of the 1.0 limit), R16F + LINEAR
-  (core-filterable). Clicks above the exported `SPLASH_MAX_Y` (at
-  depth<0.25) belong to the splash, not sonar — SonarPing imports it.
+- **Water ripples: REMOVED, don't rebuild.** Two attempts died in wave
+  2/2.1 (top-down 2D field: wrong physics for a side view; edge-on 1D
+  waterline splash: owner tried it live and cut it). The SVG waves own
+  the surface; sonar owns ALL open-water clicks. History + wave-sim
+  laws (FBO clears, NaN scrub, dimension-dependent c² limits) live in
+  docs/GRAPHICS_PLAN.md §2.
 - **DeepParticles** (`DeepParticles.jsx`): GPU snow, motion computed in
   the vertex shader from seeds+time; brightens inside the beam; adds
   `:root.gpu-snow` which stands the CSS snow down.

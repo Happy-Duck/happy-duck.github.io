@@ -30,26 +30,21 @@ NOTE: headless Edge may lack WebGPU — try launch flags
 `--enable-unsafe-webgpu --use-webgpu-adapter=swiftshader`; if unavailable,
 verify the no-WebGPU path headless and screenshot on best effort.
 
-## 2. Interactive water ripples — [x] REWORKED in wave 2.1 (edge-on)
+## 2. Interactive water ripples — REMOVED in wave 2.1
 
-Original build was a top-down 2D height-field ripple sim across the top
-22vh — rejected by the owner: top-down rings are the wrong physics for a
-side-on cross-section (exactly the reason caustic webs were rejected),
-and it reacted to the mouse anywhere in the band, even over hero text.
-Wave 2.1 replacement: **1D wave equation along the waterline**, rendered
-edge-on. Clicks/drags AT the line (±120px of the calm line at 58px from
-top) splash it; the crest displaces vertically and the disturbance
-propagates left/right, damped. Calm water renders fully transparent —
-the SVG waves carry the resting look, the canvas paints only the
-disturbance. N×1 R16F ping-pong FBOs at quarter horizontal res, two
-substeps/frame; 1D FDTD is stable to c² = 1, runs at 0.9. Fixed 150px
-strip, opacity still `--beach-op` (+ scroll-driven fade). `ocean:ping`
-in-band still splashes; ambient drips keep calm water alive.
-`SPLASH_MAX_Y` is exported and consumed by SonarPing so splash and ping
-never double-fire — single source of truth.
-Needs `EXT_color_buffer_float` → without it render nothing. Reduced
-motion → skip. z-index 1 with the water surface.
-Files: `src/components/WaterSim.jsx`, `SonarPing.jsx`, App, CSS.
+Two attempts, both retired. v1 was a top-down 2D height-field ripple
+sim across the top 22vh — rejected by the owner: top-down rings are the
+wrong physics for a side-on cross-section (exactly the reason caustic
+webs were rejected), and it reacted to the mouse anywhere in the band,
+even over hero text. v2 reworked it into a 1D wave equation along the
+waterline rendered edge-on (crest displaces, disturbance propagates
+left/right) — physically coherent, but the owner judged it didn't work
+in practice either, so the whole feature came out. The SVG waves in
+`WaterSurface.jsx` own the surface alone; SonarPing owns all open-water
+clicks again (the surface-click carve-out is gone).
+If surface interactivity ever returns, start from the wave-sim lessons
+in the notes below and the two dead approaches in git history
+(2D: pre-dc806e7, 1D edge-on: dc806e7..removal commit).
 
 ## 3. Volumetric ROV beam + GPU marine snow — [x] DONE
 
@@ -137,6 +132,7 @@ Files: raysRenderer.js, rays.worker.js, Caustics.jsx.
 | 8 | Worker rays | feat: worker rays + water sim hardening | worker path confirmed; tod messaging works |
 | 2.1a | Boid re-skin | feat: boids wear a real anchovy photo | schools + upright orientation both directions verified in dpr-1 and dpr-2 screenshots |
 | 2.1b | Edge-on splash | feat: ripples become an edge-on waterline splash | click splash, drag wake, and sonar handoff below the band all verified in screenshots |
+| 2.1c | Ripples removed | refactor: retire the water ripple sim | owner call after trying 2.1b live; sonar owns surface clicks again, verified headless |
 
 ## Notes / decisions
 
