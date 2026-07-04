@@ -2,6 +2,7 @@
 import { useState, useEffect, useRef } from 'react'
 import { firePing } from '../lib/sonar'
 import { useOceanDepthContext } from '../context/OceanDepthContext'
+import { SPLASH_MAX_Y } from './WaterSim'
 
 export function SonarPing() {
   const [rings, setRings] = useState([])
@@ -18,8 +19,8 @@ export function SonarPing() {
 
     const onClick = (e) => {
       if (e.target.closest('a,button,input,textarea,[data-no-ping]')) return
-      // Near the surface, clicks in the wave band belong to the ripple sim
-      if (depthRef.current < 0.25 && e.clientY < window.innerHeight * 0.24) return
+      // Near the surface, clicks at the waterline belong to the splash sim
+      if (depthRef.current < 0.25 && e.clientY < SPLASH_MAX_Y) return
       spawn(e.clientX, e.clientY)
     }
     const onEvent = (e) => spawn(e.detail.x, e.detail.y)

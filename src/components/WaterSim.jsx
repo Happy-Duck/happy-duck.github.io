@@ -1,13 +1,27 @@
-// ── WaterSim — interactive ripples on the surface band ─────────────────
-// Classic height-field wave equation on ping-pong float FBOs:
-//   next = 2·curr − prev + c²·∇²curr, damped
-// Cursor movement over the band drags wakes, clicks (and sonar pings)
-// drop ripples, and a soft ambient drip keeps calm water alive. Quarter-
-// res sim, shaded into specular/fresnel highlights. Needs WebGL2 +
-// renderable float textures — without them (or with reduced motion) the
-// canvas stays transparent and the SVG waves carry the surface alone.
+// ── WaterSim — edge-on splash line on the waterline ────────────────────
+// The site is a side-on cross-section, so surface ripples are a 1D wave
+// equation ALONG the waterline (not a top-down 2D field — wrong physics
+// for a side view, same reason caustic webs were rejected):
+//   next = 2·curr − prev + c²·(left + right − 2·curr), damped
+// Clicks and drags AT the line splash it; the disturbance displaces the
+// crest and propagates left/right along the surface. Calm water renders
+// fully transparent — the SVG waves carry the resting look, this canvas
+// paints only the disturbance. Quarter-res 1D sim on ping-pong float
+// FBOs. Needs WebGL2 + renderable float textures — without them (or with
+// reduced motion) the canvas stays transparent.
 import { useEffect, useRef } from 'react'
 import { useOceanDepthContext } from '../context/OceanDepthContext'
+
+// Calm waterline, px from the top of the viewport — sits on the SVG wave
+// band (.water-surface is 100px tall, wave midline ≈ 50–60px)
+const BASELINE_PX = 58
+// Clicks/drags this close to the line belong to the splash sim
+const SPLASH_BAND_PX = 120
+// SonarPing swallows surface clicks above this line so a splash never
+// double-fires a ping — single source of truth for both systems
+export const SPLASH_MAX_Y = BASELINE_PX + SPLASH_BAND_PX
+// Fixed-height strip: tall enough for crest + spray, nothing more
+const CANVAS_H = 150
 
 const VERT = `#version 300 es
 out vec2 v_uv;
@@ -21,51 +35,59 @@ const SIM_FRAG = `#version 300 es
 precision highp float;
 uniform sampler2D u_curr;
 uniform sampler2D u_prev;
-uniform vec2  u_texel;
-uniform vec3  u_drop;   // x,y in uv, z = strength (0 = none)
-uniform float u_radius; // px
+uniform float u_texel;  // 1 / sim width
+uniform vec2  u_drop;   // x in uv, y = strength (0 = none)
+uniform float u_radius; // cells
 in vec2 v_uv;
 out vec4 o;
 void main() {
   float c = texture(u_curr, v_uv).r;
   float p = texture(u_prev, v_uv).r;
-  float sum =
-      texture(u_curr, v_uv - vec2(u_texel.x, 0.0)).r
-    + texture(u_curr, v_uv + vec2(u_texel.x, 0.0)).r
-    + texture(u_curr, v_uv - vec2(0.0, u_texel.y)).r
-    + texture(u_curr, v_uv + vec2(0.0, u_texel.y)).r;
-  // c^2 = 0.42 stays safely under the 2D FDTD stability limit of 0.5 —
-  // at the limit, rounding growth saturates the field with ringing
-  float next = (c * 2.0 - p) + (sum - 4.0 * c) * 0.42;
-  next *= 0.965;
-  if (u_drop.z != 0.0) {
-    vec2 dpx = (v_uv - u_drop.xy) / u_texel;
-    float d2 = dot(dpx, dpx);
-    next += u_drop.z * exp(-d2 / (u_radius * u_radius));
+  float l = texture(u_curr, vec2(v_uv.x - u_texel, 0.5)).r;
+  float r = texture(u_curr, vec2(v_uv.x + u_texel, 0.5)).r;
+  // 1D FDTD is stable up to c² = 1; run at 0.9 for margin + fast sweep
+  float next = (c * 2.0 - p) + (l + r - 2.0 * c) * 0.9;
+  next *= 0.9965;
+  if (u_drop.y != 0.0) {
+    float d = (v_uv.x - u_drop.x) / u_texel;
+    next += u_drop.y * exp(-d * d / (u_radius * u_radius));
   }
   // Scrub NaN/Inf (uninitialized driver memory would otherwise persist
   // forever: NaN * damping = NaN) and clamp against half-float overflow
   if (!(next == next)) { next = 0.0; }
-  next = clamp(next, -4.0, 4.0);
+  next = clamp(next, -2.5, 2.5);
   o = vec4(next, 0.0, 0.0, 1.0);
 }`
 
 const DRAW_FRAG = `#version 300 es
 precision highp float;
 uniform sampler2D u_h;
-uniform vec2 u_texel;
+uniform float u_texel;    // 1 / sim width
+uniform float u_canvasH;  // px
+uniform float u_baseline; // px from top of canvas
 in vec2 v_uv;
 out vec4 o;
 void main() {
-  float hl = texture(u_h, v_uv - vec2(u_texel.x, 0.0)).r;
-  float hr = texture(u_h, v_uv + vec2(u_texel.x, 0.0)).r;
-  float hd = texture(u_h, v_uv - vec2(0.0, u_texel.y)).r;
-  float hu = texture(u_h, v_uv + vec2(0.0, u_texel.y)).r;
-  vec3 n = normalize(vec3(hl - hr, hd - hu, 0.5));
-  float spec = pow(max(dot(n, normalize(vec3(-0.3, 0.55, 0.78))), 0.0), 22.0);
-  float fres = pow(1.0 - abs(n.z), 1.5);
-  float a = clamp(spec * 0.55 + fres * 0.6, 0.0, 1.0);
-  a *= smoothstep(0.0, 0.45, v_uv.y); // dissolve toward the band's bottom
+  float h  = texture(u_h, vec2(v_uv.x, 0.5)).r;
+  float hl = texture(u_h, vec2(v_uv.x - u_texel, 0.5)).r;
+  float hr = texture(u_h, vec2(v_uv.x + u_texel, 0.5)).r;
+  float slope = (hr - hl) * 0.5;
+
+  // Local wave energy gates everything — calm line = fully transparent
+  float e = smoothstep(0.015, 0.28, abs(h) * 0.8 + abs(slope) * 2.4);
+
+  float yPx = (1.0 - v_uv.y) * u_canvasH;      // px from top
+  float lineY = u_baseline - h * 14.0;          // displaced crest
+  float d = yPx - lineY;                        // + below, − above
+
+  // Bright crest hugging the displaced line, wider where taller
+  float w = 4.0 + abs(h) * 4.0;
+  float crest = exp(-(d * d) / (w * w));
+
+  // Soft body under the crest — displaced water, quickly fading
+  float body = (1.0 - smoothstep(0.0, 26.0, d)) * step(0.0, d) * 0.22;
+
+  float a = clamp((crest + body) * e, 0.0, 1.0) * 0.85;
   o = vec4(vec3(0.86, 0.97, 1.0) * a, a); // premultiplied
 }`
 
@@ -114,18 +136,19 @@ export function WaterSim() {
       simRadius: gl.getUniformLocation(simProg, 'u_radius'),
       drawH: gl.getUniformLocation(drawProg, 'u_h'),
       drawTexel: gl.getUniformLocation(drawProg, 'u_texel'),
+      drawCanvasH: gl.getUniformLocation(drawProg, 'u_canvasH'),
+      drawBaseline: gl.getUniformLocation(drawProg, 'u_baseline'),
     }
 
-    // Quarter-res sim
+    // 1D sim: N×1 cells, quarter horizontal res
     let simW = 0
-    let simH = 0
     let texs = []
     let fbos = []
 
     const mkTex = () => {
       const t = gl.createTexture()
       gl.bindTexture(gl.TEXTURE_2D, t)
-      gl.texImage2D(gl.TEXTURE_2D, 0, gl.R16F, simW, simH, 0, gl.RED, gl.HALF_FLOAT, null)
+      gl.texImage2D(gl.TEXTURE_2D, 0, gl.R16F, simW, 1, 0, gl.RED, gl.HALF_FLOAT, null)
       // R16F is texture-filterable in core WebGL2 — LINEAR keeps the
       // upscaled display pass smooth instead of blocky
       gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR)
@@ -154,9 +177,8 @@ export function WaterSim() {
 
     const resize = () => {
       canvas.width = window.innerWidth
-      canvas.height = Math.round(window.innerHeight * 0.22)
-      simW = Math.max(128, canvas.width >> 1)
-      simH = Math.max(48, canvas.height >> 1)
+      canvas.height = CANVAS_H
+      simW = Math.max(256, canvas.width >> 2)
       alloc()
     }
     resize()
@@ -168,50 +190,43 @@ export function WaterSim() {
     let iNext = 2
 
     const drops = []
-    const queueDrop = (clientX, clientY, strength, radius) => {
-      const r = canvas.getBoundingClientRect()
-      if (clientY > r.bottom) return
-      drops.push({
-        x: clientX / r.width,
-        y: 1 - Math.max(0, clientY - r.top) / r.height,
-        s: strength,
-        r: radius,
-      })
+    const queueDrop = (clientX, strength, radius) => {
+      drops.push({ x: clientX / canvas.clientWidth, s: strength, r: radius })
       if (drops.length > 6) drops.shift()
     }
+    const inBand = (clientY) => Math.abs(clientY - BASELINE_PX) < SPLASH_BAND_PX
 
     let lastX = -1e4
     let lastT = 0
     const onMove = (e) => {
+      // Only dragging through the waterline itself makes a wake
+      if (!inBand(e.clientY) || depthRef.current > 0.3) return
       const now = performance.now()
       if (now - lastT < 34 || Math.abs(e.clientX - lastX) < 8) return
       lastT = now
       lastX = e.clientX
-      queueDrop(e.clientX, e.clientY, 0.55, 5.0)
+      queueDrop(e.clientX, 0.32, 3.5)
     }
     const onClick = (e) => {
       if (e.target.closest('a,button,input,textarea,[data-no-ping]')) return
-      queueDrop(e.clientX, e.clientY, 2.8, 7.0)
+      if (!inBand(e.clientY) || depthRef.current > 0.3) return
+      queueDrop(e.clientX, 2.2, 5.0)
     }
-    const onPing = (e) => queueDrop(e.detail.x, e.detail.y, 2.8, 7.0)
+    const onPing = (e) => {
+      if (!inBand(e.detail.y)) return
+      queueDrop(e.detail.x, 2.2, 5.0)
+    }
     window.addEventListener('mousemove', onMove, { passive: true })
     window.addEventListener('click', onClick)
     window.addEventListener('ocean:ping', onPing)
 
-    // Ambient drip so calm water still lives
+    // Ambient drips so calm water still lives — like stray raindrops
     const drip = setInterval(() => {
       if (document.hidden || depthRef.current > 0.3) return
-      queueDrop(Math.random() * canvas.clientWidth, Math.random() * canvas.clientHeight * 0.7, 0.2, 4.5)
+      queueDrop(Math.random() * canvas.clientWidth, 0.35, 2.5)
     }, 2600)
 
-    let rafId = 0
-    const frame = () => {
-      rafId = requestAnimationFrame(frame)
-      if (document.hidden || depthRef.current > 0.3) return
-
-      // Sim step → next
-      gl.useProgram(simProg)
-      gl.viewport(0, 0, simW, simH)
+    const simStep = () => {
       gl.bindFramebuffer(gl.FRAMEBUFFER, fbos[iNext])
       gl.activeTexture(gl.TEXTURE0)
       gl.bindTexture(gl.TEXTURE_2D, texs[iCurr])
@@ -219,27 +234,39 @@ export function WaterSim() {
       gl.bindTexture(gl.TEXTURE_2D, texs[iPrev])
       gl.uniform1i(loc.simCurr, 0)
       gl.uniform1i(loc.simPrev, 1)
-      gl.uniform2f(loc.simTexel, 1 / simW, 1 / simH)
+      gl.uniform1f(loc.simTexel, 1 / simW)
       const d = drops.shift()
-      gl.uniform3f(loc.simDrop, d ? d.x : 0, d ? d.y : 0, d ? d.s : 0)
+      gl.uniform2f(loc.simDrop, d ? d.x : 0, d ? d.s : 0)
       gl.uniform1f(loc.simRadius, d ? d.r : 1)
       gl.drawArrays(gl.TRIANGLES, 0, 3)
+      const t = iPrev
+      iPrev = iCurr
+      iCurr = iNext
+      iNext = t
+    }
+
+    let rafId = 0
+    const frame = () => {
+      rafId = requestAnimationFrame(frame)
+      if (document.hidden || depthRef.current > 0.3) return
+
+      // Two substeps per frame — waves sweep the line at a lively pace
+      gl.useProgram(simProg)
+      gl.viewport(0, 0, simW, 1)
+      simStep()
+      simStep()
 
       // Shade → screen
       gl.bindFramebuffer(gl.FRAMEBUFFER, null)
       gl.viewport(0, 0, canvas.width, canvas.height)
       gl.useProgram(drawProg)
       gl.activeTexture(gl.TEXTURE0)
-      gl.bindTexture(gl.TEXTURE_2D, texs[iNext])
+      gl.bindTexture(gl.TEXTURE_2D, texs[iCurr])
       gl.uniform1i(loc.drawH, 0)
-      gl.uniform2f(loc.drawTexel, 1 / simW, 1 / simH)
+      gl.uniform1f(loc.drawTexel, 1 / simW)
+      gl.uniform1f(loc.drawCanvasH, canvas.height)
+      gl.uniform1f(loc.drawBaseline, BASELINE_PX)
       gl.drawArrays(gl.TRIANGLES, 0, 3)
-
-      // Rotate prev ← curr ← next
-      const t = iPrev
-      iPrev = iCurr
-      iCurr = iNext
-      iNext = t
     }
     rafId = requestAnimationFrame(frame)
 

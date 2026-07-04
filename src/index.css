@@ -888,14 +888,14 @@ html::-webkit-scrollbar { display: none; }
   --tod-wave-3: rgba(255, 235, 195, 0.24);
 }
 
-/* Interactive water ripple sim — the very surface band */
+/* Interactive splash sim — edge-on strip straddling the waterline */
 .watersim-canvas {
   position:       fixed;
   top:            0;
   left:           0;
   right:          0;
   width:          100%;
-  height:         22vh;
+  height:         150px;
   z-index:        1;
   pointer-events: none;
   opacity:        var(--beach-op, 1);

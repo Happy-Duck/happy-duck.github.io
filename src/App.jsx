@@ -57,7 +57,7 @@ export default function App() {
         {/* Water surface — underwater perspective, only near surface (depth < 0.20) */}
         <WaterSurface />
 
-        {/* Interactive ripple sim — cursor wakes + click drops */}
+        {/* Interactive splash sim — click/drag the waterline, edge-on */}
         <WaterSim />
 
         {/* Depth overlay gradients */}
