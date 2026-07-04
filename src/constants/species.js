@@ -11,7 +11,7 @@ const HAS_SCHOOL =
 
 export const SPECIES = [
   ...(HAS_SCHOOL ? [
-    { id: 'anchovy',        name: 'Anchovy School',    zone: 'Sunlit Zone',   depth: '0–1,000 m',     note: 'Moves as one. Thinks as none.' },
+    { id: 'anchovy',        name: 'Anchovy School',    zone: 'Sunlit Zone',   depth: '0–400 m',       note: 'Moves as one. Thinks as none.' },
   ] : []),
   { id: 'reefFish',         name: 'Clownfish',         zone: 'Sunlit Zone',   depth: '0–200 m',       note: 'Travels in threes. Refuses to discuss the anemone incident.' },
   { id: 'seaTurtle',        name: 'Green Sea Turtle',  zone: 'Sunlit Zone',   depth: '0–200 m',       note: 'Unbothered. Moisturized. In its lane.' },

@@ -46,7 +46,8 @@ export function markSeen(id) {
 // Per-frame pointer check: hover (with a short dwell so sweeping the
 // cursor across the screen doesn't log every fish it crosses) or a
 // click/tap — the sonar ping doubles as the touch path on mobile.
-export function inspectSeen(id, x, y, r, mouse) {
+// `dwell` overrides the contact-tick count for slow-polling callers.
+export function inspectSeen(id, x, y, r, mouse, dwell = HOVER_FRAMES) {
   if (store[id]) return
 
   const ping = getPing()
@@ -69,5 +70,5 @@ export function inspectSeen(id, x, y, r, mouse) {
   const h = hover[id] || (hover[id] = { n: 0, last: 0 })
   h.n = now - h.last < 150 ? h.n + 1 : 1
   h.last = now
-  if (h.n >= HOVER_FRAMES) markSeen(id)
+  if (h.n >= dwell) markSeen(id)
 }

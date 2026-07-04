@@ -86,9 +86,10 @@ feature-by-feature history, specs, and hard-won gotchas.
 ## GPU / advanced-web systems (wave 2)
 
 - **BoidSchool** (`creatures/BoidSchool.jsx`): WebGPU compute boids,
-  ~380 fish, band 0.04–0.48, z-2 — a hazy BACKGROUND layer behind the
-  sprite creatures (owner wants it subtle; schools stream as ribbons via
-  anisotropic cohesion + speed floor, never discs). Rendered as textured
+  ~380 fish, band 0.04–0.275 (≈40–400 m — anchovies are epipelagic,
+  keep the claim realistic), z-2 — a hazy BACKGROUND layer behind the
+  sprite creatures (owner wants it subtle and unhurried; schools stream
+  as ribbons via anisotropic cohesion + speed floor, never discs). Rendered as textured
   quads carrying `public/creatures/anchovy.png` (real photo cutout,
   CC BY-SA 4.0 Ebachiller/Wikimedia — keep the attribution comment);
   mips are uploaded as pre-scaled ImageBitmaps (no auto mipgen in

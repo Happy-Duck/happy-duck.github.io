@@ -19,7 +19,10 @@ import { inspectSeen } from '../../lib/diveLog'
 import { getPing } from '../../lib/sonar'
 
 const COUNT = 384
-const DEPTH_RANGE = { enter: 0.04, exit: 0.48 }
+// ≈40–400 m: anchovies are epipelagic — surface schools that don't dive
+// much past ~400 m (0.275 = depthAtMeters(400)), so the school is gone
+// well before the twilight deep
+const DEPTH_RANGE = { enter: 0.04, exit: 0.275 }
 
 const WGSL = /* wgsl */ `
 struct Boid { pos: vec2f, vel: vec2f }
@@ -93,10 +96,11 @@ fn cs(@builtin(global_invocation_id) gid: vec3u) {
 
   vel += acc;
   let speed = length(vel);
-  if (speed > 2.4) { vel = vel / speed * 2.4; }
-  // High floor: milling in place is what lets a school collapse into a
-  // disc — everyone keeps swimming, so shapes stay drawn out
-  if (speed < 1.4) { vel = vel / max(speed, 0.001) * 1.4; }
+  if (speed > 1.7) { vel = vel / speed * 1.7; }
+  // High floor (relative to the cap): milling in place is what lets a
+  // school collapse into a disc — everyone keeps swimming, so shapes
+  // stay drawn out
+  if (speed < 1.0) { vel = vel / max(speed, 0.001) * 1.0; }
   pos += vel;
 
   // Horizontal wrap with a margin so fish don't pop at the edges
@@ -132,7 +136,7 @@ fn vs(@builtin(vertex_index) vi: u32, @builtin(instance_index) ii: u32) -> VSOut
   let halfLen = 11.0 + f32(ii % 5u) * 2.0;
   // Tail wag — the quad can't bend, but skewing the tail corners across
   // the body axis (zero at the nose) reads as swimming at this distance
-  let wag = sin(RP.time * 7.0 + f32(ii) * 1.7) * halfLen * 0.12 * (0.5 - lx * 0.5);
+  let wag = sin(RP.time * 5.0 + f32(ii) * 1.7) * halfLen * 0.12 * (0.5 - lx * 0.5);
   let p = b.pos + dir * (lx * halfLen) + perp * (ly * halfLen * FISH_ASPECT + wag);
   // Photo faces left (head at u=0, dorsal at v=0): nose samples u=0, and
   // when swimming leftward the quad is rotated ~180° — flip v so the
@@ -385,8 +389,11 @@ export function BoidSchool() {
               const dp = (x - ping.x) ** 2 + (y - ping.y) ** 2
               if (dp < pd) { pd = dp; pi = i }
             }
-            inspectSeen('anchovy', a[mi * 4], a[mi * 4 + 1], 32, m)
-            if (pi !== mi) inspectSeen('anchovy', a[pi * 4], a[pi * 4 + 1], 32, m)
+            // Generous radius + short dwell: the school actively flees
+            // the cursor, so chasing CLOSE to it must count — a direct
+            // hit on a 3 px fish would be nearly impossible
+            inspectSeen('anchovy', a[mi * 4], a[mi * 4 + 1], 110, m, 5)
+            if (pi !== mi) inspectSeen('anchovy', a[pi * 4], a[pi * 4 + 1], 110, m, 5)
             staging.unmap()
             stagingBusy = false
           }).catch(() => { stagingBusy = false })
