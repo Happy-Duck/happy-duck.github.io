@@ -84,16 +84,24 @@ feature-by-feature history, specs, and hard-won gotchas.
 ## GPU / advanced-web systems (wave 2)
 
 - **BoidSchool** (`creatures/BoidSchool.jsx`): WebGPU compute boids,
-  ~380 fish, band 0.04–0.48. No `navigator.gpu` → transparent canvas,
-  sprites carry the scene. Headless-testable with Edge flags
-  `--enable-unsafe-webgpu --enable-features=Vulkan
-  --use-webgpu-adapter=swiftshader`; judge WebGPU/WebGL canvases via
-  page.screenshot — drawImage readback is blank between frames.
-- **WaterSim** (`WaterSim.jsx`): height-field wave sim, top 22vh. Wave-sim
-  law: clear FBOs after allocation (texImage2D(null) isn't reliably
-  zeroed; NaN × damping = NaN forever), keep c² ≤ 0.42 (0.5 is the exact
-  2D stability limit and saturates), R16F + LINEAR (core-filterable).
-  Surface clicks near depth<0.25 belong to ripples, not sonar.
+  ~380 fish, band 0.04–0.48. Rendered as textured quads carrying
+  `public/creatures/anchovy.png` (real photo cutout, CC BY-SA 4.0
+  Ebachiller/Wikimedia — keep the attribution comment); mips are uploaded
+  as pre-scaled ImageBitmaps (no auto mipgen in WebGPU); v-flip when
+  dir.x<0 or leftward fish swim belly-up. No `navigator.gpu` OR failed
+  sprite fetch → transparent canvas, sprites carry the scene.
+  Headless-testable with Edge flags `--enable-unsafe-webgpu
+  --enable-features=Vulkan --use-webgpu-adapter=swiftshader`; judge
+  WebGPU/WebGL canvases via page.screenshot — drawImage readback is
+  blank between frames.
+- **WaterSim** (`WaterSim.jsx`): 1D wave sim ALONG the waterline, drawn
+  edge-on in a fixed 150px strip (side view — top-down ripple fields are
+  wrong physics here, like caustic webs). Wave-sim law: clear FBOs after
+  allocation (texImage2D(null) isn't reliably zeroed; NaN × damping =
+  NaN forever), stability limit is dimension-dependent (2D: c² ≤ 0.42 of
+  the 0.5 limit; 1D: 0.9 of the 1.0 limit), R16F + LINEAR
+  (core-filterable). Clicks above the exported `SPLASH_MAX_Y` (at
+  depth<0.25) belong to the splash, not sonar — SonarPing imports it.
 - **DeepParticles** (`DeepParticles.jsx`): GPU snow, motion computed in
   the vertex shader from seeds+time; brightens inside the beam; adds
   `:root.gpu-snow` which stands the CSS snow down.

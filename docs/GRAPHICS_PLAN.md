@@ -7,29 +7,49 @@ as you go. Conventions from CLAUDE.md apply everywhere: zero lint, reduced
 motion, `data-no-ping` on interactive surfaces, real-photo art only,
 feature-detect + graceful absence for every new API.
 
-## 1. WebGPU boids — school of fish — [x] DONE
+## 1. WebGPU boids — school of fish — [x] DONE (re-skinned in wave 2.1)
 
-Compute-shader flocking (separation/alignment/cohesion) for ~400 fish,
-rendered as instanced oriented triangles on a transparent canvas at the
-creature layer (z-3). Mouse repels the school; sonar pings scatter it
-(read `getPing()` and upload as uniforms). Depth-gated to the sunlit→
-twilight band (~0.04–0.48) with creatureOpacity-style fade on the canvas
-element. `navigator.gpu` absent → render nothing (sprite creatures remain).
-Reduced motion → skip entirely. Pause when tab hidden or out of band.
+Compute-shader flocking (separation/alignment/cohesion) for ~400 fish on
+a transparent canvas at the creature layer (z-3). Mouse repels the
+school; sonar pings scatter it (read `getPing()` and upload as uniforms).
+Depth-gated to the sunlit→twilight band (~0.04–0.48) with
+creatureOpacity-style fade on the canvas element. `navigator.gpu` absent
+→ render nothing (sprite creatures remain). Reduced motion → skip
+entirely. Pause when tab hidden or out of band.
+Rendering (wave 2.1, owner feedback: "triangles don't make sense"):
+instanced textured quads carrying a real anchovy photo cutout —
+`public/creatures/anchovy.png` (192×30, from Engraulis encrasicolus,
+arrainak.eus.png, Ebachiller / Wikimedia Commons, **CC BY-SA 4.0** —
+keep the attribution), oriented along velocity, v-flipped when swimming
+left so fish are never belly-up. Mip levels are uploaded as pre-scaled
+ImageBitmaps (WebGPU has no auto mipgen; unmipped 4–10× minification
+shimmers). Backing store is DPR-scaled (≤2); sim/NDC stay in CSS px via
+P.res.
 Files: `src/components/creatures/BoidSchool.jsx`, App mount, CSS.
 NOTE: headless Edge may lack WebGPU — try launch flags
 `--enable-unsafe-webgpu --use-webgpu-adapter=swiftshader`; if unavailable,
 verify the no-WebGPU path headless and screenshot on best effort.
 
-## 2. Interactive water ripples — [x] DONE
+## 2. Interactive water ripples — [x] REWORKED in wave 2.1 (edge-on)
 
-WebGL2 height-field wave sim (ping-pong float FBOs: next = 2·curr − prev +
-c²·∇²curr, damped) across the top ~22vh, opacity tied to `--beach-op`.
-Cursor movement over the band drags wakes; clicks drop ripples (also listen
-for `ocean:ping` in-band). Shade height→normal into soft white/cyan
-highlights, transparent elsewhere. Needs `EXT_color_buffer_float` → without
-it render nothing. Reduced motion → skip. z-index 1 with the water surface.
-Files: `src/components/WaterSim.jsx`, App, CSS.
+Original build was a top-down 2D height-field ripple sim across the top
+22vh — rejected by the owner: top-down rings are the wrong physics for a
+side-on cross-section (exactly the reason caustic webs were rejected),
+and it reacted to the mouse anywhere in the band, even over hero text.
+Wave 2.1 replacement: **1D wave equation along the waterline**, rendered
+edge-on. Clicks/drags AT the line (±120px of the calm line at 58px from
+top) splash it; the crest displaces vertically and the disturbance
+propagates left/right, damped. Calm water renders fully transparent —
+the SVG waves carry the resting look, the canvas paints only the
+disturbance. N×1 R16F ping-pong FBOs at quarter horizontal res, two
+substeps/frame; 1D FDTD is stable to c² = 1, runs at 0.9. Fixed 150px
+strip, opacity still `--beach-op` (+ scroll-driven fade). `ocean:ping`
+in-band still splashes; ambient drips keep calm water alive.
+`SPLASH_MAX_Y` is exported and consumed by SonarPing so splash and ping
+never double-fire — single source of truth.
+Needs `EXT_color_buffer_float` → without it render nothing. Reduced
+motion → skip. z-index 1 with the water surface.
+Files: `src/components/WaterSim.jsx`, `SonarPing.jsx`, App, CSS.
 
 ## 3. Volumetric ROV beam + GPU marine snow — [x] DONE
 
@@ -115,6 +135,8 @@ Files: raysRenderer.js, rays.worker.js, Caustics.jsx.
 | 6 | Scroll timelines | feat: scroll-driven fades | computed opacities match JS ramps exactly at 4 depths |
 | 7 | Gyro | feat: gyro parallax | synthetic DeviceOrientationEvent shifts layers under mobile emulation |
 | 8 | Worker rays | feat: worker rays + water sim hardening | worker path confirmed; tod messaging works |
+| 2.1a | Boid re-skin | feat: boids wear a real anchovy photo | schools + upright orientation both directions verified in dpr-1 and dpr-2 screenshots |
+| 2.1b | Edge-on splash | feat: ripples become an edge-on waterline splash | click splash, drag wake, and sonar handoff below the band all verified in screenshots |
 
 ## Notes / decisions
 
@@ -124,7 +146,14 @@ Files: raysRenderer.js, rays.worker.js, Caustics.jsx.
   page.screenshot (composited) instead.
 - Wave-sim hard lessons: (1) texImage2D(null) is NOT reliably zero-filled
   on every driver — clear FBOs explicitly after allocation, and scrub
-  NaN in the sim shader (NaN × damping = NaN forever). (2) c² = 0.5 is
-  the exact 2D FDTD stability limit — run at 0.42 or the field saturates
-  with ringing. (3) R16F is LINEAR-filterable in core WebGL2 — NEAREST at
-  low sim res reads as blocky confetti.
+  NaN in the sim shader (NaN × damping = NaN forever). (2) FDTD stability
+  limits are dimension-dependent: c² = 0.5 in 2D (run 0.42), c² = 1.0 in
+  1D (run 0.9) — at the limit the field saturates with ringing. (3) R16F
+  is LINEAR-filterable in core WebGL2 — NEAREST at low sim res reads as
+  blocky confetti.
+- Side-view physics is a real constraint, not a style note: top-down
+  ripple fields joined caustic webs on the rejected list. If an effect's
+  mental model is "seen from above", it doesn't belong on this site.
+- WebGPU sprite textures: upload mips as pre-scaled ImageBitmaps
+  (`createImageBitmap(blob, { resizeWidth, resizeHeight })` per level) —
+  no blit pipeline needed, and minified sprites stop shimmering.
