@@ -10,7 +10,7 @@ import { markSeen } from '../../lib/diveLog'
 const CROSS_MS = 35000
 const SUMMON_DELAY_MS = 4000
 
-// Blue whale artwork (public/creatures/blue-whale.png) faces LEFT, so the
+// Blue whale artwork (public/creatures/blue-whale.webp) faces LEFT, so the
 // crossing runs right-to-left — the whale always swims head-first.
 
 export function Whale() {
@@ -95,7 +95,7 @@ export function Whale() {
   return (
     <div className="whale-track" aria-hidden="true">
       <div className="whale">
-        <img ref={imgRef} src="/creatures/blue-whale.png" alt="" draggable={false} />
+        <img ref={imgRef} src="/creatures/blue-whale.webp" alt="" draggable={false} />
       </div>
     </div>
   )

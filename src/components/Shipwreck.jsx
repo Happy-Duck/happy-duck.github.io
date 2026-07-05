@@ -27,7 +27,7 @@ export function Shipwreck() {
     <div className="shipwreck" aria-hidden="false">
       <img
         className="shipwreck-img"
-        src="/creatures/shipwreck.png"
+        src="/creatures/shipwreck.webp"
         alt=""
         draggable={false}
         aria-hidden="true"
