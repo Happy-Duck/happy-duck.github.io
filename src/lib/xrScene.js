@@ -7,16 +7,16 @@
 import * as THREE from 'three'
 
 const CREATURES = [
-  { src: '/creatures/clownfish.webp',     w: 0.5,  y: -0.5, r: 3.0 },
-  { src: '/creatures/GreenTurtle.png',    w: 1.6,  y: -1.5, r: 4.5 },
-  { src: '/creatures/Jellyfish.png',      w: 1.0,  y: -4.0, r: 3.5 },
-  { src: '/creatures/squid.jpg',          w: 0.8,  y: -5.5, r: 4.0 },
-  { src: '/creatures/deepJellyfish.png',  w: 1.2,  y: -12,  r: 3.2 },
-  { src: '/creatures/Anglerfish.webp',    w: 1.4,  y: -14,  r: 4.2 },
-  { src: '/creatures/deepSeaFish.webp',   w: 1.1,  y: -16,  r: 3.6 },
-  { src: '/creatures/jumboSquid.webp',    w: 2.6,  y: -20,  r: 5.0 },
-  { src: '/creatures/Lizardfish.webp',    w: 1.3,  y: -23,  r: 3.4 },
-  { src: '/creatures/blue-whale.png',     w: 9.0,  y: -9,   r: 14  },
+  { src: '/creatures/clownfish-sm.webp',   w: 0.5,  y: -0.5, r: 3.0 },
+  { src: '/creatures/GreenTurtle.webp',    w: 1.6,  y: -1.5, r: 4.5 },
+  { src: '/creatures/Jellyfish.webp',      w: 1.0,  y: -4.0, r: 3.5 },
+  { src: '/creatures/squid.jpg',           w: 0.8,  y: -5.5, r: 4.0 },
+  { src: '/creatures/deepJellyfish.webp',  w: 1.2,  y: -12,  r: 3.2 },
+  { src: '/creatures/Anglerfish.webp',     w: 1.4,  y: -14,  r: 4.2 },
+  { src: '/creatures/deepSeaFish-sm.webp', w: 1.1,  y: -16,  r: 3.6 },
+  { src: '/creatures/jumboSquid-sm.webp',  w: 2.6,  y: -20,  r: 5.0 },
+  { src: '/creatures/Lizardfish-sm.webp',  w: 1.3,  y: -23,  r: 3.4 },
+  { src: '/creatures/blue-whale.webp',     w: 9.0,  y: -9,   r: 14  },
 ]
 
 const SURFACE_COLOR = new THREE.Color(0x2e8a90)
@@ -56,7 +56,7 @@ export async function startXR() {
 
   const disposables = [floor.geometry, floor.material]
 
-  const wreckTex = loader.load('/creatures/shipwreck.png')
+  const wreckTex = loader.load('/creatures/shipwreck.webp')
   const wreck = new THREE.Mesh(
     new THREE.PlaneGeometry(8, 6),
     new THREE.MeshBasicMaterial({ map: wreckTex, transparent: true, color: 0x4a5e70 }),
