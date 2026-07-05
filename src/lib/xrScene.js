@@ -6,16 +6,19 @@
 // water as you sink.
 import * as THREE from 'three'
 
+// creatures/xr/ holds full-resolution copies of the sprites that were
+// downsized for the 2D page — VR billboards fill far more of the eye
+// than a 160 px cutout can survive. Only fetched on session start.
 const CREATURES = [
-  { src: '/creatures/clownfish-sm.webp',   w: 0.5,  y: -0.5, r: 3.0 },
+  { src: '/creatures/xr/clownfish.webp',   w: 0.5,  y: -0.5, r: 3.0 },
   { src: '/creatures/GreenTurtle.webp',    w: 1.6,  y: -1.5, r: 4.5 },
-  { src: '/creatures/Jellyfish.webp',      w: 1.0,  y: -4.0, r: 3.5 },
+  { src: '/creatures/xr/Jellyfish.webp',   w: 1.0,  y: -4.0, r: 3.5 },
   { src: '/creatures/squid.jpg',           w: 0.8,  y: -5.5, r: 4.0 },
   { src: '/creatures/deepJellyfish.webp',  w: 1.2,  y: -12,  r: 3.2 },
   { src: '/creatures/Anglerfish.webp',     w: 1.4,  y: -14,  r: 4.2 },
-  { src: '/creatures/deepSeaFish-sm.webp', w: 1.1,  y: -16,  r: 3.6 },
-  { src: '/creatures/jumboSquid-sm.webp',  w: 2.6,  y: -20,  r: 5.0 },
-  { src: '/creatures/Lizardfish-sm.webp',  w: 1.3,  y: -23,  r: 3.4 },
+  { src: '/creatures/xr/deepSeaFish.webp', w: 1.1,  y: -16,  r: 3.6 },
+  { src: '/creatures/xr/jumboSquid.webp',  w: 2.6,  y: -20,  r: 5.0 },
+  { src: '/creatures/xr/Lizardfish.webp',  w: 1.3,  y: -23,  r: 3.4 },
   { src: '/creatures/blue-whale.webp',     w: 9.0,  y: -9,   r: 14  },
 ]
 

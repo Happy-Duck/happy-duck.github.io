@@ -518,6 +518,13 @@ Which file is which animal (all in `public/creatures/`):
 | `shipwreck.webp` | the shipwreck on the floor |
 | `crab-sm.gif` | the walking crab in the footer (animated GIF) |
 
+One extra folder: `public/creatures/xr/` holds **full-resolution copies**
+of five of these animals (clownfish, Jellyfish, deepSeaFish, jumboSquid,
+Lizardfish) used only by the VR headset mode — the main files above were
+shrunk for speed, too small to look good in VR. If you replace one of
+those five animals, put the big version of the new photo in `xr/` under
+the same name there, and the small version in `creatures/` as usual.
+
 After swapping, scroll the whole page in the preview and look at the
 animal in place — judging images in a file viewer lies; the site applies
 color grading so photos sit in the scene.
