@@ -126,7 +126,7 @@ function Crab() {
       {poked && <span className="crab-exclaim" aria-hidden="true">!</span>}
       <div ref={innerRef} style={{ transformOrigin: `${CRAB_W / 2}px ${CRAB_H / 2}px` }}>
         <img
-          src="/creatures/crab.gif"
+          src="/creatures/crab-sm.gif"
           alt=""
           width={CRAB_W}
           height={CRAB_H}

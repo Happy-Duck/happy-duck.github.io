@@ -27,7 +27,7 @@ export function SeaTurtle() {
         willChange: 'transform', pointerEvents: 'none', opacity: 0,
       }}
     >
-      <img src="/creatures/GreenTurtle.png" alt="" width={W} height={H} style={{ display: 'block', transform: 'scaleX(-1)' }} draggable={false} />
+      <img src="/creatures/GreenTurtle.webp" alt="" width={W} height={H} style={{ display: 'block', transform: 'scaleX(-1)' }} draggable={false} />
     </div>
   )
 }

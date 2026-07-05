@@ -121,7 +121,7 @@ function SingleJelly({ cfg, idx, peers }) {
       ref={wrapperRef}
       style={{ position: 'absolute', top: 0, left: 0, willChange: 'transform', pointerEvents: 'none', opacity: 0 }}
     >
-      <img src="/creatures/Jellyfish.png" alt="" width={sw} height={sh} style={{ display: 'block', transform: 'rotate(-40deg)' }} draggable={false} />
+      <img src="/creatures/Jellyfish.webp" alt="" width={sw} height={sh} style={{ display: 'block', transform: 'rotate(-40deg)' }} draggable={false} />
     </div>
   )
 }

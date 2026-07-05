@@ -119,7 +119,7 @@ export function GiantSquid() {
       ref={wrapperRef}
       style={{ position: 'absolute', top: 0, left: 0, willChange: 'transform', pointerEvents: 'none', opacity: 0 }}
     >
-      <img src="/creatures/jumboSquid.webp" alt="" width={W} height={H} style={{ display: 'block', transform: 'scaleX(-1)', filter: 'brightness(0.55) saturate(0.7)' }} draggable={false} />
+      <img src="/creatures/jumboSquid-sm.webp" alt="" width={W} height={H} style={{ display: 'block', transform: 'scaleX(-1)', filter: 'brightness(0.55) saturate(0.7)' }} draggable={false} />
     </div>
   )
 }

@@ -38,7 +38,7 @@ function SingleFish({ cfg, idx, peers }) {
         willChange: 'transform', pointerEvents: 'none', opacity: 0,
       }}
     >
-      <img src="/creatures/clownfish.webp" alt="" width={W * cfg.scale} height={H * cfg.scale} style={{ display: 'block', transform: 'scaleX(-1)' }} draggable={false} />
+      <img src="/creatures/clownfish-sm.webp" alt="" width={W * cfg.scale} height={H * cfg.scale} style={{ display: 'block', transform: 'scaleX(-1)' }} draggable={false} />
     </div>
   )
 }
