@@ -130,7 +130,12 @@ feature-by-feature history, specs, and hard-won gotchas.
   reused across StrictMode remounts; post transitions only.
 - **XRDive** (`XRDive.jsx` + `lib/xrScene.js`): three.js via dynamic
   import (own lazy chunk — keep it that way); fab renders only where
-  immersive-vr is supported; terminal `vr` command.
+  immersive-vr is supported; terminal `vr` command. Terminal debug
+  `vr preview` renders the same scene sans headset and exposes
+  `window.__xrPreview.{setSink,setView,close}` — screenshot THAT to
+  verify visuals. In the render loop never call `clock.getElapsedTime()`
+  then `getDelta()` (the first consumes the delta → dt≈0, everything
+  freezes; shipped that way once); dt comes from the loop timestamp.
 - **View Transitions** (`Projects.jsx`): card↔modal morph; the vt name is
   owned by ONE element per snapshot (card when closed, modal when open);
   framer/AnimatePresence stand down when VT is active.

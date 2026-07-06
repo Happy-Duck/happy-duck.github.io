@@ -32,6 +32,16 @@ export function XRDive() {
     return () => window.removeEventListener('ocean:enter-vr', onEvent)
   }, [busy])
 
+  // Desktop preview of the same scene — terminal `vr preview` (debug)
+  useEffect(() => {
+    const onPreview = async () => {
+      const { startPreview } = await import('../lib/xrScene')
+      startPreview()
+    }
+    window.addEventListener('ocean:vr-preview', onPreview)
+    return () => window.removeEventListener('ocean:vr-preview', onPreview)
+  }, [])
+
   if (!supported) return null
 
   return (

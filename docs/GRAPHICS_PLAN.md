@@ -59,16 +59,36 @@ no-WebGL/reduced-motion). Touch devices: beam rests at the CSS default
 spot (50vw/38vh) — use the same fallback position.
 Files: `src/components/DeepParticles.jsx`, RovLight coordination, CSS.
 
-## 4. WebXR dive mode — [x] DONE
+## 4. WebXR dive mode — [x] DONE (rebuilt wave 2.2)
 
-`three` as a DYNAMIC import (code-split; loads only on entry). Scene:
-depth-gradient sky sphere, creature photo billboards drifting at their real
-depths, wreck sprite on a sand plane, floating dive-log panel. Thumbstick
-or gaze-drift descend. Entry points: terminal `vr` command + a fab shown
-ONLY when `navigator.xr?.isSessionSupported('immersive-vr')` resolves true
-(hidden on ordinary desktops). Exit returns cleanly, renderer disposed.
-Headless can't test XR: verify support-detection path, chunk splitting in
-the build, and that unsupported browsers never see the button.
+`three` as a DYNAMIC import (code-split; loads only on entry). The first
+scene shipped placeholder-quality and was rebuilt after the owner called
+it in July 2026. What went wrong, so it stays fixed:
+- `clock.getElapsedTime()` then `clock.getDelta()` — getElapsedTime
+  consumes the delta internally, so dt ≈ 0 and every creature was FROZEN;
+  the 40 m/s descent constant only felt sane because it multiplied ~0.
+  The loop now derives dt from `setAnimationLoop`'s timestamp.
+- Billboards were `THREE.Sprite`s with a hardcoded 0.6 aspect: photos
+  stretched, and full billboarding pitches fish flat when the wearer
+  looks down. Now yaw-only planes sized from each texture's real aspect.
+- No `SRGBColorSpace` on textures → washed-out colors (r152+ default).
+- `squid.jpg` (white-background JPEG) floated as an opaque rectangle;
+  dropped. `deepJellyfish.webp` (dark bg, screened in 2D) renders
+  additive so the backdrop vanishes and the medusa glows.
+Current scene: 26 m water column mapped to 0–6,000 m through
+`depthAtMeters()` (creatures hang at their real zone depths, HUD meter
+readout uses `metersAt()` like the page gauge), wander-steered swim paths
+with smooth direction mirroring, whale silhouette in the fog band,
+depth-driven water color + FogExp2 density, marine snow points, additive
+surface light shafts + sun glow, speckled sand floor, wreck close enough
+to loom through bottom fog. Controls: thumbstick Y (~2.4 m/s max),
+trigger/pinch to sink + grip to rise (hand tracking exposes no gamepad).
+Entry: terminal `vr` command + a fab shown ONLY when
+`navigator.xr?.isSessionSupported('immersive-vr')` resolves true. Exit
+disposes everything. Terminal debug `vr preview` renders the SAME scene
+without a headset (drag look / scroll dive / Esc) — it exposes
+`window.__xrPreview.{setSink,setView,close}` so headless Edge can
+screenshot every depth band; that is the verification path.
 Files: `src/components/XRDive.jsx` (+ lazy `src/lib/xrScene.js`), Terminal,
 App, CSS, package.json (three).
 
@@ -125,7 +145,7 @@ Files: raysRenderer.js, rays.worker.js, Caustics.jsx.
 | 1 | Boids | feat: webgpu boids | headless Edge + swiftshader flags — schools verified in screenshot |
 | 2 | Ripples | feat: interactive water ripples | ripple ring visible in zoomed screenshot; surface clicks no longer double-fire sonar |
 | 3 | Beam+Snow | feat: gpu marine snow | beam-lit particle cloud verified in screenshot |
-| 4 | WebXR | feat: webxr dive mode | chunk split verified (xrScene 527kB lazy); fab hidden without headset; needs a real Quest test by owner |
+| 4 | WebXR | feat: webxr dive mode → feat: rebuild the VR dive scene | rebuilt wave 2.2 (frozen-dt bug, stretched sprites); verified via `vr preview` screenshots at 7 depths in headless Edge; chunk still lazy; needs a real Quest test by owner |
 | 5 | View Transitions | feat: view-transition morph | morph captured mid-flight in screenshot; open/close/reopen verified |
 | 6 | Scroll timelines | feat: scroll-driven fades | computed opacities match JS ramps exactly at 4 depths |
 | 7 | Gyro | feat: gyro parallax | synthetic DeviceOrientationEvent shifts layers under mobile emulation |

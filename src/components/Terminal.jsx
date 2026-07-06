@@ -63,11 +63,19 @@ function runCommand(raw, ctx) {
     return ['expedition records wiped. resurfacing…']
   }
 
+  // vr preview — fly the VR dive scene without a headset
+  if (cmd === 'vr preview' || cmd === 'vrpreview') {
+    window.dispatchEvent(new CustomEvent('ocean:vr-preview'))
+    setTimeout(ctx.close, 400)
+    return ['projecting the dive scene… esc to surface.']
+  }
+
   if (cmd === 'debug') {
     return [
       'debug commands:',
       '  tod dawn|day|dusk|night|auto   swap surface palette',
       '  depth <0-6000>                 dive to a depth',
+      '  vr preview                     fly the VR scene, no headset',
       '  reset                          wipe dive log + counters, reload',
     ]
   }
