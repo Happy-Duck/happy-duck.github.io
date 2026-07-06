@@ -7,7 +7,7 @@ import { useOceanDepthContext } from '../../context/OceanDepthContext'
 import { creatureOpacity, depthTraverse } from '../../constants/depthZones'
 import { inspectSeen } from '../../lib/diveLog'
 
-const W = 200, H = 67
+const W = 222, H = 61
 const DEPTH_RANGE = { enter: 0.82, exit: 1.02 }
 
 export function SnailFish() {

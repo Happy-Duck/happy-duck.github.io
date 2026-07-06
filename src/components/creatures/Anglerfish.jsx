@@ -7,7 +7,7 @@ import { creatureOpacity, depthTraverse } from '../../constants/depthZones'
 import { inspectSeen } from '../../lib/diveLog'
 import { pingImpulse } from '../../lib/sonar'
 
-const W = 225, H = 170
+const W = 234, H = 164
 const DEPTH_RANGE = { enter: 0.45, exit: 0.75 }
 
 export function Anglerfish() {

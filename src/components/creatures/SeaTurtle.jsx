@@ -2,7 +2,7 @@
 // Large, slow, majestic. High flee threshold.
 import { useCreatureAI } from '../../hooks/useCreatureAI'
 
-const W = 250, H = 155
+const W = 229, H = 169
 
 const DEPTH_RANGE = { enter: 0.00, exit: 0.25 } // ≈0–330 m — turtles genuinely dive deep
 

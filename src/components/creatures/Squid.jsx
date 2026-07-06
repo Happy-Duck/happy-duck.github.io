@@ -7,7 +7,7 @@ import { creatureOpacity, depthTraverse } from '../../constants/depthZones'
 import { inspectSeen } from '../../lib/diveLog'
 import { pingImpulse } from '../../lib/sonar'
 
-const W = 100, H = 138
+const W = 150, H = 92
 const DEPTH_RANGE = { enter: 0.23, exit: 0.52 } // ≈280–1,050 m — twilight darters
 
 const CONFIGS = [
@@ -134,7 +134,7 @@ function SingleSquid({ cfg, idx, peers }) {
       ref={wrapperRef}
       style={{ position: 'absolute', top: 0, left: 0, willChange: 'transform', pointerEvents: 'none', opacity: 0 }}
     >
-      <img src="/creatures/squid.jpg" alt="" width={W} height={H} style={{ display: 'block', transform: 'scaleX(-1)' }} draggable={false} />
+      <img src="/creatures/squid.webp" alt="" width={W} height={H} style={{ display: 'block', transform: 'scaleX(-1)' }} draggable={false} />
     </div>
   )
 }

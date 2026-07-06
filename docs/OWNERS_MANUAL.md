@@ -508,7 +508,7 @@ Which file is which animal (all in `public/creatures/`):
 | `GreenTurtle.webp` | the sea turtle |
 | `anchovy.png` | the huge background fish school (keep as `.png`; this photo is CC BY-SA licensed — replacing it removes the attribution obligation, keeping it means keep the credit comment in `BoidSchool.jsx`) |
 | `Jellyfish.webp` | moon jellyfish, twilight zone |
-| `squid.jpg` | firefly squid, twilight zone |
+| `squid.webp` | firefly squid, twilight zone |
 | `Anglerfish.webp` | the anglerfish |
 | `deepSeaFish-sm.webp` | the fangtooth |
 | `deepJellyfish.webp` | glowing abyssal jellyfish |

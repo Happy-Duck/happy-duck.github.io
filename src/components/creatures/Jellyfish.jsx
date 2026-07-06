@@ -7,7 +7,7 @@ import { creatureOpacity } from '../../constants/depthZones'
 import { inspectSeen } from '../../lib/diveLog'
 import { pingImpulse } from '../../lib/sonar'
 
-const W = 120, H = 170
+const W = 171, H = 119
 const DEPTH_RANGE = { enter: 0.20, exit: 0.52 } // ≈200–1,050 m — twilight drifters
 
 const CONFIGS = [

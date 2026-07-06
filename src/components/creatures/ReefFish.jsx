@@ -3,7 +3,7 @@
 import { useRef } from 'react'
 import { useCreatureAI } from '../../hooks/useCreatureAI'
 
-const W = 48, H = 44
+const W = 60, H = 35
 
 // Lanes spread across the frame; the depth traverse sweeps each ±30vh,
 // so bases live in the 0.3–0.75 band to stay mostly on screen

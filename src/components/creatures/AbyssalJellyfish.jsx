@@ -7,7 +7,7 @@ import { creatureOpacity } from '../../constants/depthZones'
 import { inspectSeen } from '../../lib/diveLog'
 import { pingImpulse } from '../../lib/sonar'
 
-const W = 130, H = 182
+const W = 178, H = 133
 const DEPTH_RANGE = { enter: 0.68, exit: 1.02 }
 
 export function AbyssalJellyfish() {

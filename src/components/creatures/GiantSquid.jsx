@@ -7,7 +7,7 @@ import { creatureOpacity, depthTraverse } from '../../constants/depthZones'
 import { inspectSeen } from '../../lib/diveLog'
 import { pingImpulse } from '../../lib/sonar'
 
-const W = 350, H = 175
+const W = 391, H = 157
 const DEPTH_RANGE = { enter: 0.65, exit: 1.02 }
 const TRAVERSE_SPEED = 0.5
 const PAUSE_FRAMES   = 180  // ~3s at 60fps
