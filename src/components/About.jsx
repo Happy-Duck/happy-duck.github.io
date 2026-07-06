@@ -6,7 +6,7 @@ import { useGithubActivity } from '../hooks/useGithubActivity'
 // ── Data ───────────────────────────────────────────────────────────────
 
 const LOG_ENTRIES = [
-  "I'm just a man trying to make cool stuff: games, simulations, the occasional VR experience for a space agency.",
+  "I'm just a man trying to make cool stuff: games, boat simulations, the occasional VR experience for a space agency.",
   "Gamer at heart: Zelda is an all-time favorite, Minecraft is timeless.",
   "Musical theater nerd: catching every touring production I ever can",
   "Cooking enthusiast: my favorite thing to cook is something I've never cooked before",
