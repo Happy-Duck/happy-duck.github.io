@@ -11,6 +11,7 @@ const LOG_ENTRIES = [
   "Musical theater nerd: catching every touring production I ever can",
   "Cooking enthusiast: my favorite thing to cook is something I've never cooked before",
   'Avid fly fisherman: fished the Wisconsin Driftless, the Appalachians in Virginia. Current trout count: 4',
+  "Newly PADI certified open water diver, shout out to Pacific Scuba Divers!",
   'TTRPG Player: if I use the name, then Wizards of the Coast™ might get me',
 ]
 
@@ -296,7 +297,7 @@ export function About() {
 
         {/* Metadata block */}
         <div className="log-meta">
-          <span className="log-meta-line">UIUC — CS '27 — 4.0 GPA</span>
+          <span className="log-meta-line">UIUC — CS '28 — 3.98 GPA</span>
           <span className="log-meta-line">40.1141°N 88.2249°W — {LOCATION}</span>
         </div>
 

@@ -39,13 +39,14 @@ const PROJECTS = [
   },
   {
     title:       'Party School',
-    description: 'Multiplayer sandbox party game with minigame activities built in a five-person team. Built the world map and core gameplay base shared across all minigames; implementing the racing minigame using Unreal\'s Chaos Vehicle system.',
-    stack:       ['Unreal Engine 5', 'Blueprints', 'Chaos Vehicles'],
+    description: "Multiplayer sandbox party game with minigame activities built in a five-person team. Built the shared core project base supporting multiplayer integration, reviewed teammates' code, and streamed a real-world city-scale map into the engine from the Google Map Tiles API via the BLOSM plugin; also implementing the racing minigame using Unreal's Chaos Vehicle system.",
+    stack:       ['Unreal Engine 5', 'Blueprints', 'Chaos Vehicles', 'BLOSM'],
     link:        '#',
     details: {
       role: 'Gameplay engineer on a five-person team',
       highlights: [
-        'Built the world map and the core gameplay base shared across all minigames',
+        "Built the shared core project base supporting multiplayer integration across all minigames, and reviewed teammates' code",
+        "Streamed a real-world city-scale map into the engine from Google's Map Tiles API via the BLOSM plugin",
         "Implementing the racing minigame on Unreal's Chaos Vehicle system",
       ],
     },
@@ -66,13 +67,14 @@ const PROJECTS = [
   },
   {
     title:       'SportsBot',
-    description: 'Discord bot delivering live scores, player stats, and schedule alerts through a clean slash-command interface backed by REST sports APIs.',
-    stack:       ['Python', 'discord.py', 'REST APIs'],
+    description: 'Discord bot delivering live scores, player stats, and schedule alerts through a clean slash-command interface, using asyncio for concurrent, scheduled background tasks and REST sports APIs for data retrieval.',
+    stack:       ['Python', 'discord.py', 'asyncio', 'REST APIs'],
     link:        'https://github.com/Happy-Duck/DiscordSportsBot',
     details: {
       role: 'Solo developer',
       highlights: [
         'Live scores, player stats, and schedule alerts via slash commands',
+        'Built with asyncio for concurrent, scheduled background tasks',
         'Backed by REST sports APIs with a SQL persistence layer',
       ],
     },
@@ -93,14 +95,14 @@ const PROJECTS = [
   },
   {
     title:       'Computer Vision Research',
-    description: 'Benchmark comparison of Faster R-CNN (Detectron2) against YOLOv8 for real-time object detection on the COCO dataset. Analysed accuracy–latency tradeoffs.',
+    description: 'Benchmark comparison of Faster R-CNN (Detectron2) against YOLOv8 for real-time object detection on the COCO dataset. Authored a research paper analyzing accuracy–latency tradeoffs.',
     stack:       ['Python', 'Detectron2', 'YOLOv8', 'COCO'],
     link:        '#',
     details: {
       role: 'Undergraduate researcher',
       highlights: [
         'Benchmarked Faster R-CNN (Detectron2) against YOLOv8 on COCO',
-        'Analyzed accuracy–latency tradeoffs for real-time object detection',
+        'Authored a research paper analyzing accuracy–latency tradeoffs for real-time object detection',
       ],
     },
   },

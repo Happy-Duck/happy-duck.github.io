@@ -9,6 +9,8 @@ import UnrealengineOriginal  from 'devicons-react/lib/icons/UnrealengineOriginal
 import BlenderOriginal       from 'devicons-react/lib/icons/BlenderOriginal'
 import DjangoPlain           from 'devicons-react/lib/icons/DjangoPlain'
 import AzuresqldatabasePlain from 'devicons-react/lib/icons/AzuresqldatabasePlain'
+import GitOriginal           from 'devicons-react/lib/icons/GitOriginal'
+import PytorchOriginal       from 'devicons-react/lib/icons/PytorchOriginal'
 
 // Wrapper to force fill color on icons that don't accept a color prop
 function ForcedColorIcon({ Icon, size }) {
@@ -39,6 +41,8 @@ const GROUPS = [
       { name: 'Blender',        render: (s) => <ForcedColorIcon Icon={BlenderOriginal} size={s} />,         tooltip: 'Asset creation & texturing for the ILL' },
       { name: 'Django',         render: (s) => <DjangoPlain size={s} color="currentColor" />,               tooltip: 'A web app I built and will not elaborate on' },
       { name: 'SQL',            render: (s) => <AzuresqldatabasePlain size={s} color="currentColor" />,     tooltip: 'SportsBot\'s backbone' },
+      { name: 'Git',            render: (s) => <ForcedColorIcon Icon={GitOriginal} size={s} />,             tooltip: "Version control for everything that isn't Perforce" },
+      { name: 'PyTorch',        render: (s) => <ForcedColorIcon Icon={PytorchOriginal} size={s} />,         tooltip: 'Faster R-CNN vs. YOLOv8, benchmarked' },
     ],
   },
 ]

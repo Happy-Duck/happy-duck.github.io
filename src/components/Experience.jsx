@@ -5,17 +5,17 @@ import { motion } from 'framer-motion'
 const ENTRIES = [
   {
     company:     'Brunswick BI Design Lab',
-    role:        'Computer Graphics Software Development Intern',
+    role:        'Software Development Intern, Computer Graphics',
     period:      'May 2026 – Present',
-    description: 'Developing an interactive boating simulator in Unreal Engine 5.7 for a CES 2027 AI-assisted navigation demo. Building boat AI for ambient NPC traffic, contributing to game design and core backend, and supporting cross-application data flow via Python/Websockets.',
-    stack:       ['Unreal Engine 5', 'C++', 'Python', 'Websockets', 'Perforce'],
+    description: "Primary developer on the UE5.7 simulator behind Future Helm, Brunswick's flagship CES 2027 marine showcase — reviewed by senior management including the C-suite ahead of its January public exhibition. Own the multiprotocol C++ data layer (TCP/UDP/CAN) exchanging vessel state, telemetry, and navigation data with a teammate's display app, and prototyped velocity-scaled collision avoidance and weighted spline path-selection features. Profiled and optimized runtime against a 60 fps target via LOD tuning, GPU instancing, and event-driven messaging. Top-3 finalist for Most Outstanding Undergraduate Intern at the 2026 UIUC Research Park Intern Awards (800+ interns, 120+ companies).",
+    stack:       ['Unreal Engine 5', 'C++', 'TCP/UDP', 'CAN bus', 'Perforce'],
   },
   {
     company:     'Immersive Learning Lab',
-    role:        'Unity VR Developer',
+    role:        'Virtual Reality Software Developer',
     period:      'Oct 2025 – Present',
-    description: "Designed and programmed a VR educational module in Unity/C# visualizing the MANiaC mass spectrometer (ESA's Comet Interceptor mission) and built a near-photorealistic replica of the ISSI lobby in Bern. Presented at the IMMERSE Annual Symposium (April 2026).",
-    stack:       ['Unity', 'C#', 'Blender', 'VR', 'XR Toolkit'],
+    description: "Designed and programmed a VR educational application in Unity/C# visualizing the University of Bern's MANiaC mass spectrometer (ESA's Comet Interceptor mission) and built a near-photorealistic replica of the ISSI lobby in Bern, with physics simulations, live data graphing via XCharts, animation systems, and custom interaction scripts driving NavMesh-driven NPCs. Presented at the IMMERSE Annual Symposium (April 2026) via poster and live demo.",
+    stack:       ['Unity', 'C#', 'Blender', 'VR', 'XR Toolkit', 'XCharts', 'OpenXR'],
   },
   {
     company:     'Origami Games',

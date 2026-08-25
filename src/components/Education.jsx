@@ -1,11 +1,8 @@
 import { motion } from 'framer-motion'
 
 // ── Data ───────────────────────────────────────────────────────────────
-// Coursework pills drawn from what the rest of the site already claims
-// (skills tooltips, CV research project) — owner should extend with the
-// real course list.
 
-const COURSEWORK = ['Data Structures', 'Linear Algebra', 'Game Development', 'Computer Vision Research']
+const COURSEWORK = ['Algorithms & Models of Computation', 'Data Structures', 'Computer Architecture', 'Interactive Computer Graphics']
 
 // ── Animation variants ─────────────────────────────────────────────────
 
@@ -49,17 +46,19 @@ export function Education() {
         viewport={{ once: true, margin: '-60px' }}
       >
         <span className="exp-period font-mono text-[clamp(0.625rem,0.55rem+0.2vw,0.75rem)] tracking-[0.2em] uppercase">
-          Expected May 2027
+          Expected May 2028
         </span>
         <h3 className="exp-role font-bold text-base sm:text-lg leading-snug mt-2">
-          B.S. Computer Science — 4.0 GPA
+          B.S. Computer Science — 3.98 GPA
         </h3>
         <p className="exp-company font-semibold text-sm mt-0.5 mb-3">
           University of Illinois Urbana-Champaign
         </p>
         <p className="exp-desc text-sm leading-relaxed mb-3">
-          Building games with ACM GameBuilders and shipping jam entries between
-          semesters. Undergraduate research in real-time computer vision.
+          Dean's List every semester. Building games with ACM GameBuilders and
+          shipping jam entries between semesters, with undergraduate research
+          in real-time computer vision. Also active in VR Club at UIUC,
+          Illini Fly Fishing, and Illini Metagamers.
         </p>
         <div className="flex flex-wrap gap-1.5">
           {COURSEWORK.map(c => (
