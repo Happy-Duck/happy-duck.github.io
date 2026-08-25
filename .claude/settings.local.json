@@ -47,7 +47,9 @@
       "Skill(run)",
       "Skill(run:*)",
       "PowerShell(npm run deploy)",
-      "PowerShell(npm run dev)"
+      "PowerShell(npm run dev)",
+      "Bash(npm run *)",
+      "Bash(npm i *)"
     ]
   }
 }
