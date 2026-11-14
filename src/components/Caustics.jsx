@@ -13,6 +13,7 @@ import { useEffect, useRef } from 'react'
 import { useOceanDepthContext } from '../context/OceanDepthContext'
 import { todBucket } from '../constants/timeOfDay'
 import { createRaysRenderer, TOD_RAYS } from '../lib/raysRenderer'
+import { isPaused } from '../lib/oceanPause'
 
 export function Caustics() {
   const canvasRef = useRef(null)
@@ -70,7 +71,7 @@ export function Caustics() {
     // Visibility: post only on transitions, not per frame
     let lastVis = null
     const check = () => {
-      const v = !document.hidden && depthRef.current <= 0.3
+      const v = !document.hidden && !isPaused() && depthRef.current <= 0.3
       if (v !== lastVis) {
         lastVis = v
         post({ type: 'visible', visible: v })
@@ -80,6 +81,9 @@ export function Caustics() {
     const unsubscribe = subscribe(check)
     const onVis = () => check()
     document.addEventListener('visibilitychange', onVis)
+    // A page opening over the dive stops the depth ticks, so the pause
+    // transition has to be caught here (posted, like every other change)
+    window.addEventListener('ocean:pause', onVis)
 
     const onResize = () => post({ type: 'resize', ...size() })
     window.addEventListener('resize', onResize, { passive: true })
@@ -93,6 +97,7 @@ export function Caustics() {
     return () => {
       unsubscribe()
       document.removeEventListener('visibilitychange', onVis)
+      window.removeEventListener('ocean:pause', onVis)
       window.removeEventListener('resize', onResize)
       window.removeEventListener('ocean:set-tod', onSetTod)
       post({ type: 'visible', visible: false })

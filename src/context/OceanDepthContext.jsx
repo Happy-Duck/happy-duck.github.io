@@ -1,6 +1,7 @@
 import { createContext, useCallback, useContext, useEffect, useRef, useState } from 'react'
 import { getZone } from '../constants/depthZones'
 import { todBucket, TOD_SURFACE } from '../constants/timeOfDay'
+import { isPaused } from '../lib/oceanPause'
 
 // ── Color interpolation ────────────────────────────────────────────────
 
@@ -114,6 +115,16 @@ export function OceanDepthProvider({ children }) {
     }
     window.addEventListener('ocean:set-tod', onSetTod)
 
+    // A page closing un-pauses the dive: force one depth recompute so
+    // subscribers that only tick on depth changes (reduced motion) catch
+    // any scroll that happened while they were stood down
+    const onPause = (e) => {
+      if (e.detail?.paused) return
+      lastDepthRef.current = -1
+      dirtyRef.current = true
+    }
+    window.addEventListener('ocean:pause', onPause)
+
     const loop = (now) => {
       let depthChanged = false
 
@@ -180,9 +191,10 @@ export function OceanDepthProvider({ children }) {
       }
 
       // ── Creature subscribers — continuous animation, unless the user
-      //    prefers reduced motion (then only tick while depth changes) ──
+      //    prefers reduced motion (then only tick while depth changes).
+      //    Stood down entirely while a page covers the dive. ──
       const depth = depthRef.current
-      if (!reducedRef.current || depthChanged) {
+      if (!isPaused() && (!reducedRef.current || depthChanged)) {
         subscribers.current.forEach(fn => fn(depth, dt))
       }
 
@@ -203,6 +215,7 @@ export function OceanDepthProvider({ children }) {
       cancelAnimationFrame(frameRef.current)
       window.removeEventListener('scroll', onScroll)
       window.removeEventListener('ocean:set-tod', onSetTod)
+      window.removeEventListener('ocean:pause', onPause)
       motionQuery.removeEventListener('change', onMotionChange)
     }
   }, [])

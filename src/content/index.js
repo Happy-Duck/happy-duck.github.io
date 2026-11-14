@@ -13,6 +13,9 @@ export { WORK, PROJECTS, SKILL_GROUPS }
 
 export const SITE_URL = 'https://happy-duck.github.io'
 
+// The dive's own tab title — keep in sync with <title> in index.html
+export const SITE_TITLE = 'Rishi Garhyan — XR Engineer & Game Developer'
+
 // kind → URL segment, display label, and the list it draws from
 export const KINDS = {
   work:     { segment: 'work',     label: 'Career',  entries: WORK },

@@ -25,10 +25,45 @@ import { Terminal      } from './components/Terminal'
 import { XRDive        } from './components/XRDive'
 import { GyroParallax  } from './components/GyroParallax'
 import { Footer        } from './components/Footer'
+import { PageLayer     } from './components/pages/PageLayer'
+import { useLayoutEffect, useMemo } from 'react'
+import { usePath } from './lib/router'
+import { setOceanPaused } from './lib/oceanPause'
+import { matchRoute, entryAnchor } from './content/index.js'
+
+// A visitor who lands directly on a page URL has never seen the dive.
+// Remember which card that page belongs to, so closing the page drops
+// them at that card's depth instead of the surface. Read once at load.
+let pendingAnchor = (() => {
+  const route = matchRoute(window.location.pathname)
+  return route.entry ? entryAnchor(route.kind, route.slug) : null
+})()
 
 export default function App() {
+  const path = usePath()
+  const route = useMemo(() => matchRoute(path), [path])
+  const pageOpen = route.kind !== 'home'
+
+  // Layout effect: the pause flag and the anchor scroll must land in the
+  // same commit that shows or hides the dive (View Transitions snapshot it)
+  useLayoutEffect(() => {
+    setOceanPaused(pageOpen)
+    if (pageOpen || !pendingAnchor) return
+    const anchor = pendingAnchor
+    pendingAnchor = null
+    // Career cards render twice (desktop + mobile layouts) — take the one
+    // that is actually laid out
+    const el = [...document.querySelectorAll(`[data-entry-anchor="${anchor}"]`)]
+      .find(n => n.offsetParent !== null)
+    el?.scrollIntoView({ block: 'center', behavior: 'instant' })
+  }, [pageOpen])
+
   return (
     <>
+      {/* The dive — everything below stays mounted while a page is open,
+          but hidden, inert, and paused (see lib/oceanPause.js) */}
+      <div className={pageOpen ? 'dive dive--stowed' : 'dive'} inert={pageOpen}>
+
       {/* Skip link — first focusable element, keyboard/screen-reader only */}
       <a href="#main" className="skip-link">Skip to content</a>
 
@@ -41,9 +76,6 @@ export default function App() {
 
       {/* Dive log — discovery journal, bottom-right */}
       <DiveLog />
-
-      {/* Submarine terminal — type "cmd" or press ` */}
-      <Terminal />
 
       {/* VR dive — appears only on XR-capable browsers */}
       <XRDive />
@@ -112,6 +144,15 @@ export default function App() {
 
       {/* Footer — outside content div so ocean floor styles independently */}
       <Footer />
+
+      </div>
+
+      {/* Submarine terminal — type "cmd" or press `. Outside the dive so
+          it keeps working on top of a page. */}
+      <Terminal />
+
+      {/* Expedition-file page — any route other than / */}
+      {pageOpen && <PageLayer route={route} path={path} />}
     </>
   )
 }

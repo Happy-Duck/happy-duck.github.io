@@ -7,6 +7,7 @@
 // when WebGL2 or fine pointers are unavailable, or under reduced motion.
 import { useEffect, useRef } from 'react'
 import { useOceanDepthContext } from '../context/OceanDepthContext'
+import { isPaused } from '../lib/oceanPause'
 
 const COUNT = 1800
 
@@ -112,7 +113,7 @@ export function DeepParticles() {
     const frame = () => {
       rafId = requestAnimationFrame(frame)
       const depth = depthRef.current
-      if (document.hidden) return
+      if (document.hidden || isPaused()) return
       if (depth < 0.40) {
         // Scrolled up out of the band — wipe the last frame once, or the
         // beam-lit snow stays frozen wherever the cursor was

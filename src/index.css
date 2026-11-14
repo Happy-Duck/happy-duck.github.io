@@ -76,7 +76,10 @@ html::-webkit-scrollbar { display: none; }
   --vent-op:           0;
 }
 
-:root[data-theme="deep-sea"] {
+/* .page-layer pins this palette for expedition-file pages, whatever depth
+   (and so whatever theme) the dive underneath was left at */
+:root[data-theme="deep-sea"],
+.page-layer {
   /* Page */
   --bg:                  #020818;
   --text:                #a8d8f0;
@@ -2813,4 +2816,291 @@ html::-webkit-scrollbar { display: none; }
   overflow:    hidden;
   text-overflow: ellipsis;
   transition:  color var(--theme-dur) var(--theme-ease);
+}
+
+/* ═══════════════════════════════════════════════════════════════════
+   EXPEDITION-FILE PAGES — a layer over the dive (PageLayer.jsx)
+   ═══════════════════════════════════════════════════════════════════ */
+
+/* The dive while a page covers it: nothing painted, nothing animating.
+   JS loops stand down via lib/oceanPause.js; this stills the CSS ones. */
+.dive--stowed { visibility: hidden; }
+.dive--stowed *,
+.dive--stowed *::before,
+.dive--stowed *::after { animation-play-state: paused !important; }
+
+.page-layer {
+  position:   fixed;
+  inset:      0;
+  z-index:    75;
+  background: radial-gradient(ellipse at 50% 120%, #04204a 0%, #020818 55%, #010408 100%);
+  color:      rgba(168, 216, 240, 0.92);
+}
+
+/* Pages are for reading — the dive's no-select default is lifted */
+.page-layer,
+.page-layer *,
+.page-layer *::before,
+.page-layer *::after { user-select: text; -webkit-user-select: text; }
+
+.page-scroll {
+  height:              100%;
+  overflow-y:          auto;
+  overscroll-behavior: contain;
+  scrollbar-width:     thin;
+  scrollbar-color:     rgba(0, 212, 255, 0.25) transparent;
+}
+
+.page-bar {
+  position:        sticky;
+  top:             0;
+  z-index:         1;
+  display:         flex;
+  align-items:     center;
+  justify-content: space-between;
+  gap:             1rem;
+  padding:         0.85rem clamp(1rem, 4vw, 2rem);
+  font-family:     'Share Tech Mono', ui-monospace, monospace;
+  font-size:       0.72rem;
+  letter-spacing:  0.14em;
+  text-transform:  uppercase;
+  background:      rgba(2, 8, 24, 0.82);
+  border-bottom:   1px solid rgba(0, 212, 255, 0.12);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+}
+
+.page-back {
+  display:         inline-flex;
+  align-items:     center;
+  gap:             0.55rem;
+  min-height:      44px;
+  color:           var(--card-link-hover);
+  text-decoration: none;
+  white-space:     nowrap;
+  transition:      color 0.2s ease;
+}
+.page-back:hover { color: #fff; }
+
+.page-back-depth {
+  padding-left: 0.6rem;
+  border-left:  1px solid rgba(0, 212, 255, 0.28);
+  color:        var(--card-link);
+}
+
+.page-bar-file {
+  color:         rgba(0, 212, 255, 0.38);
+  overflow:      hidden;
+  text-overflow: ellipsis;
+  white-space:   nowrap;
+}
+@media (max-width: 640px) {
+  .page-bar-file { display: none; }
+}
+
+/* Headings take programmatic focus on page open — no ring for that */
+.page-layer h1[tabindex="-1"]:focus { outline: none; }
+
+.page-main {
+  width:   min(760px, 100%);
+  margin:  0 auto;
+  padding: clamp(2rem, 6vw, 4rem) clamp(1rem, 4vw, 2rem) 6rem;
+}
+
+/* ── Entry (job / project) ─────────────────────────────────────────── */
+
+.entry-head { margin-bottom: 1.75rem; }
+
+.entry-kicker {
+  margin:         0 0 0.7rem;
+  font-family:    'Share Tech Mono', ui-monospace, monospace;
+  font-size:      0.72rem;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color:          var(--card-link);
+}
+
+.entry-title-row {
+  display:         flex;
+  align-items:     flex-start;
+  justify-content: space-between;
+  gap:             1rem;
+}
+
+.entry-title {
+  margin:         0;
+  font-size:      clamp(1.9rem, 1.3rem + 3vw, 3rem);
+  font-weight:    900;
+  line-height:    1.08;
+  letter-spacing: -0.02em;
+  color:          var(--section-heading);
+  text-wrap:      balance;
+}
+
+.entry-sub {
+  margin:      0.7rem 0 0;
+  font-size:   1rem;
+  font-weight: 600;
+  color:       var(--exp-company);
+}
+
+.entry-stack {
+  display:    flex;
+  flex-wrap:  wrap;
+  gap:        0.4rem;
+  margin-top: 1.1rem;
+}
+
+.entry-lede {
+  margin:      0 0 1.5rem;
+  font-size:   1.05rem;
+  line-height: 1.75;
+  color:       rgba(168, 216, 240, 0.82);
+}
+
+.entry-highlights {
+  list-style:     none;
+  margin:         0 0 2rem;
+  padding:        1.1rem 1.25rem;
+  display:        flex;
+  flex-direction: column;
+  gap:            0.6rem;
+  border:         1px solid var(--card-border);
+  border-radius:  14px;
+  background:     var(--card-bg);
+}
+.entry-highlights li {
+  position:     relative;
+  padding-left: 1.2rem;
+  font-size:    0.95rem;
+  line-height:  1.6;
+  color:        var(--card-title);
+}
+.entry-highlights li::before {
+  content:  '»';
+  position: absolute;
+  left:     0;
+  color:    var(--card-link);
+}
+
+.entry-embed { margin: 0 0 2rem; }
+.entry-embed iframe {
+  display:       block;
+  width:         100%;
+  border:        1px solid var(--card-border);
+  border-radius: 10px;
+  background:    rgba(0, 0, 0, 0.25);
+}
+
+.entry-related {
+  margin-top:  3rem;
+  padding-top: 1.5rem;
+  border-top:  1px solid var(--section-rule);
+}
+.entry-related-label {
+  margin:         0 0 0.9rem;
+  font-family:    'Share Tech Mono', ui-monospace, monospace;
+  font-size:      0.72rem;
+  font-weight:    400;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color:          var(--card-link);
+}
+.entry-related-list {
+  list-style: none;
+  margin:     0;
+  padding:    0;
+  display:    grid;
+  gap:        0.6rem;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+}
+.entry-related-link {
+  display:         flex;
+  flex-direction:  column;
+  gap:             0.3rem;
+  height:          100%;
+  padding:         0.85rem 1rem;
+  border:          1px solid var(--card-border);
+  border-radius:   12px;
+  background:      var(--card-bg);
+  text-decoration: none;
+  transition:      border-color 0.25s ease, transform 0.18s ease;
+}
+.entry-related-link:hover {
+  border-color: var(--card-border-hover);
+  transform:    translateY(-2px);
+}
+.entry-related-kind {
+  font-family:    'Share Tech Mono', ui-monospace, monospace;
+  font-size:      0.65rem;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color:          var(--card-link);
+}
+.entry-related-title {
+  font-size:   0.92rem;
+  font-weight: 600;
+  line-height: 1.35;
+  color:       var(--card-title);
+}
+
+/* ── Lost at Sea (in-app 404) ──────────────────────────────────────── */
+
+.page-lost {
+  min-height:      60vh;
+  display:         flex;
+  flex-direction:  column;
+  align-items:     center;
+  justify-content: center;
+  gap:             1.25rem;
+  text-align:      center;
+  font-family:     'Share Tech Mono', ui-monospace, monospace;
+}
+.page-lost-depth {
+  font-size:      0.7rem;
+  letter-spacing: 0.3em;
+  text-transform: uppercase;
+  color:          rgba(0, 212, 255, 0.45);
+}
+.page-lost-code {
+  margin:         0;
+  font-size:      clamp(3rem, 14vw, 7rem);
+  font-weight:    900;
+  letter-spacing: 0.04em;
+  color:          rgba(168, 216, 240, 0.95);
+  text-shadow:    0 0 40px rgba(0, 180, 255, 0.4), 0 0 80px rgba(0, 80, 200, 0.2);
+}
+.page-lost-text {
+  max-width:   36ch;
+  margin:      0;
+  line-height: 1.7;
+  color:       rgba(140, 192, 225, 0.7);
+}
+.page-lost-link {
+  margin-top:      0.75rem;
+  padding:         0.8rem 1.6rem;
+  border:          1px solid rgba(0, 212, 255, 0.35);
+  border-radius:   999px;
+  color:           #00d4ff;
+  text-decoration: none;
+  font-size:       0.8rem;
+  letter-spacing:  0.18em;
+  text-transform:  uppercase;
+  transition:      background 0.25s ease, box-shadow 0.25s ease;
+}
+.page-lost-link:hover,
+.page-lost-link:focus-visible {
+  background: rgba(0, 212, 255, 0.1);
+  box-shadow: 0 0 24px rgba(0, 212, 255, 0.25);
+}
+
+/* The console button rides above an open page, in the page's palette
+   (the root theme may still be the sunlit one underneath) */
+:root.page-open .term-fab {
+  z-index:             76;
+  --card-bg:           rgba(2, 12, 38, 0.78);
+  --card-border:       rgba(0, 212, 255, 0.13);
+  --card-border-hover: rgba(0, 212, 255, 0.65);
+  --card-link:         rgba(0, 212, 255, 0.60);
+  --card-link-hover:   rgba(0, 212, 255, 0.95);
 }

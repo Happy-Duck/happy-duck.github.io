@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react'
 import { useMouse } from '../context/MouseContext'
 import { markSeen } from '../lib/diveLog'
+import { isPaused } from '../lib/oceanPause'
 import { Shipwreck } from './Shipwreck'
 
 // ── Dimensions ─────────────────────────────────────────────────────────
@@ -60,6 +61,13 @@ function Crab() {
     const wreckEdge = () => Math.min(floorW * 0.28, 380)
 
     const tick = (now) => {
+      // Stood down while a page covers the dive
+      if (isPaused()) {
+        lastT = 0
+        rafId = requestAnimationFrame(tick)
+        return
+      }
+
       // Own rAF loop, so normalize elapsed time to 60fps units itself —
       // motion constants below are tuned per-60fps-step
       const dt = lastT > 0 ? Math.min(2.5, Math.max(0.25, (now - lastT) / (1000 / 60))) : 1

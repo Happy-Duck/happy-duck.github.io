@@ -6,6 +6,7 @@
 // parallax. iOS requires a user gesture to grant orientation access, so
 // permission is requested on the first touch.
 import { useEffect } from 'react'
+import { isPaused } from '../lib/oceanPause'
 
 export function GyroParallax() {
   useEffect(() => {
@@ -30,6 +31,8 @@ export function GyroParallax() {
     let lastT = 0
     const loop = (now) => {
       rafId = requestAnimationFrame(loop)
+      // Stood down while a page covers the dive
+      if (isPaused()) { lastT = 0; return }
       // Normalize the lerp to 60fps units — same tilt response at any
       // display refresh rate
       const dt = lastT > 0 ? Math.min(2.5, Math.max(0.25, (now - lastT) / (1000 / 60))) : 1

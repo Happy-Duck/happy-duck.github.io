@@ -17,6 +17,7 @@ import { useMouse } from '../../context/MouseContext'
 import { creatureOpacity } from '../../constants/depthZones'
 import { inspectSeen } from '../../lib/diveLog'
 import { getPing } from '../../lib/sonar'
+import { isPaused } from '../../lib/oceanPause'
 
 const COUNT = 384
 // ≈40–400 m: anchovies are epipelagic — surface schools that don't dive
@@ -331,7 +332,7 @@ export function BoidSchool() {
       let lastT = 0
       const frame = () => {
         rafId = requestAnimationFrame(frame)
-        if (document.hidden || opacityRef.current <= 0.01) { lastT = 0; return }
+        if (document.hidden || isPaused() || opacityRef.current <= 0.01) { lastT = 0; return }
 
         // The sim is stepped per rendered frame, so without dt-scaling a
         // 120/144 Hz display fast-forwards the school (and main-thread
