@@ -1,0 +1,53 @@
+# Kitchen sink
+
+A reference page for everything a page body can contain. It only exists on the dev server, at `/dev/kitchen-sink`, and is never built into the live site. Use it to check how Markdown looks before writing a real page, and to try out new components.
+
+## Text
+
+A paragraph with **bold**, *italic*, `inline code`, an [external link](https://github.com/Happy-Duck), and a [link to another page](/projects/pelagos/) that opens without leaving the site.
+
+> A block quote, for a testimonial or a line worth setting apart.
+
+### A third-level heading
+
+- An unordered list
+- With a second item
+  - And a nested one
+
+1. An ordered list
+2. With a second step
+
+---
+
+## Code
+
+Fenced code blocks are highlighted when the site is built, so no highlighter is sent to the browser. This block is the real depth conversion from `src/constants/depthZones.js`:
+
+```js
+// Scroll fraction → displayed meters (piecewise through zone boundaries)
+export function metersAt(depth) {
+  const d = Math.max(0, Math.min(1, depth))
+  const zone = getZone(d)
+  const t = (d - zone.min) / (zone.max - zone.min)
+  return zone.meterMin + t * (zone.meterMax - zone.meterMin)
+}
+```
+
+A shader block, to check a second language:
+
+```glsl
+// Buffer-less fullscreen triangle
+void main() {
+  vec2 p = vec2((gl_VertexID << 1) & 2, gl_VertexID & 2);
+  gl_Position = vec4(p * 2.0 - 1.0, 0.0, 1.0);
+}
+```
+
+## Table
+
+| Zone     | Scroll      | Meters        |
+| -------- | ----------- | ------------- |
+| Sunlit   | 0 – 0.20    | 0 – 200       |
+| Twilight | 0.20 – 0.50 | 200 – 1,000   |
+| Midnight | 0.50 – 0.72 | 1,000 – 4,000 |
+| Abyssal  | 0.72 – 1.0  | 4,000 – 6,000 |

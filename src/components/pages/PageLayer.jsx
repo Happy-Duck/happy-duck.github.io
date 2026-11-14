@@ -12,6 +12,8 @@ import { createPortal } from 'react-dom'
 import { goBack } from '../../lib/router'
 import { useOceanDepth } from '../../hooks/useOceanDepth'
 import { KINDS, SITE_TITLE, entryTitle } from '../../content/index.js'
+import { devBodyLoader } from '../../content/bodies.js'
+import { MdxBody } from '../mdx/MdxBody'
 import { EntryPage } from './EntryPage'
 import { NotFoundPage } from './NotFoundPage'
 
@@ -19,6 +21,9 @@ export function PageLayer({ route, path }) {
   const scrollRef = useRef(null)
   const { depthMeters } = useOceanDepth()
   const found = route.kind !== 'notfound'
+  // Dev-server-only reference pages (src/content/dev) — always null in a
+  // production build
+  const devBody = found ? null : devBodyLoader(path)
 
   // Scroll lock, Esc to go back, focus restore — the dive behind is
   // inert, so focus has to be placed and returned by hand
@@ -83,7 +88,9 @@ export function PageLayer({ route, path }) {
         <main className="page-main">
           {found
             ? <EntryPage kind={route.kind} entry={route.entry} />
-            : <NotFoundPage />}
+            : devBody
+              ? <article className="entry"><MdxBody loader={devBody} /></article>
+              : <NotFoundPage />}
         </main>
       </div>
     </div>,

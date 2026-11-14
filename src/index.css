@@ -2864,7 +2864,7 @@ html::-webkit-scrollbar { display: none; }
   font-size:       0.72rem;
   letter-spacing:  0.14em;
   text-transform:  uppercase;
-  background:      rgba(2, 8, 24, 0.82);
+  background:      rgba(2, 8, 24, 0.93);
   border-bottom:   1px solid rgba(0, 212, 255, 0.12);
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
@@ -3103,4 +3103,149 @@ html::-webkit-scrollbar { display: none; }
   --card-border-hover: rgba(0, 212, 255, 0.65);
   --card-link:         rgba(0, 212, 255, 0.60);
   --card-link-hover:   rgba(0, 212, 255, 0.95);
+}
+
+/* ── Page body (MDX write-up) ──────────────────────────────────────── */
+
+.entry-body {
+  font-size:   1rem;
+  line-height: 1.75;
+  color:       rgba(168, 216, 240, 0.82);
+}
+.entry-body > :first-child { margin-top: 0; }
+
+.entry-body-loading {
+  font-family:    'Share Tech Mono', ui-monospace, monospace;
+  font-size:      0.75rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color:          var(--card-link);
+}
+
+.entry-body h1,
+.entry-body h2,
+.entry-body h3 {
+  color:       var(--section-heading);
+  line-height: 1.2;
+  text-wrap:   balance;
+}
+.entry-body h1 {
+  margin:         0 0 1.25rem;
+  font-size:      clamp(1.9rem, 1.3rem + 3vw, 3rem);
+  font-weight:    900;
+  letter-spacing: -0.02em;
+}
+.entry-body h2 {
+  margin:         2.75rem 0 0.9rem;
+  font-size:      1.5rem;
+  font-weight:    800;
+  letter-spacing: -0.01em;
+}
+.entry-body h3 {
+  margin:      2rem 0 0.6rem;
+  font-size:   1.12rem;
+  font-weight: 700;
+}
+
+.entry-body p { margin: 0 0 1.15rem; }
+
+.entry-body a {
+  color:                 var(--card-link-hover);
+  text-decoration:       underline;
+  text-decoration-color: rgba(0, 212, 255, 0.35);
+  text-underline-offset: 3px;
+  transition:            text-decoration-color 0.2s ease;
+}
+.entry-body a:hover { text-decoration-color: currentColor; }
+
+.entry-body strong { color: var(--card-title); font-weight: 700; }
+
+.entry-body ul,
+.entry-body ol {
+  margin:  0 0 1.15rem;
+  padding: 0 0 0 1.4rem;
+}
+.entry-body ul { list-style: disc; }
+.entry-body ol { list-style: decimal; }
+.entry-body li { margin: 0.3rem 0; }
+.entry-body li::marker { color: var(--card-link); }
+.entry-body li > ul,
+.entry-body li > ol { margin: 0.3rem 0 0; }
+
+.entry-body blockquote {
+  margin:      0 0 1.15rem;
+  padding:     0.2rem 0 0.2rem 1.1rem;
+  border-left: 2px solid var(--card-link);
+  color:       var(--card-title);
+  font-style:  italic;
+}
+.entry-body blockquote > :last-child { margin-bottom: 0; }
+
+.entry-body hr {
+  margin:     2.5rem 0;
+  border:     0;
+  border-top: 1px solid var(--section-rule);
+}
+
+.entry-body img,
+.entry-body video {
+  display:       block;
+  max-width:     100%;
+  height:        auto;
+  border-radius: 12px;
+}
+
+/* Inline code */
+.entry-body :not(pre) > code {
+  padding:       0.12em 0.4em;
+  border:        1px solid var(--pill-border);
+  border-radius: 6px;
+  background:    var(--pill-bg);
+  color:         var(--pill-text);
+  font-family:   ui-monospace, 'Cascadia Code', Menlo, monospace;
+  font-size:     0.86em;
+}
+
+/* Code blocks — token colors are inline styles written at build time by
+   shiki (vite.config.js); only the frame is styled here */
+.entry-body figure[data-rehype-pretty-code-figure] { margin: 0 0 1.4rem; }
+.entry-body pre {
+  margin:          0;
+  padding:         1rem 1.15rem;
+  overflow-x:      auto;
+  border:          1px solid var(--card-border);
+  border-radius:   12px;
+  background:      rgba(1, 6, 20, 0.85);
+  font-family:     ui-monospace, 'Cascadia Code', Menlo, monospace;
+  font-size:       0.84rem;
+  line-height:     1.65;
+  tab-size:        2;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(0, 212, 255, 0.25) transparent;
+}
+.entry-body pre > code { display: grid; }
+
+/* Tables scroll sideways on their own instead of widening the page */
+.entry-body table {
+  display:         block;
+  width:           max-content;
+  max-width:       100%;
+  overflow-x:      auto;
+  margin:          0 0 1.4rem;
+  border-collapse: collapse;
+  font-size:       0.92rem;
+}
+.entry-body th,
+.entry-body td {
+  padding:       0.5rem 0.9rem;
+  border-bottom: 1px solid var(--section-rule);
+  text-align:    left;
+}
+.entry-body th {
+  font-family:    'Share Tech Mono', ui-monospace, monospace;
+  font-size:      0.7rem;
+  font-weight:    400;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color:          var(--card-link);
 }

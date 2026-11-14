@@ -4,6 +4,8 @@
 // case-study modal. The long-form body (MDX) slots in under the header
 // as pages get written.
 import { KINDS, entryPath, entryTitle, related } from '../../content/index.js'
+import { bodyLoader } from '../../content/bodies.js'
+import { MdxBody } from '../mdx/MdxBody'
 import { EntryLinkButton } from '../EntryLinkButton'
 import { Link } from '../Link'
 
@@ -18,6 +20,7 @@ export function EntryPage({ kind, entry }) {
   const { title, sub } = headerFor(kind, entry)
   const d = entry.details
   const more = related(kind, entry.slug)
+  const body = bodyLoader(kind, entry.slug)
 
   return (
     <article className="entry">
@@ -57,6 +60,8 @@ export function EntryPage({ kind, entry }) {
           />
         </div>
       )}
+
+      {body && <MdxBody loader={body} />}
 
       {more.length > 0 && (
         <nav className="entry-related" aria-label="Related work">
