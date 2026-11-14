@@ -11,6 +11,7 @@ import DjangoPlain           from 'devicons-react/lib/icons/DjangoPlain'
 import AzuresqldatabasePlain from 'devicons-react/lib/icons/AzuresqldatabasePlain'
 import GitOriginal           from 'devicons-react/lib/icons/GitOriginal'
 import PytorchOriginal       from 'devicons-react/lib/icons/PytorchOriginal'
+import { SKILL_GROUPS as GROUPS } from '../content/index.js'
 
 // Wrapper to force fill color on icons that don't accept a color prop
 function ForcedColorIcon({ Icon, size }) {
@@ -21,31 +22,23 @@ function ForcedColorIcon({ Icon, size }) {
   )
 }
 
-// ── Data ───────────────────────────────────────────────────────────────
+// ── Icons ──────────────────────────────────────────────────────────────
+// Names and tooltips live in src/content/skills.js; this list supplies the
+// icon for each skill id. A skill needs a line in both places.
 
-const GROUPS = [
-  {
-    label: 'Languages',
-    items: [
-      { name: 'C++',    render: (s) => <CplusplusPlain size={s} color="currentColor" />,       tooltip: 'Data Structures and Unreal Engine' },
-      { name: 'C#',     render: (s) => <CsharpPlain size={s} color="currentColor" />,           tooltip: 'All of my Unity Scripts' },
-      { name: 'Java',   render: (s) => <JavaPlain size={s} color="currentColor" />,             tooltip: 'Good ol\' CS 124' },
-      { name: 'Python', render: (s) => <PythonPlain size={s} color="currentColor" />,           tooltip: 'Data analysis, Linear algebra, Computer vision research' },
-    ],
-  },
-  {
-    label: 'Tools & Frameworks',
-    items: [
-      { name: 'Unity',          render: (s) => <UnityPlain size={s} color="currentColor" />,                tooltip: 'What haven\'t I used Unity for' },
-      { name: 'Unreal Engine',  render: (s) => <ForcedColorIcon Icon={UnrealengineOriginal} size={s} />,    tooltip: 'Game Dev coursework' },
-      { name: 'Blender',        render: (s) => <ForcedColorIcon Icon={BlenderOriginal} size={s} />,         tooltip: 'Asset creation & texturing for the ILL' },
-      { name: 'Django',         render: (s) => <DjangoPlain size={s} color="currentColor" />,               tooltip: 'A web app I built and will not elaborate on' },
-      { name: 'SQL',            render: (s) => <AzuresqldatabasePlain size={s} color="currentColor" />,     tooltip: 'SportsBot\'s backbone' },
-      { name: 'Git',            render: (s) => <ForcedColorIcon Icon={GitOriginal} size={s} />,             tooltip: "Version control for everything that isn't Perforce" },
-      { name: 'PyTorch',        render: (s) => <ForcedColorIcon Icon={PytorchOriginal} size={s} />,         tooltip: 'Faster R-CNN vs. YOLOv8, benchmarked' },
-    ],
-  },
-]
+const ICONS = {
+  cpp:     (s) => <CplusplusPlain size={s} color="currentColor" />,
+  csharp:  (s) => <CsharpPlain size={s} color="currentColor" />,
+  java:    (s) => <JavaPlain size={s} color="currentColor" />,
+  python:  (s) => <PythonPlain size={s} color="currentColor" />,
+  unity:   (s) => <UnityPlain size={s} color="currentColor" />,
+  unreal:  (s) => <ForcedColorIcon Icon={UnrealengineOriginal} size={s} />,
+  blender: (s) => <ForcedColorIcon Icon={BlenderOriginal} size={s} />,
+  django:  (s) => <DjangoPlain size={s} color="currentColor" />,
+  sql:     (s) => <AzuresqldatabasePlain size={s} color="currentColor" />,
+  git:     (s) => <ForcedColorIcon Icon={GitOriginal} size={s} />,
+  pytorch: (s) => <ForcedColorIcon Icon={PytorchOriginal} size={s} />,
+}
 
 // ── Animation variants ─────────────────────────────────────────────────
 
@@ -80,7 +73,7 @@ function SkillItem({ item }) {
           whileHover={{ y: -10, scale: 1.1 }}
           transition={{ type: 'spring', stiffness: 300, damping: 20 }}
         >
-          {item.render('48px')}
+          {ICONS[item.id]?.('48px')}
         </motion.div>
 
         <div className="skill-tooltip" role="tooltip">
@@ -117,7 +110,7 @@ function SkillGroup({ group }) {
         viewport={{ once: true, margin: '-60px' }}
       >
         {group.items.map(item => (
-          <SkillItem key={item.name} item={item} />
+          <SkillItem key={item.id} item={item} />
         ))}
       </motion.div>
     </div>

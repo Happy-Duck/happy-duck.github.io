@@ -1,30 +1,6 @@
 import { motion } from 'framer-motion'
-
-// ── Data ───────────────────────────────────────────────────────────────
-
-const ENTRIES = [
-  {
-    company:     'Brunswick BI Design Lab',
-    role:        'Software Development Intern, Computer Graphics',
-    period:      'May 2026 – Present',
-    description: "Primary developer on the UE5.7 simulator behind Future Helm, Brunswick's flagship CES 2027 marine showcase, reviewed and approved by the C-suite ahead of its January public exhibition. Own the multiprotocol C++ data layer (TCP, UDP, CAN) exchanging live vessel state, engine telemetry, and navigation data with a teammate's multi-function display app, and prototyped collision prevention and spline-based intelligent navigation. Optimized runtime to a 60 fps target with custom LOD tuning and event-driven Blueprint messaging in place of per-frame polling. Top-3 finalist for Most Outstanding Undergraduate Intern at the 2026 UIUC Research Park Intern Awards (800+ interns, 120+ companies).",
-    stack:       ['Unreal Engine 5', 'C++', 'TCP/UDP', 'CAN bus', 'Perforce'],
-  },
-  {
-    company:     'Immersive Learning Lab',
-    role:        'Virtual Reality Software Developer',
-    period:      'Oct 2025 – Present',
-    description: "Designed and programmed a VR educational application in Unity/C# visualizing the University of Bern's MANiaC mass spectrometer (ESA's Comet Interceptor mission) and built a near-photorealistic replica of the ISSI lobby in Bern, with physics simulations, live data graphing via XCharts, animation systems, and custom interaction scripts driving NavMesh-driven NPCs. Presented at the IMMERSE Annual Symposium (April 2026) via poster and live demo.",
-    stack:       ['Unity', 'C#', 'Blender', 'VR', 'XR Toolkit', 'XCharts', 'OpenXR'],
-  },
-  {
-    company:     'Origami Games',
-    role:        'Game Development Intern',
-    period:      'June – July 2023',
-    description: 'Built prototypes for endless runner and maze escape games in Unity/C#; implemented procedural level generation.',
-    stack:       ['Unity', 'C#', 'Procedural Gen'],
-  },
-]
+// Career data lives in src/content/work.js
+import { WORK as ENTRIES, entryAnchor } from '../content/index.js'
 
 // ── Kelp cable ─────────────────────────────────────────────────────────
 // Gentle S-curves: organic, not ruler-straight
@@ -91,6 +67,7 @@ function EntryCard({ entry, fromLeft = false }) {
   return (
     <motion.div
       className="exp-card"
+      data-entry-anchor={entryAnchor('work', entry.slug)}
       initial={{ opacity: 0, x: fromLeft ? -52 : 52 }}
       whileInView={{ opacity: 1, x: 0 }}
       transition={{ duration: 0.72, ease: [0.22, 1, 0.36, 1] }}
@@ -148,7 +125,7 @@ export function Experience() {
         {/* ── Desktop: alternating left / right ── */}
         <div className="hidden sm:block">
           {ENTRIES.map((entry, i) => (
-            <div key={entry.company} className={`flex items-start${i < ENTRIES.length - 1 ? ' pb-24' : ''}`}>
+            <div key={entry.slug} className={`flex items-start${i < ENTRIES.length - 1 ? ' pb-24' : ''}`}>
               {i % 2 === 0 ? (
                 <>
                   <div className="flex-1 pr-4 flex justify-end">
@@ -178,7 +155,7 @@ export function Experience() {
         <div className="sm:hidden pl-10">
           {ENTRIES.map((entry, i) => (
             <div
-              key={entry.company}
+              key={entry.slug}
               className={`relative${i < ENTRIES.length - 1 ? ' pb-12' : ''}`}
             >
               <div className="absolute -left-[1.4rem] top-5">
