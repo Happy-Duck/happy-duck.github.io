@@ -29,6 +29,7 @@ to preview, save, and publish.
    - [6.7 The hidden Education section](#67-the-hidden-education-section)
    - [6.8 Browser-tab title and search-engine text](#68-browser-tab-title-and-search-engine-text)
    - [6.9 Dive-log species names and jokes](#69-dive-log-species-names-and-jokes)
+   - [6.10 Pages for each job and project](#610-pages-for-each-job-and-project)
 7. [Swapping images and files](#7-swapping-images-and-files)
    - [7.1 The resume PDF](#71-the-resume-pdf)
    - [7.2 Creature photos](#72-creature-photos)
@@ -161,13 +162,16 @@ happy-duck.github.io/
 │   ├── App.jsx         ← the page's table of contents (section order)
 │   ├── components/     ← one file per section / visual system
 │   │   ├── Hero.jsx        ← name, roles, tagline
-│   │   ├── Experience.jsx  ← "Career" cards
-│   │   ├── Projects.jsx    ← project cards + their pop-up case studies
-│   │   ├── Skills.jsx      ← skill icons and tooltips
+│   │   ├── Skills.jsx      ← the icon for each skill (see 6.4)
 │   │   ├── About.jsx       ← Captain's Log
 │   │   ├── Education.jsx   ← currently hidden (see 6.7)
 │   │   ├── ContactSidebar.jsx ← email / LinkedIn / GitHub / resume links
 │   │   └── creatures/      ← code for each animated creature
+│   ├── content/        ← YOUR CONTENT: the words on the cards and pages
+│   │   ├── work.js         ← "Career" cards and job pages
+│   │   ├── projects.js     ← project cards and project pages
+│   │   ├── skills.js       ← skill names and tooltips
+│   │   └── pages/          ← the long write-up for each page (see 6.10)
 │   ├── constants/
 │   │   └── species.js  ← dive-log journal names and one-liners
 │   └── ...             ← ocean plumbing: DON'T EDIT (see below)
@@ -180,7 +184,8 @@ happy-duck.github.io/
 
 **Do not edit** (these run the ocean simulation, and small mistakes break
 the whole page): anything in `src/context/`, `src/hooks/`, `src/lib/`,
-`src/workers/`, `src/index.css`, `vite.config.js`, `eslint.config.js`,
+`src/workers/`, `src/index.css`, `src/content/index.js`,
+`src/content/bodies.js`, `scripts/`, `vite.config.js`, `eslint.config.js`,
 and the creature/effect files except for the one photo-swap noted in 7.2.
 
 ---
@@ -192,11 +197,15 @@ Here is one career card as it appears in the code:
 
 ```js
 {
+  slug:        'origami-games',
   company:     'Origami Games',
   role:        'Game Development Intern',
   period:      'June – July 2023',
+  summary:     'Built endless runner and maze escape prototypes in Unity with procedural level generation.',
   description: 'Built prototypes for endless runner and maze escape games in Unity/C#; implemented procedural level generation.',
   stack:       ['Unity', 'C#', 'Procedural Gen'],
+  tags:        ['games'],
+  skills:      ['unity', 'csharp'],
 },
 ```
 
@@ -264,20 +273,24 @@ which controls the browser tab and Google results.
 
 ### 6.2 Career cards
 
-**File:** `src/components/Experience.jsx` — the list called `ENTRIES`
-starting at ~line 5. (The section is titled "Career" on the page; find the
-heading near the bottom of the file if you want to rename the section
-itself.)
+**File:** `src/content/work.js` — the list called `WORK`. (The section is
+titled "Career" on the page; the heading itself is near the bottom of
+`src/components/Experience.jsx` if you want to rename the section.)
 
-Each card has five parts:
+Each job is one block. The same block feeds the card on the main page
+**and** that job's own page (see 6.10):
 
 | Label | What it is | Example |
 |---|---|---|
+| `slug` | The job's web address: `/work/<slug>/`. Lowercase, no spaces, hyphens between words. **Don't change it once the link is on your resume** — old links would break. | `'brunswick'` |
 | `company` | Employer name (bold line under the role) | `'Brunswick BI Design Lab'` |
 | `role` | Job title (the big line) | `'Unity VR Developer'` |
 | `period` | Dates, shown in small caps | `'May 2026 – Present'` |
+| `summary` | ONE sentence. Shown under the link in Google and when the page is shared in Discord, LinkedIn, etc. | any sentence |
 | `description` | The paragraph | any sentence(s) |
 | `stack` | The little pills | `['Unity', 'C#', 'VR']` |
+| `tags` | Broad categories, used to suggest related pages: `games`, `xr`, `graphics`, `tools`, `research` | `['xr']` |
+| `skills` | Which of your Skills icons this job used, by their `id` in `src/content/skills.js`. Used to suggest related pages. | `['unity', 'csharp']` |
 
 - **Edit** — change text inside quotes.
 - **Add a job** — copy an existing block from `{` through `},` and paste
@@ -287,22 +300,26 @@ Each card has five parts:
 - Cards alternate left/right of the kelp strand automatically; nothing to
   configure.
 
-One caveat: each card must have a **different `company` name** (the code
-uses it as an internal ID). Two stints at the same company? Make them
-differ, e.g. `'Origami Games'` and `'Origami Games (returning)'`.
+One caveat: each job must have a **different `slug`** (it is the page
+address and the code's internal ID). Two stints at the same company? Give
+them different slugs, e.g. `'origami-games'` and `'origami-games-2025'`.
 
 ### 6.3 Project cards
 
-**File:** `src/components/Projects.jsx` — the list called `PROJECTS`
-starting at ~line 24. Each card also powers the pop-up **case study**
-that opens when a visitor clicks the card.
+**File:** `src/content/projects.js` — the list called `PROJECTS`. Each
+block feeds the card, the pop-up **case study** that opens when a visitor
+clicks the card, and the project's own page (see 6.10).
 
 ```js
 {
+  slug:        'sportsbot',
   title:       'SportsBot',
+  summary:     'A Discord bot delivering live scores, player stats, and schedule alerts through slash commands.',
   description: 'Discord bot delivering live scores...',
   stack:       ['Python', 'discord.py', 'REST APIs'],
   link:        'https://github.com/Happy-Duck/DiscordSportsBot',
+  tags:        ['tools'],
+  skills:      ['python', 'sql'],
   details: {
     role: 'Solo developer',
     highlights: [
@@ -313,6 +330,8 @@ that opens when a visitor clicks the card.
 },
 ```
 
+- `slug`, `summary`, `tags`, `skills` — same meaning as on career cards
+  (6.2). The project's page lives at `/projects/<slug>/`.
 - `title`, `description`, `stack` — same drill as career cards.
 - `link` — the full web address the corner button opens. The button's
   icon picks itself: a Steam address shows the Steam logo, `itch.io` the
@@ -331,24 +350,28 @@ that opens when a visitor clicks the card.
   To remove a widget, delete the whole `embed: { ... },` line.
 - **Add a project** — copy a whole card block, paste it into the list at
   the position you want (cards fill the grid left-to-right, top-to-bottom,
-  first in the list = top-left). Each card needs a **unique `title`**.
+  first in the list = top-left). Each card needs a **unique `slug`**.
 - **Remove a project** — delete its block, `{` through `},`.
 
 ### 6.4 Skills icons
 
-**File:** `src/components/Skills.jsx` — the list called `GROUPS` at
-~line 24. There are two groups, `Languages` and `Tools & Frameworks`;
-each item is one icon with a hover tooltip.
+**Files:** `src/content/skills.js` holds the words (the list called
+`SKILL_GROUPS`: two groups, `Languages` and `Tools & Frameworks`, each
+item a name and a hover tooltip). `src/components/Skills.jsx` holds the
+picture for each one (the list called `ICONS`). The two are matched by
+the item's `id`.
 
-- **Change a tooltip or label** — edit the `name:` or `tooltip:` text.
-  Watch the apostrophe rule (rule 2 in section 5) — several tooltips use
-  `\'` already.
-- **Remove a skill** — delete its `{ name: ..., render: ..., tooltip: ... },`
-  line, and also delete the matching `import ... from 'devicons-react...'`
-  line at the top of the file (a leftover import makes the pre-publish
-  check in section 9 fail with an "unused variable" warning — that's
-  intentional; the check is telling you to finish the job).
-- **Add a skill** — this is the one content edit that needs two steps,
+- **Change a tooltip or label** — in `skills.js`, edit the `name:` or
+  `tooltip:` text. Watch the apostrophe rule (rule 2 in section 5).
+  **Don't change an `id`** — jobs and projects refer to skills by it.
+- **Remove a skill** — delete its `{ id: ..., name: ..., tooltip: ... },`
+  line in `skills.js`. Then in `Skills.jsx` delete its line in `ICONS`
+  and the matching `import ... from 'devicons-react...'` line at the top
+  (a leftover import makes the pre-publish check in section 9 fail with
+  an "unused variable" warning — that's intentional; the check is telling
+  you to finish the job). Also remove that `id` from any `skills: [...]`
+  lists in `work.js` and `projects.js`.
+- **Add a skill** — this is the one content edit that needs three steps,
   because each icon ships as its own tiny file:
   1. Find the icon's name. Icons come from a library called *Devicon* —
      browse https://devicon.dev to see what exists. The import name is the
@@ -356,17 +379,22 @@ each item is one icon with a hover tooltip.
      `Plain` or `Original` (e.g. `RustPlain`, `GodotOriginal`). You can
      confirm the exact spelling by looking in the
      `node_modules/devicons-react/lib/icons` folder.
-  2. Add an import at the top, next to the existing ones:
+  2. In `Skills.jsx`, add an import at the top, next to the existing ones:
      ```js
      import GodotOriginal from 'devicons-react/lib/icons/GodotOriginal'
      ```
-     then add an item to a group:
+     then add a line to the `ICONS` list. The word before the colon is
+     the `id` you are about to use in step 3:
      ```js
-     { name: 'Godot', render: (s) => <GodotOriginal size={s} color="currentColor" />, tooltip: 'My next engine' },
+     godot:   (s) => <GodotOriginal size={s} color="currentColor" />,
      ```
      If the icon comes out the wrong color (some icons ignore the color
-     setting), copy the `ForcedColorIcon` pattern used by the Unreal
-     Engine and Blender entries instead.
+     setting), copy the `ForcedColorIcon` pattern used by the `unreal`
+     and `blender` lines instead.
+  3. In `skills.js`, add an item to a group with that same `id`:
+     ```js
+     { id: 'godot', name: 'Godot', tooltip: 'My next engine' },
+     ```
   - **Never** import from `'devicons-react'` directly (without
     `/lib/icons/...`) — it silently pulls ~3,000 icons into the site and
     bloats it.
@@ -451,6 +479,48 @@ Don't add or remove lines here either; a journal entry without a matching
 animated creature can never be discovered, which makes the journal
 impossible to complete. (Adding a whole new creature is a programming
 project — see `CLAUDE.md` — not a content edit.)
+
+### 6.10 Pages for each job and project
+
+Every block in `work.js` and `projects.js` automatically gets its own
+page with its own web address — for example
+`https://happy-duck.github.io/projects/pelagos/` — that you can put on a
+resume or send to someone. Out of the box a page shows what the card
+shows, plus the role, highlights, and playable widget.
+
+**Status while this is being built:** pages currently open only from
+their address; clicking a card still opens the pop-up. That switches over
+in the next phase of `docs/PORTFOLIO_PLAN.md`.
+
+To give a page a longer write-up, create one text file named after the
+block's `slug`:
+
+```
+src/content/pages/projects/pelagos.mdx      ← for a project
+src/content/pages/work/brunswick.mdx        ← for a job
+```
+
+(Create the `pages`, `projects`, and `work` folders the first time —
+right-click in the VS Code Explorer → New Folder.) The file is written in
+**Markdown**, the same simple format as this manual:
+
+```
+## How it works
+
+A paragraph. **Bold**, *italic*, and a [link](https://example.com).
+
+- A bullet
+- Another bullet
+```
+
+Fenced code blocks (three backticks, then the language name, e.g.
+`` ```cs `` for C#) are color-highlighted automatically. To see every
+kind of formatting and exactly how it will look, run the preview
+(section 8) and visit `localhost:5173/dev/kitchen-sink`.
+
+No list to update and nothing to register: save the file and the page
+picks it up. Delete the file and the page goes back to showing just the
+card content.
 
 ---
 
@@ -537,8 +607,9 @@ color grading so photos sit in the scene.
 - **Social preview** (the picture shown when the link is shared):
   replace `public/og-image.png`, sized 1200×630 pixels.
 - Don't delete `googleb28b642a426b9703.html`, `robots.txt`,
-  `sitemap.xml`, `manifest.json`, or `404.html` — they're plumbing for
-  Google and GitHub Pages.
+  `manifest.json`, or `404.html` — they're plumbing for Google and
+  GitHub Pages. (The sitemap is no longer a file you keep: the build
+  writes it from your list of jobs and projects.)
 
 ---
 
@@ -691,7 +762,7 @@ Run `npm install` once and retry.
 **Undo edits to one file (not saved as a commit yet):**
 `Ctrl+Z` in the editor, or to fully reset one file to the last snapshot:
 ```
-git checkout -- src/components/Projects.jsx
+git checkout -- src/content/projects.js
 ```
 (swap in the file's actual path — this **permanently discards** your
 uncommitted edits to that file).

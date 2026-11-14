@@ -3,20 +3,28 @@
 Rishi Garhyan's deep-sea portfolio (happy-duck.github.io). React 19 + Vite 8
 + Tailwind v4 + Framer Motion. The page is a side-on cross-section of the
 ocean: scrolling = diving 0–6,000 m. Read this whole file before touching
-the ocean systems; `docs/FEATURE_PLAN.md` (wave 1) and
-`docs/GRAPHICS_PLAN.md` (wave 2: WebGPU/WebGL/XR features) hold the
-feature-by-feature history, specs, and hard-won gotchas.
+the ocean systems; `docs/FEATURE_PLAN.md` (wave 1),
+`docs/GRAPHICS_PLAN.md` (wave 2: WebGPU/WebGL/XR features), and
+`docs/PORTFOLIO_PLAN.md` (wave 3: pages, content registry, courses —
+IN PROGRESS on branch `feature/portfolio-wave-3`, phase table at the top)
+hold the feature-by-feature history, specs, and hard-won gotchas.
 
 ## Commands
 
 - `npm run dev` — dev server on :5173 (watcher ignores `public/` — OneDrive
   locks freshly-dropped files and crashes fs.watch with EBUSY otherwise)
 - `npm run lint` — MUST stay at zero errors/warnings before every commit
-- `npm run build` — prod build (bundle ≈ 410 kB / 132 kB gzip; devicons are
-  imported per-icon from `devicons-react/lib/icons/*` — never from the
-  package index, it's CJS and ships ~3,000 icons)
+- `npm run build` — prod build, then `scripts/prerender.mjs` writes a
+  page shell per route + `sitemap.xml` into `dist/` (main bundle ≈ 444 kB
+  / 144 kB gzip; devicons are imported per-icon from
+  `devicons-react/lib/icons/*` — never from the package index, it's CJS
+  and ships ~3,000 icons)
+- `npm run preview` — serve `dist/`; the only way to check prerendered
+  routes and their meta tags locally
 - `npm run deploy` — build + push `dist/` to the `gh-pages` branch. This is
   the ONLY thing that changes the live site; merging to master does not.
+  It publishes whatever is checked out — do NOT run it from the wave 3
+  branch until the owner says that work is ready.
 
 ## Core architecture — the depth system
 
@@ -145,13 +153,53 @@ feature-by-feature history, specs, and hard-won gotchas.
 - **GyroParallax** (`GyroParallax.jsx`): tilt → `--tilt-x/-y` on coarse
   pointers; CSS consumes under `(pointer: coarse)`.
 
+## Pages and content (wave 3)
+
+- **Content registry** (`src/content/`): `work.js`, `projects.js`,
+  `skills.js` are PURE DATA (no JSX, no imports); `index.js` has the
+  lookups, `matchRoute()`, `entryPath()`, and relation helpers. It must
+  stay Node-importable (explicit `.js` extensions, no `import.meta`) —
+  the prerender script reads it. Components import from the registry;
+  never put content lists back into component files. A new kind of page
+  (hobbies, courses) = a new entry in `KINDS`; routing, prerender, and
+  sitemap follow.
+- **Router** (`src/lib/router.js`): History API, no dependency. `usePath()`,
+  `navigate()`, `goBack()`; `<Link>` in `components/Link.jsx`. Navigations
+  run in a View Transition with the commit `flushSync`ed. Hrefs carry a
+  trailing slash (GitHub Pages serves `<path>/index.html`); the router
+  strips it for matching.
+- **Page layer** (`components/pages/PageLayer.jsx`): every route except `/`
+  is an opaque layer portaled to body at z-75, own scroll. THE DIVE NEVER
+  UNMOUNTS — `App.jsx` wraps it in `.dive`, and with a page open it is
+  `.dive--stowed` (hidden, CSS animations paused) + `inert`. The document
+  never scrolls, so closing a page restores the exact depth. Terminal
+  lives OUTSIDE `.dive` so it works over a page. `.page-layer` re-declares
+  the deep-sea theme vars, so pages look the same at any dive depth.
+- **Pause contract** (`src/lib/oceanPause.js`): `isPaused()` is true while a
+  page is open. The depth loop skips subscribers; any loop with its own
+  rAF MUST check `isPaused()` wherever it checks `document.hidden`.
+  Transitions fire `ocean:pause`; the rays worker gets a posted
+  visibility message (never terminated).
+- **Page bodies** (`src/content/bodies.js` + `components/mdx/`): add
+  `src/content/pages/<kind>/<slug>.mdx` and that entry's page renders it,
+  as its own lazy chunk. MDX + remark-gfm + rehype-pretty-code (shiki at
+  BUILD time — no highlighter in the bundle). Register page components in
+  `MDX_COMPONENTS` (MdxBody.jsx). `/dev/kitchen-sink` (dev server only)
+  is the reference page for prose styles and new components.
+- **Prerender** (`scripts/prerender.mjs`): each tag swap must match
+  exactly once or the build fails — if you restructure `index.html`'s
+  meta tags, update the patterns there. Keep `SITE_TITLE` in
+  `content/index.js` in sync with `<title>` in `index.html`.
+
 ## z-index map
 
 0 backdrop · 1 caustics+water surface · 2 overlays, whale(reef), boid
 school · 3 creatures · 4 snow/plankton · 5 ROV darkness · 6 sonar rings,
 bio trail ·
 10 content · 11 whale(deep, glides OVER content) · 50 sidebar/gauge ·
-60 fabs (dive log, console) · 65 floor stamp · 70 toasts · 80 terminal ·
+60 fabs (dive log, console) · 65 floor stamp · 70 toasts · 75 page layer
+(PORTALED to body; console fab lifts to 76 while a page is open) ·
+80 terminal ·
 90 case-study modal (PORTALED to body — sections create stacking contexts
 that trap fixed children) · 100 skip link.
 
@@ -165,6 +213,12 @@ delete the artifacts, `npm prune`. Scroll depth correctly:
 `max = scrollHeight - innerHeight; scrollTo(0, max * fraction)` — and
 remember `depth N` in the terminal for meter-accurate jumps. Fake the clock
 with `context.addInitScript(() => { Date.prototype.getHours = () => 18 })`.
+Installing any real dependency (`npm i -D x`) prunes the `--no-save`
+playwright-core — reinstall it. Never `git stash -u` in this folder:
+OneDrive denies removing empty dirs, so the stash is saved but the working
+tree is left as-is and `stash pop` then refuses. To drive the router from
+a dev-server smoke script:
+`page.evaluate(async () => (await import('/src/lib/router.js')).navigate('/work/brunswick/'))`.
 
 ## React gotchas already paid for (dev runs StrictMode)
 
