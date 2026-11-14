@@ -1,14 +1,13 @@
-import { useRef, useState, useEffect } from 'react'
-import { createPortal, flushSync } from 'react-dom'
-import { motion, AnimatePresence } from 'framer-motion'
+import { useRef } from 'react'
+import { motion } from 'framer-motion'
 // Project data lives in src/content/projects.js
-import { PROJECTS, entryAnchor } from '../content/index.js'
+import { PROJECTS, entryAnchor, entryPath } from '../content/index.js'
+import { navigate } from '../lib/router'
 import { EntryLinkButton } from './EntryLinkButton'
 
-// View Transitions: card ↔ modal shared-element morph where supported.
-// With VT active the framer mount/exit animations stand down so the two
-// systems don't fight over the same elements.
-const supportsVT = typeof document !== 'undefined' && 'startViewTransition' in document
+// Projects marked `grid: false` have a page (and show up under their
+// class) but no card here
+const CARDS = PROJECTS.filter(p => p.grid !== false)
 
 // ── Animation variants ─────────────────────────────────────────────────
 
@@ -32,8 +31,10 @@ const headerItem = {
 }
 
 // ── Parallax card shell ────────────────────────────────────────────────
+// The whole card opens the project's page. It is a div with role="link"
+// rather than an <a> because the store button inside it is itself a link.
 
-function ParallaxCard({ children, delay = 0, onOpen, label, vtName, anchor }) {
+function ParallaxCard({ children, delay = 0, href, label, anchor }) {
   const innerRef = useRef(null)
 
   const onMouseMove = (e) => {
@@ -54,10 +55,19 @@ function ParallaxCard({ children, delay = 0, onOpen, label, vtName, anchor }) {
     el.style.transition = 'transform 0.55s cubic-bezier(0.22,1,0.36,1), box-shadow 0.55s ease, border-color 0.55s ease'
   }
 
+  const open = (e) => {
+    // Ctrl/Cmd/middle click: a new tab, like any link
+    if (e.metaKey || e.ctrlKey || e.button === 1) {
+      window.open(href, '_blank', 'noopener')
+      return
+    }
+    navigate(href)
+  }
+
   const onKeyDown = (e) => {
-    if (e.key === 'Enter' || e.key === ' ') {
+    if (e.key === 'Enter') {
       e.preventDefault()
-      onOpen()
+      navigate(href)
     }
   }
 
@@ -72,13 +82,13 @@ function ParallaxCard({ children, delay = 0, onOpen, label, vtName, anchor }) {
       <div
         ref={innerRef}
         className="project-card project-card--clickable h-full"
-        style={vtName ? { viewTransitionName: vtName } : undefined}
         data-no-ping
         data-entry-anchor={anchor}
-        role="button"
+        role="link"
         tabIndex={0}
-        aria-label={`${label} — open case study`}
-        onClick={onOpen}
+        aria-label={`${label} — open the project page`}
+        onClick={open}
+        onAuxClick={open}
         onKeyDown={onKeyDown}
         onMouseMove={onMouseMove}
         onMouseLeave={onMouseLeave}
@@ -91,13 +101,12 @@ function ParallaxCard({ children, delay = 0, onOpen, label, vtName, anchor }) {
 
 // ── Standard card ──────────────────────────────────────────────────────
 
-function ProjectCard({ project, delay, onOpen, vtName }) {
+function ProjectCard({ project, delay }) {
   return (
     <ParallaxCard
       delay={delay}
-      onOpen={onOpen}
+      href={entryPath('projects', project.slug)}
       label={project.title}
-      vtName={vtName}
       anchor={entryAnchor('projects', project.slug)}
     >
       <div className="flex flex-col gap-3 h-full">
@@ -115,144 +124,28 @@ function ProjectCard({ project, delay, onOpen, vtName }) {
           {project.description}
         </p>
 
-        {/* Stack pills */}
-        <div className="flex flex-wrap gap-1.5 mt-auto pt-1">
+        {/* Stack pills + the way in */}
+        <div className="flex flex-wrap items-end gap-1.5 mt-auto pt-1">
           {project.stack.map(t => (
             <span key={t} className="card-pill px-2 py-0.5 rounded-full text-[clamp(0.625rem,0.55rem+0.2vw,0.75rem)] font-mono">
               {t}
             </span>
           ))}
+          <span className="card-open" aria-hidden="true">open file →</span>
         </div>
       </div>
     </ParallaxCard>
   )
 }
 
-// ── Case-study modal ───────────────────────────────────────────────────
-
-function ProjectModal({ project, onClose, vt }) {
-  const closeRef = useRef(null)
-  const d = project.details
-
-  useEffect(() => {
-    const prev = document.activeElement
-    closeRef.current?.focus()
-    document.body.style.overflow = 'hidden'
-
-    const onKey = (e) => { if (e.key === 'Escape') onClose() }
-    window.addEventListener('keydown', onKey)
-    return () => {
-      window.removeEventListener('keydown', onKey)
-      document.body.style.overflow = ''
-      if (prev && prev.focus) prev.focus()
-    }
-  }, [onClose])
-
-  // Portal to <body> — the section's position:relative + z-index creates a
-  // stacking context that would trap the fixed backdrop under later sections
-  return createPortal(
-    <motion.div
-      className="pmodal-backdrop"
-      data-no-ping
-      initial={vt ? false : { opacity: 0 }}
-      animate={{ opacity: 1 }}
-      exit={{ opacity: 0 }}
-      transition={{ duration: 0.18 }}
-      onMouseDown={(e) => { if (e.target === e.currentTarget) onClose() }}
-    >
-      <motion.div
-        className="pmodal"
-        style={vt ? { viewTransitionName: 'case-study' } : undefined}
-        role="dialog"
-        aria-modal="true"
-        aria-label={project.title}
-        initial={vt ? false : { opacity: 0, y: 26, scale: 0.97 }}
-        animate={{ opacity: 1, y: 0, scale: 1 }}
-        exit={{ opacity: 0, y: 18, scale: 0.97 }}
-        transition={{ duration: 0.24, ease: [0.22, 1, 0.36, 1] }}
-      >
-        <div className="pmodal-head">
-          <h3 className="pmodal-title">{project.title}</h3>
-          <button
-            ref={closeRef}
-            type="button"
-            className="pmodal-close"
-            onClick={onClose}
-            aria-label="Close case study"
-          >
-            ×
-          </button>
-        </div>
-
-        {d?.role && <p className="pmodal-role">{d.role}</p>}
-
-        <p className="pmodal-desc">{project.description}</p>
-
-        {d?.highlights?.length > 0 && (
-          <ul className="pmodal-highlights">
-            {d.highlights.map(h => (
-              <li key={h}>{h}</li>
-            ))}
-          </ul>
-        )}
-
-        {d?.embed && (
-          <div className="pmodal-embed">
-            <iframe
-              src={d.embed.src}
-              height={d.embed.height}
-              title={d.embed.title}
-              loading="lazy"
-            />
-          </div>
-        )}
-
-        <div className="pmodal-foot">
-          <div className="flex flex-wrap gap-1.5">
-            {project.stack.map(t => (
-              <span key={t} className="card-pill px-2 py-0.5 rounded-full text-[clamp(0.625rem,0.55rem+0.2vw,0.75rem)] font-mono">
-                {t}
-              </span>
-            ))}
-          </div>
-          <EntryLinkButton href={project.link} />
-        </div>
-      </motion.div>
-    </motion.div>,
-    document.body,
-  )
-}
-
 // ── Section ────────────────────────────────────────────────────────────
 
 export function Projects() {
-  const [openIdx, setOpenIdx] = useState(-1)
-  // Which card owns the shared view-transition name (the last one opened)
-  const [vtIdx, setVtIdx] = useState(-1)
-
-  const vtActive = () =>
-    supportsVT && !window.matchMedia('(prefers-reduced-motion: reduce)').matches
-
-  const openModal = (i) => {
-    if (!vtActive()) { setOpenIdx(i); return }
-    // The card must carry the name in the OLD snapshot, the modal in the NEW
-    flushSync(() => setVtIdx(i))
-    document.startViewTransition(() => {
-      flushSync(() => setOpenIdx(i))
-    })
-  }
-
-  const closeModal = () => {
-    if (!vtActive()) { setOpenIdx(-1); return }
-    document.startViewTransition(() => {
-      flushSync(() => setOpenIdx(-1))
-    })
-  }
-
   return (
     <section
       className="relative px-6 pb-28 pt-4 w-full max-w-6xl mx-auto"
       style={{ zIndex: 10 }}
+      data-entry-anchor="projects"
     >
       {/* Section header */}
       <motion.div
@@ -270,30 +163,10 @@ export function Projects() {
 
       {/* Project grid */}
       <div className="grid sm:grid-cols-2 gap-5">
-        {PROJECTS.map((p, i) => (
-          <ProjectCard
-            key={p.slug}
-            project={p}
-            delay={i * 0.07}
-            onOpen={() => openModal(i)}
-            vtName={vtIdx === i && openIdx !== i ? 'case-study' : undefined}
-          />
+        {CARDS.map((p, i) => (
+          <ProjectCard key={p.slug} project={p} delay={i * 0.07} />
         ))}
       </div>
-
-      {/* Case-study modal — with View Transitions the morph replaces the
-          framer mount/exit, so AnimatePresence must not delay unmount */}
-      {supportsVT ? (
-        openIdx >= 0 && (
-          <ProjectModal project={PROJECTS[openIdx]} onClose={closeModal} vt />
-        )
-      ) : (
-        <AnimatePresence>
-          {openIdx >= 0 && (
-            <ProjectModal project={PROJECTS[openIdx]} onClose={closeModal} />
-          )}
-        </AnimatePresence>
-      )}
     </section>
   )
 }

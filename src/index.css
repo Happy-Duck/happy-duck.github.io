@@ -683,137 +683,29 @@ html::-webkit-scrollbar { display: none; }
 
 
 /* ═══════════════════════════════════════════════════════════════════
-   PROJECT CASE-STUDY MODAL
+   PROJECT / CAREER CARD → PAGE
    ═══════════════════════════════════════════════════════════════════ */
 
 .project-card--clickable { cursor: pointer; }
 
-/* Card ↔ modal shared-element morph */
-::view-transition-group(case-study) {
-  animation-duration: 0.32s;
-  animation-timing-function: cubic-bezier(0.22, 1, 0.36, 1);
-}
-::view-transition-old(case-study),
-::view-transition-new(case-study) {
-  animation-duration: 0.32s;
-  height: 100%;
-  overflow: clip;
-}
-
-.pmodal-backdrop {
-  position:        fixed;
-  inset:           0;
-  z-index:         90;
-  display:         flex;
-  align-items:     center;
-  justify-content: center;
-  padding:         16px;
-  background:      rgba(0, 6, 18, 0.55);
-  backdrop-filter: blur(6px);
-  -webkit-backdrop-filter: blur(6px);
-}
-
-.pmodal {
-  width:          min(620px, 100%);
-  max-height:     min(84vh, 720px);
-  overflow-y:     auto;
-  scrollbar-width: thin;
-  border-radius:  16px;
-  border:         1px solid var(--card-border-hover);
-  background:     var(--card-bg);
-  box-shadow:     var(--card-shadow-hover);
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
-  padding:        clamp(1.2rem, 1rem + 1.5vw, 1.8rem);
-}
-
-.pmodal-head {
-  display:         flex;
-  align-items:     flex-start;
-  justify-content: space-between;
-  gap:             0.75rem;
-  margin-bottom:   0.2rem;
-}
-
-.pmodal-title {
-  font-size:   clamp(1.15rem, 1rem + 1vw, 1.5rem);
-  font-weight: 800;
-  line-height: 1.25;
-  color:       var(--card-title);
-  margin:      0;
-}
-
-.pmodal-close {
-  border:        none;
-  background:    none;
-  color:         var(--card-body);
-  font-size:     1.6rem;
-  line-height:   1;
-  cursor:        pointer;
-  padding:       2px 8px;
-  border-radius: 8px;
-  flex-shrink:   0;
-}
-.pmodal-close:hover { color: var(--card-link-hover); }
-
-.pmodal-role {
-  font-family:    ui-monospace, monospace;
-  font-size:      0.72rem;
-  letter-spacing: 0.14em;
+/* The way in to the full page — sits at the end of the pill row */
+.card-open {
+  margin-left:    auto;
+  padding-left:   0.5rem;
+  font-family:    'Share Tech Mono', ui-monospace, monospace;
+  font-size:      0.68rem;
+  letter-spacing: 0.12em;
   text-transform: uppercase;
-  color:          var(--card-link);
-  margin:         0 0 0.9rem;
+  white-space:     nowrap;
+  text-decoration: none;
+  color:           var(--card-link);
+  transition:      color 0.2s ease, transform 0.2s ease;
 }
-
-.pmodal-desc {
-  font-size:   0.9rem;
-  line-height: 1.65;
-  color:       var(--card-body);
-  margin:      0 0 0.9rem;
-}
-
-.pmodal-highlights {
-  list-style: none;
-  margin:     0 0 1.1rem;
-  padding:    0;
-  display:    flex;
-  flex-direction: column;
-  gap:        0.45rem;
-}
-
-.pmodal-highlights li {
-  position:    relative;
-  padding-left: 1.15rem;
-  font-size:   0.85rem;
-  line-height: 1.55;
-  color:       var(--card-title);
-}
-
-.pmodal-highlights li::before {
-  content:  '»';
-  position: absolute;
-  left:     0;
-  color:    var(--card-link);
-}
-
-.pmodal-embed {
-  margin: 0 0 1.1rem;
-}
-
-.pmodal-embed iframe {
-  display:       block;
-  width:         100%;
-  border:        1px solid var(--card-border);
-  border-radius: 10px;
-  background:    rgba(0, 0, 0, 0.25);
-}
-
-.pmodal-foot {
-  display:         flex;
-  align-items:     center;
-  justify-content: space-between;
-  gap:             0.75rem;
-  flex-wrap:       wrap;
+.project-card:hover .card-open,
+.exp-card:hover .card-open,
+.card-open:focus-visible {
+  color:     var(--card-link-hover);
+  transform: translateX(3px);
 }
 
 /* ═══════════════════════════════════════════════════════════════════
@@ -1287,6 +1179,22 @@ html::-webkit-scrollbar { display: none; }
   color:       var(--about-body);
   margin:      0;
   transition:  color var(--theme-dur) var(--theme-ease);
+}
+
+/* Hobby lines link to their pages — a quiet dotted underline, so the log
+   still reads as a log */
+.log-link {
+  color:                 inherit;
+  text-decoration:       underline dotted;
+  text-decoration-color: var(--about-bullet);
+  text-underline-offset: 4px;
+  transition:            color 0.2s ease, text-decoration-color 0.2s ease;
+}
+.log-link:hover,
+.log-link:focus-visible {
+  color:                 var(--about-label);
+  text-decoration-style: solid;
+  text-decoration-color: currentColor;
 }
 
 .log-prompt {
@@ -3248,4 +3156,318 @@ html::-webkit-scrollbar { display: none; }
   letter-spacing: 0.16em;
   text-transform: uppercase;
   color:          var(--card-link);
+}
+
+/* ═══════════════════════════════════════════════════════════════════
+   COURSE COLUMN — lava-lamp bubbles (CourseColumn.jsx)
+   Sits in deep water, and paints its own dark glass, so it uses fixed
+   colors rather than the depth theme.
+   ═══════════════════════════════════════════════════════════════════ */
+
+.course-wrap {
+  --course-ink:   rgba(214, 238, 250, 0.94);
+  --course-muted: rgba(150, 198, 226, 0.62);
+  --course-line:  rgba(0, 212, 255, 0.16);
+  font-family: 'Share Tech Mono', ui-monospace, monospace;
+}
+
+.course-controls {
+  display:         flex;
+  align-items:     center;
+  justify-content: space-between;
+  flex-wrap:       wrap;
+  gap:             0.6rem 1rem;
+  margin-bottom:   0.8rem;
+}
+
+.course-legend {
+  display:   flex;
+  flex-wrap: wrap;
+  gap:       0.45rem;
+}
+
+.course-chip,
+.course-view-toggle {
+  display:        inline-flex;
+  align-items:    center;
+  gap:            0.45rem;
+  min-height:     34px;
+  padding:        0.3rem 0.75rem;
+  border:         1px solid var(--course-line);
+  border-radius:  999px;
+  background:     rgba(2, 10, 30, 0.6);
+  color:          var(--course-muted);
+  font:           inherit;
+  font-size:      0.7rem;
+  letter-spacing: 0.08em;
+  cursor:         pointer;
+  transition:     border-color 0.2s ease, color 0.2s ease, background-color 0.2s ease;
+}
+.course-chip:hover,
+.course-view-toggle:hover { color: var(--course-ink); border-color: rgba(0, 212, 255, 0.4); }
+.course-chip--on {
+  color:        var(--course-ink);
+  border-color: var(--bubble-color);
+  background:   color-mix(in srgb, var(--bubble-color) 16%, rgba(2, 10, 30, 0.7));
+}
+.course-chip-dot {
+  width:         9px;
+  height:        9px;
+  border-radius: 50%;
+  background:    var(--bubble-color);
+  box-shadow:    0 0 8px var(--bubble-color);
+}
+.course-view-toggle { text-transform: uppercase; letter-spacing: 0.14em; }
+
+/* The glass */
+.course-column {
+  position:      relative;
+  height:        clamp(520px, 72vh, 640px);
+  overflow:      hidden;
+  border:        1px solid var(--course-line);
+  border-radius: 18px;
+  background:
+    radial-gradient(ellipse at 50% 108%, rgba(0, 150, 220, 0.20) 0%, transparent 62%),
+    linear-gradient(rgba(1, 7, 22, 0.78), rgba(1, 5, 16, 0.86));
+  box-shadow: inset 0 0 60px rgba(0, 0, 0, 0.5), 0 8px 40px rgba(0, 0, 0, 0.35);
+  touch-action: pan-y;
+}
+
+.course-canvas {
+  position:       absolute;
+  inset:          0;
+  width:          100%;
+  height:         100%;
+  pointer-events: none;
+}
+
+/* The DOM node for one bubble: label, hit area, focus target. Positioned
+   and scaled by transform from the tick loop; the wax is the canvas. */
+.cbubble {
+  position:        absolute;
+  top:             0;
+  left:            0;
+  display:         flex;
+  align-items:     center;
+  justify-content: center;
+  border-radius:   50%;
+  color:           var(--course-ink);
+  text-decoration: none;
+  will-change:     transform;
+  cursor:          default;
+  transition:      opacity 0.35s ease;
+}
+.cbubble--now  { opacity: 0.86; }
+.cbubble--next { opacity: 0.6; }
+.cbubble--dim  { opacity: 0.22; }
+
+.cbubble-label {
+  display:        flex;
+  flex-direction: column;
+  align-items:    center;
+  line-height:    1.05;
+  text-shadow:    0 1px 6px rgba(0, 8, 24, 0.9), 0 0 2px rgba(0, 8, 24, 0.9);
+  pointer-events: none;
+}
+.cbubble-dept {
+  font-size:      0.56rem;
+  letter-spacing: 0.14em;
+  opacity:        0.82;
+}
+.cbubble-num {
+  font-size:      0.92rem;
+  letter-spacing: 0.04em;
+}
+@media (max-width: 640px) {
+  .cbubble-dept { font-size: 0.5rem; }
+  .cbubble-num  { font-size: 0.74rem; }
+}
+
+/* Classes with a page: a ring, a pulse, a pointer */
+.cbubble--page { cursor: pointer; }
+.cbubble--page::after {
+  content:       "";
+  position:      absolute;
+  inset:         -5px;
+  border-radius: 50%;
+  border:        1.5px solid color-mix(in srgb, var(--bubble-color) 70%, white);
+  box-shadow:    0 0 14px color-mix(in srgb, var(--bubble-color) 65%, transparent);
+  animation:     cbubble-ring 2.8s ease-in-out infinite;
+  pointer-events: none;
+}
+.cbubble--page:hover::after,
+.cbubble--page:focus-visible::after {
+  animation:    none;
+  border-color: #fff;
+  box-shadow:   0 0 22px var(--bubble-color);
+}
+.cbubble--page:focus-visible { outline: none; }
+
+@keyframes cbubble-ring {
+  0%, 100% { opacity: 0.55; transform: scale(1); }
+  50%      { opacity: 1;    transform: scale(1.06); }
+}
+
+/* No WebGL2: the nodes paint their own circles */
+.course-column--css .course-canvas { display: none; }
+.course-column--css .cbubble {
+  background: radial-gradient(circle at 50% 50%,
+    color-mix(in srgb, var(--bubble-color) 32%, transparent) 0%,
+    color-mix(in srgb, var(--bubble-color) 62%, transparent) 78%,
+    var(--bubble-color) 100%);
+  box-shadow: 0 0 18px color-mix(in srgb, var(--bubble-color) 35%, transparent);
+}
+
+/* Hover card */
+.ccard {
+  position:       absolute;
+  top:            0;
+  left:           0;
+  z-index:        2;
+  display:        flex;
+  flex-direction: column;
+  gap:            0.2rem;
+  width:          max-content;
+  max-width:      min(280px, 86%);
+  padding:        0.6rem 0.8rem;
+  border:         1px solid color-mix(in srgb, var(--bubble-color, #22c7f5) 55%, transparent);
+  border-radius:  10px;
+  background:     rgba(2, 8, 24, 0.94);
+  box-shadow:     0 8px 28px rgba(0, 0, 0, 0.5);
+  opacity:        0;
+  pointer-events: none;
+  transition:     opacity 0.15s ease;
+}
+.ccard--on { opacity: 1; }
+.ccard-code {
+  font-size:      0.66rem;
+  letter-spacing: 0.18em;
+  color:          var(--bubble-color, #22c7f5);
+}
+.ccard-title {
+  font-family: ui-sans-serif, system-ui, sans-serif;
+  font-size:   0.92rem;
+  font-weight: 600;
+  line-height: 1.3;
+  color:       var(--course-ink);
+}
+.ccard-meta {
+  font-size:      0.66rem;
+  letter-spacing: 0.06em;
+  color:          var(--course-muted);
+}
+.ccard-open {
+  margin-top:     0.15rem;
+  font-size:      0.66rem;
+  letter-spacing: 0.1em;
+  color:          var(--bubble-color, #22c7f5);
+}
+
+/* Semester scrubber */
+.course-scrub {
+  display:               grid;
+  grid-template-columns: auto minmax(120px, 1fr) auto;
+  align-items:           center;
+  gap:                   0.6rem 1.2rem;
+  margin-top:            0.9rem;
+  font-size:             0.7rem;
+  letter-spacing:        0.08em;
+  color:                 var(--course-muted);
+}
+.course-scrub-label strong {
+  color:       var(--course-ink);
+  font-weight: 400;
+}
+.course-scrub-note {
+  margin-left: 0.6rem;
+  opacity:     0.7;
+}
+.course-scrub-range {
+  width:        100%;
+  height:       28px;
+  accent-color: #22c7f5;
+  cursor:       pointer;
+  background:   transparent;
+}
+.course-status-key { display: flex; gap: 0.9rem; }
+.course-status-key-item::before {
+  content:        "";
+  display:        inline-block;
+  width:          9px;
+  height:         9px;
+  margin-right:   0.4rem;
+  border-radius:  50%;
+  background:     #22c7f5;
+  vertical-align: -1px;
+}
+.course-status-key-item--now::before  { opacity: 0.6; }
+.course-status-key-item--next::before { opacity: 0.3; }
+@media (max-width: 760px) {
+  .course-scrub { grid-template-columns: 1fr; }
+  .course-scrub-note { display: block; margin: 0.15rem 0 0; }
+}
+
+/* List view */
+.course-list {
+  display:               grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap:                   1rem;
+  padding:               1.1rem;
+  border:                1px solid var(--course-line);
+  border-radius:         18px;
+  background:            rgba(1, 7, 22, 0.8);
+}
+.course-table {
+  width:           100%;
+  border-collapse: collapse;
+  font-size:       0.78rem;
+  color:           var(--course-ink);
+}
+.course-table caption {
+  padding-bottom: 0.45rem;
+  text-align:     left;
+  font-size:      0.68rem;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color:          #22c7f5;
+}
+/* Column headers are for screen readers; the columns read on their own */
+.course-table th {
+  position:  absolute;
+  width:     1px;
+  height:    1px;
+  overflow:  hidden;
+  clip-path: inset(50%);
+}
+.course-table td {
+  padding:        0.34rem 0.5rem 0.34rem 0;
+  border-top:     1px solid var(--course-line);
+  vertical-align: top;
+}
+.course-table td:nth-child(2) {
+  width:       100%;
+  font-family: ui-sans-serif, system-ui, sans-serif;
+}
+.course-table td:nth-child(3),
+.course-table td:nth-child(4) { color: var(--course-muted); white-space: nowrap; }
+.course-table-code {
+  white-space: nowrap;
+  color:       var(--bubble-color);
+}
+.course-table-link {
+  color:                 var(--course-ink);
+  text-decoration:       underline;
+  text-decoration-color: rgba(0, 212, 255, 0.5);
+  text-underline-offset: 3px;
+}
+.course-table-link:hover { text-decoration-color: currentColor; }
+
+@media (prefers-reduced-motion: reduce) {
+  .cbubble--page::after { animation: none; }
+}
+
+/* Holds the height of the column while its chunk loads (Education.jsx) */
+.course-placeholder { height: calc(clamp(520px, 72vh, 640px) + 90px); }
+@media (max-width: 760px) {
+  .course-placeholder { height: calc(clamp(520px, 72vh, 640px) + 215px); }
 }

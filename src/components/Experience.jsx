@@ -1,6 +1,7 @@
 import { motion } from 'framer-motion'
 // Career data lives in src/content/work.js
-import { WORK as ENTRIES, entryAnchor } from '../content/index.js'
+import { WORK as ENTRIES, entryAnchor, entryPath } from '../content/index.js'
+import { Link } from './Link'
 
 // ── Kelp cable ─────────────────────────────────────────────────────────
 // Gentle S-curves: organic, not ruler-straight
@@ -85,12 +86,19 @@ function EntryCard({ entry, fromLeft = false }) {
       <p className="exp-desc text-sm leading-relaxed mb-3">
         {entry.description}
       </p>
-      <div className="flex flex-wrap gap-1.5">
+      <div className="flex flex-wrap items-end gap-1.5">
         {entry.stack.map(t => (
           <span key={t} className="card-pill px-2 py-0.5 rounded-full text-[clamp(0.625rem,0.55rem+0.2vw,0.75rem)] font-mono">
             {t}
           </span>
         ))}
+        <Link
+          href={entryPath('work', entry.slug)}
+          className="card-open"
+          aria-label={`${entry.role}, ${entry.company} — open the page`}
+        >
+          open file →
+        </Link>
       </div>
     </motion.div>
   )
