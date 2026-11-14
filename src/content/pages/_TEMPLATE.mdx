@@ -20,13 +20,24 @@
     public/media/projects/pelagos/menu.webp   →   /media/projects/pelagos/menu.webp
 
   Keep images to .webp or .jpg under about 300 kB, and video clips short
-  (under about 4 MB, .mp4). Longer video: upload to YouTube and embed it.
+  (under about 4 MB, .mp4). Longer video: upload to YouTube and use the
+  YouTube block.
+
+  To see every block below rendered, run the preview and open
+  localhost:5173/dev/kitchen-sink
 */}
+
+<Stats items={[
+  { value: '30,000+', label: 'What the number counts' },
+  { value: '60 fps', label: 'Keep labels short' },
+]} />
 
 ## What it is
 
 One or two paragraphs. What is this, who was it for, and what did it end
 up doing? Lead with the result if there is one.
+
+<YouTube id="VIDEO_ID" title="What the video shows" />
 
 ## What I built
 
@@ -34,21 +45,26 @@ up doing? Lead with the result if there is one.
 - The hard problem and how you got past it
 - A number, if you have one
 
-![Describe the picture for someone who cannot see it](/media/projects/example/screenshot.webp)
+<Figure
+  src="/media/projects/example/screenshot.webp"
+  alt="Describe the picture for someone who cannot see it"
+  caption="An optional caption under the picture."
+/>
+
+Several pictures at once. Click any of them to page through full-size:
+
+<Gallery images={[
+  { src: '/media/projects/example/one.webp', alt: 'What the first picture shows', caption: 'Optional caption' },
+  { src: '/media/projects/example/two.webp', alt: 'What the second picture shows' },
+]} />
 
 A short video clip that plays in place:
 
 <video src="/media/projects/example/clip.mp4" controls muted playsInline preload="none" poster="/media/projects/example/clip-poster.webp" />
 
-A YouTube video (paste the id from the video's address after `embed/`):
-
-<iframe
-  src="https://www.youtube-nocookie.com/embed/VIDEO_ID"
-  title="What the video shows"
-  loading="lazy"
-  allowFullScreen
-  style={{ width: '100%', aspectRatio: '16 / 9', border: 0, borderRadius: 12 }}
-/>
+<Callout title="Why this mattered">
+  The one thing a skimming reader should not miss.
+</Callout>
 
 ## How it works
 
@@ -60,12 +76,42 @@ void Update() {
 }
 ```
 
+A chart. `type` is `line`, `bar`, or `scatter`:
+
+<Chart
+  type="line"
+  title="Downloads per month"
+  unit="downloads"
+  x={['Oct', 'Nov', 'Dec']}
+  series={[{ name: 'Downloads', values: [120, 900, 2400] }]}
+  caption="Where the numbers come from."
+/>
+
+<Chart
+  type="scatter"
+  title="Accuracy vs. latency"
+  xLabel="Latency (ms per image)"
+  yLabel="Accuracy (mAP)"
+  points={[
+    { name: 'Model one', x: 6, y: 37, group: 'Family A' },
+    { name: 'Model two', x: 48, y: 40, group: 'Family B' },
+  ]}
+/>
+
 | A table  | Works | Too |
 | -------- | ----- | --- |
 | Row one  | 1     | a   |
 | Row two  | 2     | b   |
 
 > A quote, for a review or a line worth setting apart.
+
+Something that can't be shown yet:
+
+<Redacted until="January 2027">Screenshots of the simulator</Redacted>
+
+A GitHub repository, with its live stats:
+
+<RepoCard repo="Happy-Duck/DiscordSportsBot" />
 
 ## What I would do differently
 

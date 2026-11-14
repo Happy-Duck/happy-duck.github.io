@@ -51,3 +51,98 @@ void main() {
 | Twilight | 0.20 – 0.50 | 200 – 1,000   |
 | Midnight | 0.50 – 0.72 | 1,000 – 4,000 |
 | Abyssal  | 0.72 – 1.0  | 4,000 – 6,000 |
+
+## Blocks
+
+Every number and picture below is a made-up sample, here only to show how each block looks.
+
+### Stats
+
+<Stats items={[
+  { value: '30,000+', label: 'Sample headline number' },
+  { value: '60 fps', label: 'Another one, with a unit' },
+  { value: '48 h', label: 'Short labels read best' },
+]} />
+
+### Callout
+
+<Callout title="Why this mattered">
+  A boxed aside for the one thing a skimming reader should not miss. It can hold **formatting** and more than one paragraph.
+</Callout>
+
+### Figure
+
+<Figure src="/creatures/GreenTurtle.webp" alt="A green sea turtle, cut out from its background" caption="One image with a caption. Click it to enlarge." />
+
+### Gallery
+
+<Gallery images={[
+  { src: '/creatures/GreenTurtle.webp', alt: 'A green sea turtle', caption: 'Captions show in the enlarged view.' },
+  { src: '/creatures/Jellyfish.webp', alt: 'A jellyfish' },
+  { src: '/creatures/Anglerfish.webp', alt: 'An anglerfish' },
+  { src: '/creatures/squid.webp', alt: 'A firefly squid' },
+]} />
+
+### YouTube
+
+Nothing loads from YouTube until play is pressed.
+
+<YouTube id="aqz-KE-bpKQ" title="Sample video: Big Buck Bunny" />
+
+### Redacted
+
+<Redacted until="January 2027">Screenshots of the simulator</Redacted>
+
+### Repo card
+
+<RepoCard repo="Happy-Duck/DiscordSportsBot" />
+
+## Charts
+
+Sample data throughout. Hover, or focus a chart and use the arrow keys; "View as table" shows every value.
+
+<Chart
+  type="line"
+  title="Line, one series"
+  unit="downloads"
+  x={['Oct', 'Nov', 'Dec', 'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep']}
+  series={[{ name: 'Downloads', values: [400, 1900, 4200, 6100, 7400, 9800, 12500, 15200, 19800, 23100, 26400, 30200] }]}
+  caption="Sample data. A single series needs no legend: the title names it."
+/>
+
+<Chart
+  type="line"
+  title="Line, three series"
+  unit="fps"
+  x={['Build 1', 'Build 2', 'Build 3', 'Build 4', 'Build 5', 'Build 6']}
+  series={[
+    { name: 'Desktop', values: [41, 44, 52, 58, 61, 62] },
+    { name: 'Laptop', values: [28, 30, 37, 44, 49, 53] },
+    { name: 'Handheld', values: [19, 21, 24, 31, 36, 41] },
+  ]}
+  caption="Sample data."
+/>
+
+<Chart
+  type="bar"
+  title="Bars"
+  unit="ms"
+  x={['Baseline', 'LOD tuning', 'Event messaging', 'Both']}
+  series={[{ name: 'Frame time', values: [26.3, 20.1, 21.8, 16.4] }]}
+  caption="Sample data."
+/>
+
+<Chart
+  type="scatter"
+  title="Scatter, two groups"
+  xLabel="Latency (ms per image)"
+  yLabel="Accuracy (mAP)"
+  points={[
+    { name: 'Model A, small', x: 6, y: 37, group: 'Family A' },
+    { name: 'Model A, medium', x: 11, y: 45, group: 'Family A' },
+    { name: 'Model A, large', x: 19, y: 50, group: 'Family A' },
+    { name: 'Model B, R50', x: 48, y: 40, group: 'Family B' },
+    { name: 'Model B, R101', x: 63, y: 42, group: 'Family B' },
+  ]}
+  caption="Sample data."
+/>

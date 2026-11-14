@@ -6,7 +6,7 @@
 // MDX_COMPONENTS is what Markdown elements and custom tags resolve to
 // inside a page body. Portfolio components (Figure, Gallery, Video,
 // CodeTour, …) get registered here as they are built.
-import { Suspense, createElement, use } from 'react'
+import { Suspense, createElement, lazy, use } from 'react'
 import { Link } from '../Link'
 
 // Site links navigate in-app; everything else opens in a new tab
@@ -21,8 +21,20 @@ function MdxLink({ href = '', children, ...rest }) {
   )
 }
 
+// Page blocks load on first use, as their own chunks — the dive's bundle
+// carries none of them. (blocks.jsx is one chunk; Chart.jsx is another.)
+const block = (name) => lazy(() => import('./blocks').then(m => ({ default: m[name] })))
+
 const MDX_COMPONENTS = {
   a: MdxLink,
+  Chart:    lazy(() => import('./Chart')),
+  Stats:    block('Stats'),
+  Figure:   block('Figure'),
+  Gallery:  block('Gallery'),
+  YouTube:  block('YouTube'),
+  Callout:  block('Callout'),
+  Redacted: block('Redacted'),
+  RepoCard: block('RepoCard'),
 }
 
 const modules = new Map()

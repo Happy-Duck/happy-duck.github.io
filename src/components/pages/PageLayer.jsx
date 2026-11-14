@@ -33,8 +33,9 @@ export function PageLayer({ route, path }) {
 
     const onKey = (e) => {
       if (e.key !== 'Escape') return
-      // The terminal sits above the page and owns Esc while it is open
-      if (document.querySelector('.term-overlay')) return
+      // The terminal sits above the page and owns Esc while it is open;
+      // so does anything a page opens over itself (an image lightbox)
+      if (document.querySelector('.term-overlay, [data-esc-layer]')) return
       goBack()
     }
     window.addEventListener('keydown', onKey)
