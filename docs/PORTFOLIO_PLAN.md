@@ -7,11 +7,11 @@ line as work lands. Edit with the Write/Edit tools only.
 | Phase | What | Status |
 |---|---|---|
 | 0 | Foundations: registry, router, page layer, pause, prerender, MDX | DONE |
-| 1 | Project pages | PARTLY: cards open pages, modal retired, write-up template. Rich components, media pipeline, and the Pelagos write-up are not started |
+| 1 | Project pages | MOSTLY: cards open pages, write-up template, page blocks and charts. Left: code tours, before/after slider, media script, summary toggle, the write-ups themselves |
 | 2 | Job and hobby pages | PARTLY: every hobby and job has a page and a way in. No write-ups yet (waiting on the owner's photos and stories) |
 | 3 | Course bubble column | DONE (four class pages carry placeholder wording) |
 | 4 | Findability | not started |
-| 5 | Showpieces and polish | not started |
+| 5 | Showpieces and polish | PARTLY: porthole header done. Engine Room and the rest not started |
 
 ## Context
 
@@ -135,10 +135,20 @@ Build Pelagos completely as the template, then port the other five.
   is a copy-and-fill write-up (underscore files are excluded from the
   build); plain Markdown images, `<video>`, and a YouTube `<iframe>` work
   in a body today, so content does not have to wait for the components.
-- Not done: the card-to-page shared-element morph (the router cross-fades
-  for now), every component in the list above, the media script, the
-  surface-summary toggle, contents rail, previous/next, and any actual
-  write-up.
+- Done later: `Chart` (line, bar, scatter), `Stats`, `Callout`, `Figure`,
+  `Gallery` with a lightbox, `YouTube` (click-to-load), `Redacted`,
+  `RepoCard`. All lazy chunks registered in `MDX_COMPONENTS`; every one
+  is shown on `/dev/kitchen-sink` and in the template. The chart palette
+  was validated with the dataviz validator against `--viz-surface`
+  (#061229): eight slots pass on adjacent pairs, the first three on all
+  pairs, which is why scatter caps at three colored groups.
+- Not done: `CodeTour`, `Compare`, `Timeline`, `Download`, `Model`,
+  `FlowDiagram`; the card-to-page shared-element morph (the router
+  cross-fades for now); the media script; the surface-summary toggle,
+  contents rail, previous/next; and any actual write-up.
+- **Evidence charts need the owner's numbers**: Pelagos downloads over
+  time, and the accuracy and latency figures from the vision paper. The
+  component is ready; no real chart is on any page yet.
 - Pelagos: the owner plans to supply the Steam trailer and screenshots;
   the source may be lost, so that page should lean on design, process,
   and outcome rather than code.
@@ -223,9 +233,42 @@ What differs from the plan above, and what was learned:
 ## Phase 5 — Showpieces and polish
 
 - The Engine Room ★.
+- **Porthole header: DONE** (the owner picked it, with evidence charts,
+  from the backlog). See the status note below.
 - From the backlog, whichever you pick: porthole header, career dive profile, gauge landmarks, recovered files and certificate, captain's tour, message in a bottle, opt-in sound.
 - Per-page social images composited by script; JSON-LD per type; print stylesheet.
 - Docs: new `docs/PORTFOLIO_PLAN.md`, Owner's Manual sections (add a page, add media, add a course), CLAUDE.md (routes, page layer, pause contract, z-index map).
+
+**Status:** PARTLY DONE (porthole only).
+
+- **The porthole is a real hole, not a picture.** While it is on screen
+  the page layer's background is off and the glass casts the same color
+  as a 200vmax box-shadow. The hole scrolls with the frame on the
+  compositor, with no scroll-linked JS.
+- **The page background became a flat color** (`--page-bg`) so the
+  hand-off between background and shadow cannot be seen. The old
+  bottom glow is gone.
+- **Paint order had to be made explicit.** The first version left the
+  shadow to paint "under the text" by paint phase; it covered the title
+  and opening paragraph, and every DOM-based check still passed. All
+  page content now sits at `z-index: 1` above the glass, and the smoke
+  test screenshots the title, lede, and caption and checks they put
+  pixels on screen.
+- **Only the water shows.** The ocean layers are grouped in an
+  unpositioned `.dive-ocean` wrapper; content, fabs, gauge, ROV
+  darkness, and sonar stay hidden.
+- **The dive runs while the porthole is in view** and stands down when
+  it scrolls away. On short pages it never scrolls away, so the dive
+  runs the whole time such a page is open.
+- **Direct landings scroll the dive to the card at load** (and again at
+  900 ms and on close), so the porthole shows that depth, not the surface.
+- Class links added alongside: Party School is under CS 415 (confirmed
+  by the owner); CS 417 links `CS417_MP2` and INFO 418 links
+  `MetaPuzzleArduinoCode` (both confirmed). The owner's GitHub also has
+  `CS417MP0…`, `CS417MP1a…`, and two GSD 390 repos that are not linked.
+- Open question for the owner: replace the shipwreck chest's "the real
+  treasure" label (they find it big-headed). Options were proposed;
+  nothing is to be changed until they pick one.
 
 ## Things to settle before they bite
 
@@ -236,9 +279,10 @@ What differs from the plan above, and what was learned:
 
 ## What I need from you
 
-- ~~Course list~~ received (transcript). Still open: what the CS 415, CS 417, CS 418, and INFO 418 projects were, and whether Party School came out of CS 415.
+- ~~Course list~~ received (transcript). Still open: details of the CS 417, CS 418, and INFO 418 projects once they wrap.
+- Numbers for the evidence charts: Pelagos downloads over time; accuracy and latency per model from the vision paper.
 - Photos and clips per project, job, and hobby (real photos, as always), plus the paper and poster PDFs.
-- Which backlog ideas you want. (Hobbies: all six get pages.)
+- ~~Backlog picks~~ porthole header and evidence charts. (Hobbies: all six get pages.)
 
 ## Verification
 

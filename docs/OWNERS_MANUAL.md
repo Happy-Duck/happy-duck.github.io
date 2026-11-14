@@ -561,8 +561,35 @@ src/content/pages/hobbies/fly-fishing.mdx    ← a hobby
 
 **The fast way:** copy `src/content/pages/_TEMPLATE.mdx`, paste it into
 the right folder, rename it, and replace its contents. It already has a
-working example of everything below — headings, a picture, a video clip,
-a YouTube video, code, a table — plus notes on where files go.
+working example of everything below, plus notes on where files go.
+
+**Blocks you can drop into a write-up.** Each is one tag; copy it from
+the template and change the text between the quotes:
+
+| Block | What it makes |
+|---|---|
+| `<Stats items={[…]} />` | A row of headline numbers ("30,000+ downloads"). |
+| `<Figure src="…" alt="…" caption="…" />` | One picture with a caption. Click enlarges it. |
+| `<Gallery images={[…]} />` | A grid of pictures; click any to page through them full-size. |
+| `<YouTube id="…" title="…" />` | A video. The `id` is the part after `v=` in the video's address. |
+| `<Callout title="…">…</Callout>` | A boxed aside for the point a skimmer must not miss. |
+| `<Chart type="line" … />` | A line, bar, or scatter chart from numbers you type in. |
+| `<Redacted until="…">…</Redacted>` | A placeholder for something you can't show yet. |
+| `<RepoCard repo="Happy-Duck/Name" />` | A GitHub repository with its live stats. |
+
+Two rules that keep these from breaking: every `alt="…"` should say what
+the picture shows (screen readers read it aloud), and inside the curly
+braces the usual list rules from section 5 apply — quotes around text,
+commas between items, no quotes around numbers. To see all of them
+working, run the preview and open `localhost:5173/dev/kitchen-sink`.
+
+**Extra buttons on a page.** Any block in the data files can carry
+`links: [{ label: 'MP2 source', href: 'https://github.com/…' }],` — each
+becomes a button under the page's title. (`link:` on a project is still
+the main store button.)
+
+**The round window** at the top of every page is the live ocean at the
+depth the visitor came from. There is nothing to set up or edit.
 
 **Pictures and video** go in the `public` folder, one folder per page:
 `public/media/projects/pelagos/menu.webp` is written in the page as

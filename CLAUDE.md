@@ -191,10 +191,23 @@ hold the feature-by-feature history, specs, and hard-won gotchas.
   lives OUTSIDE `.dive` so it works over a page. `.page-layer` re-declares
   the deep-sea theme vars, so pages look the same at any dive depth.
 - **Pause contract** (`src/lib/oceanPause.js`): `isPaused()` is true while a
-  page is open. The depth loop skips subscribers; any loop with its own
-  rAF MUST check `isPaused()` wherever it checks `document.hidden`.
-  Transitions fire `ocean:pause`; the rays worker gets a posted
-  visibility message (never terminated).
+  page is open AND its porthole is off screen. The depth loop skips
+  subscribers; any loop with its own rAF MUST check `isPaused()` wherever
+  it checks `document.hidden`. Transitions fire `ocean:pause`; the rays
+  worker gets a posted visibility message (never terminated).
+- **Porthole** (`pages/Porthole.jsx`): a real hole in the page layer onto
+  the live dive. While it is on screen (`:root.porthole-open`) the layer's
+  background is off and `.porthole-glass` casts a 200vmax box-shadow in
+  the same `--page-bg`. Three rules, each paid for:
+  (1) EVERYTHING else on a page must paint above that shadow — page
+  content is `z-index: 1`; never give `.entry-head`, `.porthole`, or
+  `.porthole-window` a z-index, and anything new placed outside `.entry`
+  needs its own. The shadow once covered the title while every DOM check
+  passed — verify pages with SCREENSHOTS of the text.
+  (2) `--page-bg` stays a flat color; a gradient pops at the hand-off.
+  (3) Only `.dive-ocean` (an UNPOSITIONED wrapper in App.jsx — it must
+  not create a stacking context) and `.ocean-backdrop` are un-hidden; a
+  new water layer goes inside `.dive-ocean`, new UI stays outside it.
 - **Page bodies** (`src/content/bodies.js` + `components/mdx/`): add
   `src/content/pages/<kind>/<slug>.mdx` and that entry's page renders it,
   as its own lazy chunk. MDX + remark-gfm + rehype-pretty-code (shiki at
@@ -204,6 +217,19 @@ hold the feature-by-feature history, specs, and hard-won gotchas.
   `pages/_TEMPLATE.mdx` is the owner's copy-and-fill starter (files
   starting with `_` are excluded from the glob). Media lives in
   `public/media/<kind>/<slug>/`.
+- **Page blocks** (`components/mdx/blocks.jsx`, `Chart.jsx`): Stats,
+  Callout, Figure, Gallery, YouTube, Redacted, RepoCard, Chart — each
+  `lazy()` in `MDX_COMPONENTS`, so none ship in the main bundle. A new
+  block needs: an entry there, an example in the kitchen sink AND the
+  template, and a line in the Owner's Manual. Anything that opens over a
+  page (lightbox) is portaled to body with `data-esc-layer`, or Esc will
+  close the page under it; portaled UI cannot use the page's theme vars.
+- **Charts** (`Chart.jsx`, plain SVG): one y-axis always; series colors
+  are the fixed `--viz-s1…s8` order, validated against `--viz-surface`
+  with the dataviz skill's `validate_palette.js` — re-run it if either
+  changes. Scatter caps at 3 colored groups (all-pairs separation).
+  Text never takes a series color; every value must stay reachable
+  without hover (arrow keys + table view).
 - **Course column** (`CourseColumn.jsx` + `lib/bubbleSim.js`): lazy chunk
   behind a fixed-height placeholder in `Education.jsx`. Sim ticks via
   `subscribe` (dt-scaled, IntersectionObserver-gated, state in typed
@@ -243,7 +269,9 @@ delete the artifacts, `npm prune`. Scroll depth correctly:
 remember `depth N` in the terminal for meter-accurate jumps. Fake the clock
 with `context.addInitScript(() => { Date.prototype.getHours = () => 18 })`.
 Installing any real dependency (`npm i -D x`) prunes the `--no-save`
-playwright-core — reinstall it. Never `git stash -u` in this folder:
+playwright-core — reinstall it. Source files are CRLF on disk but Git
+Bash tools (grep, sed, cat -A) HIDE the CRs: a Node script that matches
+multi-line strings must normalize `\r\n` first or it finds nothing. Never `git stash -u` in this folder:
 OneDrive denies removing empty dirs, so the stash is saved but the working
 tree is left as-is and `stash pop` then refuses. To drive the router from
 a dev-server smoke script:
