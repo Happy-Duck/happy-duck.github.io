@@ -52,21 +52,23 @@ function linkIcon(url) {
   return { Icon: ExternalLinkIcon, label: 'Link' }
 }
 
-// Returns null for a missing link or the '#' placeholder
-export function EntryLinkButton({ href, onClick }) {
+// Returns null for a missing link or the '#' placeholder. `label`
+// overrides the site name ("MP2 source" instead of "GitHub").
+export function EntryLinkButton({ href, onClick, label }) {
   if (!href || href === '#') return null
-  const { Icon, label } = linkIcon(href)
+  const { Icon, label: site } = linkIcon(href)
+  const text = label || site
   return (
     <a
       href={href}
       target="_blank"
       rel="noopener noreferrer"
-      aria-label={label}
+      aria-label={label ? `${label} (${site})` : site}
       className="card-link-btn"
       onClick={onClick}
     >
       <Icon />
-      <span className="card-link-label">{label}</span>
+      <span className="card-link-label">{text}</span>
     </a>
   )
 }

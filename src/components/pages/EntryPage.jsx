@@ -11,6 +11,7 @@ import { bodyLoader } from '../../content/bodies.js'
 import { MdxBody } from '../mdx/MdxBody'
 import { EntryLinkButton } from '../EntryLinkButton'
 import { Link } from '../Link'
+import { Porthole } from './Porthole'
 
 function headerFor(kind, entry) {
   if (kind === 'work') {
@@ -70,6 +71,8 @@ export function EntryPage({ kind, entry }) {
   const { title, sub } = headerFor(kind, entry)
   const d = entry.details
   const stack = entry.stack || []
+  const links = entry.links || []
+  const hasLink = Boolean(entry.link) && entry.link !== '#'
   const body = bodyLoader(kind, entry.slug)
   const ties = tiesFor(kind, entry)
   const more = related(kind, entry.slug).map(p => ({
@@ -79,21 +82,30 @@ export function EntryPage({ kind, entry }) {
   return (
     <article className="entry">
       <header className="entry-head">
-        <p className="entry-kicker">{KINDS[kind].label}</p>
-        <div className="entry-title-row">
+        <div className="entry-head-text">
+          <p className="entry-kicker">{KINDS[kind].label}</p>
           <h1 className="entry-title" tabIndex={-1}>{title}</h1>
-          <EntryLinkButton href={entry.link} />
+          {sub && <p className="entry-sub">{sub}</p>}
+          {stack.length > 0 && (
+            <div className="entry-stack">
+              {stack.map(t => (
+                <span key={t} className="card-pill px-2 py-0.5 rounded-full text-[clamp(0.625rem,0.55rem+0.2vw,0.75rem)] font-mono">
+                  {t}
+                </span>
+              ))}
+            </div>
+          )}
+          {/* The store / repo button, then any extra links from the data */}
+          {(hasLink || links.length > 0) && (
+            <div className="entry-links">
+              <EntryLinkButton href={entry.link} />
+              {links.map(l => (
+                <EntryLinkButton key={l.href} href={l.href} label={l.label} />
+              ))}
+            </div>
+          )}
         </div>
-        {sub && <p className="entry-sub">{sub}</p>}
-        {stack.length > 0 && (
-          <div className="entry-stack">
-            {stack.map(t => (
-              <span key={t} className="card-pill px-2 py-0.5 rounded-full text-[clamp(0.625rem,0.55rem+0.2vw,0.75rem)] font-mono">
-                {t}
-              </span>
-            ))}
-          </div>
-        )}
+        <Porthole />
       </header>
 
       <p className="entry-lede">{entryDescription(kind, entry)}</p>

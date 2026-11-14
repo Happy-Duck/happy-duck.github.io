@@ -9,6 +9,8 @@
 //   credits      credit hours (bubble size)
 //   category     one of the ids in COURSE_CATEGORIES below (bubble color)
 //   note         optional extra line in the hover card
+//   links        optional buttons on the class page (a repo, a demo):
+//                links: [{ label: 'MP2 source', href: 'https://github.com/...' }]
 //
 // MAKING A CLASS CLICKABLE: give it a `summary` and a `description`. That
 // is all it takes — the bubble gets a glow ring and opens the class's own
@@ -71,9 +73,8 @@ export const COURSES = [
   { slug: 'cs-374',   code: 'CS 374',   title: 'Algorithms & Models of Computation',            term: 'SP26', credits: 4, category: 'core' },
   {
     slug: 'cs-415', code: 'CS 415', title: 'Game Development', term: 'SP26', credits: 3, category: 'games',
-    // PLACEHOLDER wording — replace with what you built
-    summary:     "UIUC's game development course.",
-    description: "UIUC's game development course. Project write-up coming soon.",
+    summary:     "UIUC's game development course. Final project: Party School, a multiplayer party game in Unreal Engine 5.",
+    description: "UIUC's game development course. The final project was Party School, a multiplayer sandbox party game built in Unreal Engine 5 with a five-person team.",
   },
   { slug: 'math-257', code: 'MATH 257', title: 'Linear Algebra with Computational Applications', term: 'SP26', credits: 3, category: 'math' },
 
@@ -85,6 +86,9 @@ export const COURSES = [
     // PLACEHOLDER wording — replace once the games are done
     summary:     "UIUC's introduction to extended reality: three VR games built over the semester.",
     description: "UIUC's introduction to extended reality. Three VR games, in progress this semester. Write-ups coming as they wrap.",
+    links: [
+      { label: 'MP2 source', href: 'https://github.com/Happy-Duck/CS417_MP2' },
+    ],
   },
   {
     slug: 'cs-418', code: 'CS 418', title: 'Interactive Computer Graphics', term: 'FA26', credits: 3, category: 'games',
@@ -94,9 +98,13 @@ export const COURSES = [
   },
   {
     slug: 'info-418', code: 'INFO 418', title: 'Makerspace: Escape Rooms', term: 'FA26', credits: 3, category: 'games',
-    // PLACEHOLDER wording — replace once the build is done
-    summary:     'A makerspace course on building escape rooms, with an electronics project.',
-    description: 'A makerspace course on building escape rooms. An electronics project, in progress this semester. Write-up coming.',
+    // PLACEHOLDER wording, drawn from the repo description — replace once
+    // the build is done
+    summary:     'A makerspace course on building escape rooms. I wrote the Arduino code behind two of the props in Riggs Escape.',
+    description: 'A makerspace course on building escape rooms. For Riggs Escape I wrote the Arduino Uno code that controls the electronics for the sticker dispenser and the keg safe door. In progress this semester; write-up coming.',
+    links: [
+      { label: 'Arduino source', href: 'https://github.com/Happy-Duck/MetaPuzzleArduinoCode' },
+    ],
   },
 
   // ── Spring 2027 ──

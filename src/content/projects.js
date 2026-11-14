@@ -8,6 +8,9 @@
 //   link     corner button target; '#' hides the button
 //   tags     which mission profiles feature this (games, xr, graphics, tools, research)
 //   skills   ids from skills.js — drives the cross-links
+//   courses  optional: slugs from courses.js for the class it came out of
+//   grid     optional: false = has a page but no card in the Projects grid
+//   links    optional extra buttons on the page: [{ label, href }]
 //   details  role / highlights / optional playable embed, shown on the page
 //
 // details.highlights wording drawn from the card descriptions + README —
@@ -42,6 +45,7 @@ export const PROJECTS = [
     link:        '#',
     tags:        ['games'],
     skills:      ['unreal'],
+    courses:     ['cs-415'],
     details: {
       role: 'Gameplay engineer on a five-person team',
       highlights: [

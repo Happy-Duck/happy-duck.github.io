@@ -24,7 +24,7 @@ import { XRDive        } from './components/XRDive'
 import { GyroParallax  } from './components/GyroParallax'
 import { Footer        } from './components/Footer'
 import { PageLayer     } from './components/pages/PageLayer'
-import { useLayoutEffect, useMemo } from 'react'
+import { useEffect, useLayoutEffect, useMemo } from 'react'
 import { usePath } from './lib/router'
 import { setOceanPaused } from './lib/oceanPause'
 import { matchRoute, entryAnchor } from './content/index.js'
@@ -46,6 +46,11 @@ function findAnchor(name) {
     .find(n => n.offsetParent !== null)
 }
 
+function scrollToAnchor([own, section]) {
+  const el = findAnchor(own) || findAnchor(section)
+  el?.scrollIntoView({ block: 'center', behavior: 'instant' })
+}
+
 export default function App() {
   const path = usePath()
   const route = useMemo(() => matchRoute(path), [path])
@@ -59,11 +64,20 @@ export default function App() {
     // (scripts/prerender.mjs); the app owns the background from here on
     document.getElementById('page-prepaint')?.remove()
     if (pageOpen || !pendingAnchor) return
-    const [own, section] = pendingAnchor
+    scrollToAnchor(pendingAnchor)
     pendingAnchor = null
-    const el = findAnchor(own) || findAnchor(section)
-    el?.scrollIntoView({ block: 'center', behavior: 'instant' })
   }, [pageOpen])
+
+  // Direct landing: also move the dive to the entry's card right away, so
+  // the page's porthole looks out at the right depth. Layout is still
+  // settling this early (fonts, the lazy course column), which is why the
+  // scroll is repeated once and then again when the page closes (above).
+  useEffect(() => {
+    if (!pendingAnchor) return
+    scrollToAnchor(pendingAnchor)
+    const id = setTimeout(() => { if (pendingAnchor) scrollToAnchor(pendingAnchor) }, 900)
+    return () => clearTimeout(id)
+  }, [])
 
   return (
     <>
@@ -92,6 +106,12 @@ export default function App() {
 
       <div className="relative overflow-hidden">
 
+        {/* The water itself. Grouped so a page's porthole can show just
+            these layers (no content, no UI) — see pages/Porthole.jsx. The
+            wrapper is unpositioned on purpose: it must not create a
+            stacking context, the layers interleave with <main> by z-index. */}
+        <div className="dive-ocean">
+
         {/* WebGL caustics — shader light-dance in the sunlit zone */}
         <Caustics />
 
@@ -119,6 +139,8 @@ export default function App() {
 
         {/* GPU marine snow — lit volumetrically by the ROV beam */}
         <DeepParticles />
+
+        </div>
 
         {/* ROV headlight — darkness + cursor light cone in deep zones */}
         <RovLight />

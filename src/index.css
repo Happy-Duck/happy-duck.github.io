@@ -2741,7 +2741,10 @@ html::-webkit-scrollbar { display: none; }
   position:   fixed;
   inset:      0;
   z-index:    75;
-  background: radial-gradient(ellipse at 50% 120%, #04204a 0%, #020818 55%, #010408 100%);
+  /* Flat on purpose: the porthole swaps this background for a shadow
+     of the same color, and a gradient would visibly pop at the switch */
+  --page-bg:  #020a1c;
+  background: var(--page-bg);
   color:      rgba(168, 216, 240, 0.92);
 }
 
@@ -2817,7 +2820,7 @@ html::-webkit-scrollbar { display: none; }
 
 /* ── Entry (job / project) ─────────────────────────────────────────── */
 
-.entry-head { margin-bottom: 1.75rem; }
+.entry-head { margin-bottom: 1.75rem; }  /* grid: see Porthole below */
 
 .entry-kicker {
   margin:         0 0 0.7rem;
@@ -2828,12 +2831,6 @@ html::-webkit-scrollbar { display: none; }
   color:          var(--card-link);
 }
 
-.entry-title-row {
-  display:         flex;
-  align-items:     flex-start;
-  justify-content: space-between;
-  gap:             1rem;
-}
 
 .entry-title {
   margin:         0;
@@ -3475,4 +3472,147 @@ html::-webkit-scrollbar { display: none; }
 .course-placeholder { height: calc(clamp(520px, 72vh, 640px) + 90px); }
 @media (max-width: 760px) {
   .course-placeholder { height: calc(clamp(520px, 72vh, 640px) + 215px); }
+}
+
+/* ── Porthole — a hole in the page layer onto the live dive ─────────── */
+/* See pages/Porthole.jsx. While the porthole is on screen the layer's own
+   background is off and the glass casts the same color as a 200vmax
+   shadow: everything but the circle stays covered, and the hole scrolls
+   with the frame on the compositor. */
+
+:root.porthole-open .page-layer { background: transparent; }
+:root.porthole-open .porthole-glass { box-shadow: 0 0 0 200vmax var(--page-bg); }
+
+/* Just the water shows through — no cards, no fabs, no gauge */
+:root.porthole-open .dive--stowed .ocean-backdrop,
+:root.porthole-open .dive--stowed .dive-ocean { visibility: visible; }
+:root.porthole-open .dive--stowed .dive-ocean *,
+:root.porthole-open .dive--stowed .dive-ocean *::before,
+:root.porthole-open .dive--stowed .dive-ocean *::after { animation-play-state: running !important; }
+
+.entry-head {
+  display:               grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap:                   1.25rem 2rem;
+  align-items:           start;
+}
+
+.entry-links {
+  display:    flex;
+  flex-wrap:  wrap;
+  gap:        0.2rem 1.4rem;
+  margin-top: 0.8rem;
+}
+
+.porthole {
+  --porthole:     168px;
+  --porthole-rim: 11px;
+  display:        flex;
+  flex-direction: column;
+  align-items:    center;
+  gap:            0.85rem;
+  padding:        var(--porthole-rim) var(--porthole-rim) 0;
+}
+
+.porthole-window { position: relative; }
+
+/* The glass's shadow stands in for the page background, so everything
+   else on the page has to paint ABOVE it. Paint phases alone don't
+   guarantee that (grid items and positioned boxes paint as units, and
+   the shadow went over the title once), so it is explicit: every piece
+   of page content sits at z-index 1, and the glass — with no z-index,
+   under a header that creates no stacking context — stays beneath.
+   Don't give .entry-head, .porthole, or .porthole-window a z-index. */
+.entry-head-text,
+.entry > :not(.entry-head),
+.porthole-caption,
+.porthole-frame {
+  position: relative;
+  z-index:  1;
+}
+
+.porthole-glass {
+  width:         var(--porthole);
+  height:        var(--porthole);
+  border-radius: 50%;
+}
+/* Before the observer reports, and once scrolled away: dark glass */
+:root:not(.porthole-open) .porthole-glass { background: #041530; }
+
+/* Lens: darkened edge and a glare arc. The frame is positioned, so it
+   (and the rim below) paint above the big shadow rather than under it. */
+.porthole-window > .porthole-frame {
+  position:      absolute;
+  inset:         0;
+  border-radius: 50%;
+  background:
+    radial-gradient(circle at 30% 24%, rgba(255, 255, 255, 0.16) 0%, transparent 34%),
+    radial-gradient(circle at 50% 50%, transparent 56%, rgba(0, 6, 20, 0.55) 100%);
+  box-shadow: inset 0 0 22px 4px rgba(0, 6, 20, 0.7);
+  pointer-events: none;
+}
+
+/* Rim: brushed steel ring with a lit top edge */
+.porthole-frame::after {
+  content:       "";
+  position:      absolute;
+  inset:         calc(var(--porthole-rim) * -1);
+  border-radius: 50%;
+  border:        var(--porthole-rim) solid #20344e;
+  box-shadow:
+    0 0 0 1px rgba(130, 195, 235, 0.22),
+    0 -1px 0 1px rgba(160, 210, 240, 0.28),
+    inset 0 0 0 1px rgba(0, 0, 0, 0.7),
+    0 10px 28px rgba(0, 0, 0, 0.55);
+  pointer-events: none;
+}
+
+.porthole-caption {
+  display:        flex;
+  align-items:    center;
+  gap:            0.55rem;
+  font-family:    'Share Tech Mono', ui-monospace, monospace;
+  font-size:      0.64rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  white-space:    nowrap;
+  color:          rgba(150, 198, 226, 0.62);
+}
+.porthole-live {
+  display:     inline-flex;
+  align-items: center;
+  gap:         0.35rem;
+  color:       #3fe0a6;
+}
+.porthole-live::before {
+  content:       "";
+  width:         6px;
+  height:        6px;
+  border-radius: 50%;
+  background:    currentColor;
+  box-shadow:    0 0 8px currentColor;
+  animation:     porthole-live 2.2s ease-in-out infinite;
+}
+@keyframes porthole-live {
+  0%, 100% { opacity: 1; }
+  50%      { opacity: 0.35; }
+}
+
+/* Phone: the porthole sits above the title, caption beside it */
+@media (max-width: 640px) {
+  .entry-head { grid-template-columns: minmax(0, 1fr); }
+  .porthole {
+    --porthole:     104px;
+    --porthole-rim: 8px;
+    order:          -1;
+    flex-direction: row;
+    justify-self:   start;
+    gap:            1.1rem;
+    padding:        var(--porthole-rim) 0 var(--porthole-rim) var(--porthole-rim);
+  }
+  .porthole-caption { flex-direction: column; align-items: flex-start; gap: 0.3rem; white-space: normal; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .porthole-live::before { animation: none; }
 }
