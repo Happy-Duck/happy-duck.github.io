@@ -48,6 +48,9 @@ export default function App() {
   // same commit that shows or hides the dive (View Transitions snapshot it)
   useLayoutEffect(() => {
     setOceanPaused(pageOpen)
+    // Prerendered page shells paint a dark background before boot
+    // (scripts/prerender.mjs); the app owns the background from here on
+    document.getElementById('page-prepaint')?.remove()
     if (pageOpen || !pendingAnchor) return
     const anchor = pendingAnchor
     pendingAnchor = null

@@ -31,6 +31,16 @@ export default defineConfig([
     },
   },
   {
+    // Build scripts run in Node, not the browser
+    files: ['scripts/**/*.mjs'],
+    extends: [js.configs.recommended],
+    languageOptions: {
+      ecmaVersion: 'latest',
+      sourceType: 'module',
+      globals: globals.node,
+    },
+  },
+  {
     // Context modules idiomatically export their provider + hook together;
     // fast-refresh purity doesn't matter for these rarely-edited files.
     files: ['src/context/**/*.jsx'],
