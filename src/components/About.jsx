@@ -2,17 +2,16 @@ import { useState, useEffect, useRef, useCallback, useSyncExternalStore } from '
 import { motion } from 'framer-motion'
 import { useLanyard } from '../hooks/useLanyard'
 import { useGithubActivity } from '../hooks/useGithubActivity'
+import { HOBBIES, LOG_INTRO, entryPath } from '../content/index.js'
+import { Link } from './Link'
 
 // ── Data ───────────────────────────────────────────────────────────────
+// The log lines live in src/content/hobbies.js. Each hobby line links to
+// that hobby's page; the intro line is plain text.
 
 const LOG_ENTRIES = [
-  "I'm just a man trying to make cool stuff: games, boat simulations, the occasional VR experience for a space agency.",
-  "Gamer at heart: Zelda is an all-time favorite, Minecraft is timeless.",
-  "Musical theater nerd: catching every touring production I ever can",
-  "Cooking enthusiast: my favorite thing to cook is something I've never cooked before",
-  'Avid fly fisherman: fished the Wisconsin Driftless, the Appalachians in Virginia. Current trout count: 4',
-  "Newly PADI certified open water diver, shout out to Pacific Scuba Divers!",
-  'TTRPG Player: if I use the name, then Wizards of the Coast™ might get me',
+  { text: LOG_INTRO },
+  ...HOBBIES.map(h => ({ text: h.log, href: entryPath('hobbies', h.slug) })),
 ]
 
 const LOCATION = 'Urbana, IL'
@@ -22,7 +21,7 @@ const LOCATION = 'Urbana, IL'
 function useRotatingTypewriter(lines, pauseMs = 4000) {
   // All entries render from first paint — the card's height never shifts.
   // start() only kicks off the retype cycle.
-  const [entries, setEntries]       = useState(() => lines.map((text, i) => ({ text, id: i })))
+  const [entries, setEntries]       = useState(() => lines.map((line, i) => ({ ...line, id: i })))
   const [typingIdx, setTypingIdx]   = useState(-1)
   const [typingLen, setTypingLen]   = useState(0)
   const [phase, setPhase]           = useState('paused') // typing | paused
@@ -49,11 +48,12 @@ function useRotatingTypewriter(lines, pauseMs = 4000) {
     // updaters, and side effects inside one fork the typing loop into
     // exponentially multiplying chains.
     function cycle() {
-      const text = lines[headRef.current % n]
+      const line = lines[headRef.current % n]
+      const text = line.text
       headRef.current++
       const id = idRef.current++
 
-      setEntries(prev => [...prev.slice(1), { text, id }])
+      setEntries(prev => [...prev.slice(1), { ...line, id }])
       setTypingIdx(n - 1)
       setTypingLen(0)
       setPhase('typing')
@@ -260,18 +260,23 @@ function TypewriterLog() {
 
   return (
     <div ref={ref} className="log-entries">
-      {entries.map((entry, i) => (
+      {entries.map((entry, i) => {
+        const text = i === typingIdx ? entry.text.slice(0, typingLen) : entry.text
+        return (
         <p key={entry.id} className="log-entry">
           <span className="log-prompt" aria-hidden="true">&gt;</span>
           <span>
-            {i === typingIdx ? entry.text.slice(0, typingLen) : entry.text}
+            {entry.href
+              ? <Link href={entry.href} className="log-link">{text}</Link>
+              : text}
             {((i === typingIdx && phase === 'typing') ||
               (phase === 'paused' && i === entries.length - 1)) && (
               <span className="typewriter-cursor" aria-hidden="true">|</span>
             )}
           </span>
         </p>
-      ))}
+        )
+      })}
     </div>
   )
 }
@@ -287,6 +292,7 @@ export function About() {
       {/* Captain's log card — single unified console */}
       <motion.div
         className="log-card"
+        data-entry-anchor="hobbies"
         initial={{ opacity: 0, y: 40 }}
         whileInView={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.78, ease: [0.22, 1, 0.36, 1] }}

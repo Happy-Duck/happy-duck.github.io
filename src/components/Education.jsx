@@ -1,8 +1,13 @@
+import { Suspense, lazy } from 'react'
 import { motion } from 'framer-motion'
 
-// ── Data ───────────────────────────────────────────────────────────────
-
-const COURSEWORK = ['Algorithms & Models of Computation', 'Data Structures', 'Computer Architecture', 'Interactive Computer Graphics']
+// The column (sim + metaball shader) is its own chunk, fetched right
+// after boot — it sits far down the dive, so the first paint never waits
+// on it. The placeholder holds the same height so the page (and with it
+// the scroll → depth mapping) doesn't change length when it arrives.
+const CourseColumn = lazy(() =>
+  import('./CourseColumn').then(m => ({ default: m.CourseColumn })),
+)
 
 // ── Animation variants ─────────────────────────────────────────────────
 
@@ -17,6 +22,8 @@ const headerItem = {
 }
 
 // ── Section ────────────────────────────────────────────────────────────
+// Degree card + the course column. The class list itself lives in
+// src/content/courses.js.
 
 export function Education() {
   return (
@@ -39,7 +46,7 @@ export function Education() {
       </motion.div>
 
       <motion.div
-        className="exp-card max-w-2xl"
+        className="exp-card max-w-2xl mb-8"
         initial={{ opacity: 0, y: 36 }}
         whileInView={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.72, ease: [0.22, 1, 0.36, 1] }}
@@ -52,21 +59,29 @@ export function Education() {
           B.S. Computer Science — 3.98 GPA
         </h3>
         <p className="exp-company font-semibold text-sm mt-0.5 mb-3">
-          University of Illinois Urbana-Champaign
+          University of Illinois Urbana-Champaign · Minor in Game Studies and Design
         </p>
-        <p className="exp-desc text-sm leading-relaxed mb-3">
-          Dean's List every semester. Building games with ACM GameBuilders and
-          shipping jam entries between semesters, with undergraduate research
-          in real-time computer vision. Also active in VR Club at UIUC,
-          Illini Fly Fishing, and Illini Metagamers.
+        <p className="exp-desc text-sm leading-relaxed">
+          Dean's List in Fall 2024, Spring 2025, and Fall 2025. Building games
+          with ACM GameBuilders and shipping jam entries between semesters,
+          with undergraduate research in real-time computer vision. Also
+          active in VR Club at UIUC, Illini Fly Fishing, and Illini
+          Metagamers.
         </p>
-        <div className="flex flex-wrap gap-1.5">
-          {COURSEWORK.map(c => (
-            <span key={c} className="card-pill px-2 py-0.5 rounded-full text-[clamp(0.625rem,0.55rem+0.2vw,0.75rem)] font-mono">
-              {c}
-            </span>
-          ))}
-        </div>
+      </motion.div>
+
+      {/* data-entry-anchor: where closing a class page lands if its own
+          bubble isn't there to scroll to */}
+      <motion.div
+        data-entry-anchor="courses"
+        initial={{ opacity: 0, y: 36 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.72, ease: [0.22, 1, 0.36, 1] }}
+        viewport={{ once: true, margin: '-60px' }}
+      >
+        <Suspense fallback={<div className="course-placeholder" aria-hidden="true" />}>
+          <CourseColumn />
+        </Suspense>
       </motion.div>
     </section>
   )

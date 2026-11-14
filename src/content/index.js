@@ -1,25 +1,35 @@
 // ── Content registry — lookups, routes, and the relation graph ─────────
-// Everything the site says about jobs, projects, and skills lives in the
-// sibling data files; this module turns them into one addressable set of
-// entries. Node-safe on purpose (explicit .js extensions, no JSX, no
-// import.meta) — scripts/prerender.mjs imports it to write the per-page
-// HTML shells and the sitemap.
+// Everything the site says about jobs, projects, classes, hobbies, and
+// skills lives in the sibling data files; this module turns them into one
+// addressable set of entries. Node-safe on purpose (explicit .js
+// extensions, no JSX, no import.meta) — scripts/prerender.mjs imports it
+// to write the per-page HTML shells and the sitemap.
 
 import { WORK } from './work.js'
 import { PROJECTS } from './projects.js'
 import { SKILL_GROUPS } from './skills.js'
+import { COURSES, courseHasPage } from './courses.js'
+import { HOBBIES, LOG_INTRO } from './hobbies.js'
 
-export { WORK, PROJECTS, SKILL_GROUPS }
+export { WORK, PROJECTS, SKILL_GROUPS, COURSES, HOBBIES, LOG_INTRO }
+export {
+  TERMS, CURRENT_TERM, COURSE_CATEGORIES, STATUS_LABEL,
+  termLabel, courseStatus, courseHasPage,
+} from './courses.js'
 
 export const SITE_URL = 'https://happy-duck.github.io'
 
 // The dive's own tab title — keep in sync with <title> in index.html
 export const SITE_TITLE = 'Rishi Garhyan — XR Engineer & Game Developer'
 
-// kind → URL segment, display label, and the list it draws from
+// kind → URL segment, display label, and the list it draws from. Adding a
+// kind here is all routing, prerender, and the sitemap need.
 export const KINDS = {
-  work:     { segment: 'work',     label: 'Career',  entries: WORK },
-  projects: { segment: 'projects', label: 'Project', entries: PROJECTS },
+  work:     { segment: 'work',     label: 'Career',      entries: WORK },
+  projects: { segment: 'projects', label: 'Project',     entries: PROJECTS },
+  // Only classes with a description have a page (see courses.js)
+  courses:  { segment: 'courses',  label: 'Coursework',  entries: COURSES.filter(courseHasPage) },
+  hobbies:  { segment: 'hobbies',  label: 'Shore leave', entries: HOBBIES },
 }
 
 // Hrefs carry a trailing slash: GitHub Pages serves each page from
@@ -28,14 +38,29 @@ export function entryPath(kind, slug) {
   return `/${KINDS[kind].segment}/${slug}/`
 }
 
-// The card on the dive that an entry's page belongs to — deep links scroll
-// here so closing the page lands at the right depth
+// The element on the dive that an entry's page belongs to — deep links
+// scroll here so closing the page lands at the right depth. Elements carry
+// data-entry-anchor="<kind>-<slug>"; each section also carries a bare
+// data-entry-anchor="<kind>" as the fallback (entries with no card).
 export function entryAnchor(kind, slug) {
   return `${kind}-${slug}`
 }
 
+// One accessor per field, because the four kinds name things differently
 export function entryTitle(kind, entry) {
-  return kind === 'work' ? `${entry.role} — ${entry.company}` : entry.title
+  if (kind === 'work')    return `${entry.role} — ${entry.company}`
+  if (kind === 'courses') return `${entry.code}: ${entry.title}`
+  return entry.title
+}
+
+// One sentence, for search results and link previews
+export function entrySummary(kind, entry) {
+  return kind === 'hobbies' ? entry.log : entry.summary
+}
+
+// The opening paragraph on the page
+export function entryDescription(kind, entry) {
+  return kind === 'hobbies' ? entry.log : entry.description
 }
 
 export function findEntry(kind, slug) {
@@ -77,6 +102,18 @@ export function findSkill(id) {
 // Every job and project that lists a skill
 export function pagesForSkill(id) {
   return allEntries().filter(p => p.entry.skills?.includes(id))
+}
+
+// Projects that came out of a class (projects.js: courses: ['cs-418'])
+export function projectsForCourse(slug) {
+  return PROJECTS.filter(p => p.courses?.includes(slug))
+}
+
+// The classes a project came out of
+export function coursesForProject(project) {
+  return (project.courses || [])
+    .map(slug => COURSES.find(c => c.slug === slug))
+    .filter(Boolean)
 }
 
 // Other entries sharing at least one skill or tag, most overlap first

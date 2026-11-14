@@ -15,10 +15,8 @@ import { Hero          } from './components/Hero'
 import { Experience    } from './components/Experience'
 import { Skills        } from './components/Skills'
 import { Projects      } from './components/Projects'
-// Education is shelved for now — restore by uncommenting this import and
-// the <Education /> line in <main>
-// import { Education     } from './components/Education'
-import { About         } from './components/About'
+import { Education     } from './components/Education'
+import { About        } from './components/About'
 import { ContactSidebar } from './components/ContactSidebar'
 import { DiveLog       } from './components/DiveLog'
 import { Terminal      } from './components/Terminal'
@@ -34,10 +32,19 @@ import { matchRoute, entryAnchor } from './content/index.js'
 // A visitor who lands directly on a page URL has never seen the dive.
 // Remember which card that page belongs to, so closing the page drops
 // them at that card's depth instead of the surface. Read once at load.
+// Two candidates: the entry's own element, then its section (for entries
+// that have a page but no card on the dive).
 let pendingAnchor = (() => {
   const route = matchRoute(window.location.pathname)
-  return route.entry ? entryAnchor(route.kind, route.slug) : null
+  return route.entry ? [entryAnchor(route.kind, route.slug), route.kind] : null
 })()
+
+// Career cards render twice (desktop + mobile layouts) — take the one
+// that is actually laid out
+function findAnchor(name) {
+  return [...document.querySelectorAll(`[data-entry-anchor="${name}"]`)]
+    .find(n => n.offsetParent !== null)
+}
 
 export default function App() {
   const path = usePath()
@@ -52,12 +59,9 @@ export default function App() {
     // (scripts/prerender.mjs); the app owns the background from here on
     document.getElementById('page-prepaint')?.remove()
     if (pageOpen || !pendingAnchor) return
-    const anchor = pendingAnchor
+    const [own, section] = pendingAnchor
     pendingAnchor = null
-    // Career cards render twice (desktop + mobile layouts) — take the one
-    // that is actually laid out
-    const el = [...document.querySelectorAll(`[data-entry-anchor="${anchor}"]`)]
-      .find(n => n.offsetParent !== null)
+    const el = findAnchor(own) || findAnchor(section)
     el?.scrollIntoView({ block: 'center', behavior: 'instant' })
   }, [pageOpen])
 
@@ -133,13 +137,13 @@ export default function App() {
 
         {/* ── Page content (z 10) ────────────────────────────────── */}
         {/* Recruiter's dive: internships first, then what got shipped,
-            the toolbox, and the personal log at the floor */}
+            the toolbox, the coursework, and the personal log at the floor */}
         <main id="main">
           <Hero />
           <Experience />
           <Projects />
           <Skills />
-          {/* <Education /> — shelved for now, uncomment with its import */}
+          <Education />
           <About />
         </main>
 

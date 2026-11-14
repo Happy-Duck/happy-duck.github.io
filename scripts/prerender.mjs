@@ -15,7 +15,7 @@
 import { mkdirSync, readFileSync, writeFileSync } from 'node:fs'
 import { dirname, join } from 'node:path'
 import { fileURLToPath } from 'node:url'
-import { SITE_URL, KINDS, allEntries } from '../src/content/index.js'
+import { SITE_URL, KINDS, allEntries, entrySummary, entryDescription } from '../src/content/index.js'
 
 const dist = join(dirname(fileURLToPath(import.meta.url)), '..', 'dist')
 const shell = readFileSync(join(dist, 'index.html'), 'utf8')
@@ -40,7 +40,8 @@ function swap(html, label, pattern, replacement) {
 function renderPage({ kind, entry, path, title }) {
   const url = SITE_URL + path
   const fullTitle = `${title} | Rishi Garhyan`
-  const description = entry.summary
+  const description = entrySummary(kind, entry)
+  const stack = entry.stack || []
   const t = esc(fullTitle)
   const d = esc(description)
 
@@ -51,7 +52,7 @@ function renderPage({ kind, entry, path, title }) {
     description,
     url,
     author: { '@type': 'Person', name: 'Rishi Garhyan', url: SITE_URL },
-    keywords: entry.stack.join(', '),
+    ...(stack.length ? { keywords: stack.join(', ') } : {}),
   }).replace(/</g, '\\u003c')
 
   let html = shell
@@ -87,8 +88,8 @@ function renderPage({ kind, entry, path, title }) {
     '<noscript>',
     `      <p>${esc(KINDS[kind].label)}</p>`,
     `      <h1>${esc(title)}</h1>`,
-    `      <p>${esc(entry.description)}</p>`,
-    `      <p>${esc(entry.stack.join(' · '))}</p>`,
+    `      <p>${esc(entryDescription(kind, entry))}</p>`,
+    ...(stack.length ? [`      <p>${esc(stack.join(' · '))}</p>`] : []),
     '      <p><a href="/">Rishi Garhyan — portfolio</a></p>',
     '    </noscript>',
   ].join('\n'))
