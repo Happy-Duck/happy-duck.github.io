@@ -1,0 +1,75 @@
+{/*
+  PAGE WRITE-UP TEMPLATE
+
+  To give a page a write-up, copy this file into the folder for its kind
+  and name it after the entry's slug:
+
+    src/content/pages/projects/pelagos.mdx       (slug in projects.js)
+    src/content/pages/work/brunswick.mdx         (slug in work.js)
+    src/content/pages/courses/cs-418.mdx         (slug in courses.js)
+    src/content/pages/hobbies/fly-fishing.mdx    (slug in hobbies.js)
+
+  Save it and the page shows it, under the title and opening paragraph
+  that already come from the data file. Delete everything you don't need,
+  including this note. Files starting with an underscore, like this one,
+  are never published.
+
+  Media goes in the public folder, one folder per page, and is linked
+  from the site root:
+
+    public/media/projects/pelagos/menu.webp   →   /media/projects/pelagos/menu.webp
+
+  Keep images to .webp or .jpg under about 300 kB, and video clips short
+  (under about 4 MB, .mp4). Longer video: upload to YouTube and embed it.
+*/}
+
+## What it is
+
+One or two paragraphs. What is this, who was it for, and what did it end
+up doing? Lead with the result if there is one.
+
+## What I built
+
+- The parts that were yours
+- The hard problem and how you got past it
+- A number, if you have one
+
+![Describe the picture for someone who cannot see it](/media/projects/example/screenshot.webp)
+
+A short video clip that plays in place:
+
+<video src="/media/projects/example/clip.mp4" controls muted playsInline preload="none" poster="/media/projects/example/clip-poster.webp" />
+
+A YouTube video (paste the id from the video's address after `embed/`):
+
+<iframe
+  src="https://www.youtube-nocookie.com/embed/VIDEO_ID"
+  title="What the video shows"
+  loading="lazy"
+  allowFullScreen
+  style={{ width: '100%', aspectRatio: '16 / 9', border: 0, borderRadius: 12 }}
+/>
+
+## How it works
+
+Code is highlighted automatically. Put the language after the backticks:
+
+```cs
+void Update() {
+    transform.position += velocity * Time.deltaTime;
+}
+```
+
+| A table  | Works | Too |
+| -------- | ----- | --- |
+| Row one  | 1     | a   |
+| Row two  | 2     | b   |
+
+> A quote, for a review or a line worth setting apart.
+
+## What I would do differently
+
+Optional, but it is the section people remember.
+
+A link to [another page on this site](/projects/pelagos/) and to
+[somewhere else](https://github.com/Happy-Duck).

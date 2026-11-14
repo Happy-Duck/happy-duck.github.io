@@ -7,9 +7,9 @@ line as work lands. Edit with the Write/Edit tools only.
 | Phase | What | Status |
 |---|---|---|
 | 0 | Foundations: registry, router, page layer, pause, prerender, MDX | DONE |
-| 1 | Project pages | not started |
-| 2 | Job and hobby pages | not started |
-| 3 | Course bubble column | not started |
+| 1 | Project pages | PARTLY: cards open pages, modal retired, write-up template. Rich components, media pipeline, and the Pelagos write-up are not started |
+| 2 | Job and hobby pages | PARTLY: every hobby and job has a page and a way in. No write-ups yet (waiting on the owner's photos and stories) |
+| 3 | Course bubble column | DONE (four class pages carry placeholder wording) |
 | 4 | Findability | not started |
 | 5 | Showpieces and polish | not started |
 
@@ -98,9 +98,9 @@ What differs from the plan above, and what was learned:
   is closed, when layout has long settled. Career cards render twice
   (desktop and mobile layouts), so the anchor lookup takes the one that is
   laid out.
-- **Hobbies and courses are not in the registry yet.** `KINDS` in
-  `src/content/index.js` has `work` and `projects`; add a kind there and
-  routing, prerender, and the sitemap pick it up.
+- **Adding a kind of page** is one entry in `KINDS` in
+  `src/content/index.js`; routing, prerender, and the sitemap pick it up
+  (courses and hobbies were added this way later).
 - **Tables needed `remark-gfm`.** Core MDX has no GFM tables.
 - **Focus goes to the page's `h1`**, not the back link: a programmatic
   focus on a link draws a focus ring on direct landings.
@@ -126,6 +126,23 @@ Build Pelagos completely as the template, then port the other five.
   - `Embed` (existing Steam/itch iframes), `Chart`, `RepoCard`, `Redacted`
 - **Media pipeline**: `public/media/<kind>/<slug>/` plus `scripts/optimize-media.mjs` (sharp) emitting sized WebP with recorded dimensions.
 
+**Status:** PARTLY DONE.
+
+- Done: project cards navigate to their page (`role="link"`, Ctrl/Cmd/
+  middle click opens a tab, the store button still goes to the store);
+  the modal and its View Transition wiring are deleted. `grid: false` on
+  a project gives it a page without a card. `src/content/pages/_TEMPLATE.mdx`
+  is a copy-and-fill write-up (underscore files are excluded from the
+  build); plain Markdown images, `<video>`, and a YouTube `<iframe>` work
+  in a body today, so content does not have to wait for the components.
+- Not done: the card-to-page shared-element morph (the router cross-fades
+  for now), every component in the list above, the media script, the
+  surface-summary toggle, contents rail, previous/next, and any actual
+  write-up.
+- Pelagos: the owner plans to supply the Steam trailer and screenshots;
+  the source may be lost, so that page should lean on design, process,
+  and outcome rather than code.
+
 ## Phase 2 — Job and hobby pages
 
 - **Jobs**: each Career card becomes a link. Pages cover what I owned, the system, results, media, linked projects. `FlowDiagram` ★ for the Brunswick data layer; `Model` viewer for Immersive Learning Lab assets; the IMMERSE poster as a PDF.
@@ -133,6 +150,17 @@ Build Pelagos completely as the template, then port the other five.
   - Scuba: your actual PADI dive log as a table with depth profiles
   - Fly fishing: catch log and rivers; the trout count comes from data
   - Cooking: dish gallery. Musical theater: shows seen. Gaming and TTRPG: favorites, characters, campaigns
+
+**Status:** PARTLY DONE. The owner wants a page for every hobby.
+
+- Done: `src/content/hobbies.js` holds the Captain's Log lines; each of
+  the six hobby lines links to `/hobbies/<slug>/`, and each career card
+  has an "open file" link to `/work/<slug>/`.
+- Not done: every write-up. Hobby pages currently show only their log
+  line, so they are stubs until `pages/hobbies/<slug>.mdx` files exist.
+  Do not ship to `master` with stub pages linked without asking the owner.
+- Idea not yet raised with the owner: THEA 110 (Broadway Musicals) and
+  the GSD classes pair naturally with the musical theater and gaming pages.
 
 ## Phase 3 — Course bubble column
 
@@ -144,6 +172,44 @@ Restore the Education section (between Skills and Captain's Log, in dark water w
 - **Interaction**: hover shows code, title, term. Courses with projects carry a glow ring and a count and are real buttons: click pops the bubble into a card listing those projects, each linking to its page.
 - **Time scrubber** ★: a semester slider that adds bubbles in the order you took them.
 - **Accessibility**: list-view toggle (semantic table by semester); static packed layout under reduced motion.
+
+**Status:** DONE. 30 classes from the owner's transcript (Fall 2024
+through Spring 2027) in `src/content/courses.js`. Verified in headless
+Edge on the dev server and the production build, desktop and phone,
+reduced motion, zero console errors.
+
+What differs from the plan above, and what was learned:
+
+- **Buoyancy is a per-bubble sine cycle**, not heat-at-the-bottom. With
+  the column a third full, bubbles could not reliably reach a heating
+  zone; independent 45–100 s cycles give the same look and never stall.
+  Measured: even top-to-bottom spread over five simulated minutes, about
+  8 px/s, and the same speed within 2% at 144, 60, 30, and 24 Hz.
+- **`PAIR_REACH` (bubbleSim.js) is the one fragile constant.** The shader
+  fuses two bubbles when their gap is under ~0.38 r. At 1.16 the column
+  freezes into a molecule diagram (13–20 fused pairs), at 1.21 nothing
+  ever fuses; 1.19 keeps a handful forming and breaking. Re-measure
+  before touching it.
+- **Field kernel is (r²/d²)², not r²/d².** The plain metaball kernel has
+  a long tail: 30 distant bubbles inflate each other into mush.
+- **A class opens its own page, not a pop-up card.** A class becomes
+  clickable by getting a `summary` and `description`; projects attach
+  with `courses: ['cs-418']` in projects.js. This is simpler to fill in
+  than per-project entries, which the owner asked for.
+- **Left out of the column on purpose:** grades (never stored), test and
+  IB credit, and the two 1-credit orientation classes. PHYS 211/212 are
+  in, marked as summer transfer credit.
+- **Education card facts changed to match the transcript:** added the
+  Game Studies and Design minor; "Dean's List every semester" became the
+  three semesters listed (Spring 2026 shows none).
+- **CS 415, CS 417, CS 418, INFO 418 have PLACEHOLDER wording** in
+  courses.js, marked in comments; the owner will supply details (three
+  VR games, WebGL work, an electronics project).
+- **The component is a lazy 12 kB chunk** behind a fixed-height
+  placeholder, so the page length (and the scroll → depth mapping) does
+  not change when it loads. `CURRENT_TERM` in courses.js needs bumping
+  once a semester.
+- Main bundle after all of the above: 450 kB / 146 kB gzip.
 
 ## Phase 4 — Findability
 
@@ -170,9 +236,9 @@ Restore the Education section (between Skills and Captain's Log, in dark water w
 
 ## What I need from you
 
-- Course list: code, title, term, and which projects came from which course.
+- ~~Course list~~ received (transcript). Still open: what the CS 415, CS 417, CS 418, and INFO 418 projects were, and whether Party School came out of CS 415.
 - Photos and clips per project, job, and hobby (real photos, as always), plus the paper and poster PDFs.
-- Which backlog ideas you want, and which hobbies get pages first.
+- Which backlog ideas you want. (Hobbies: all six get pages.)
 
 ## Verification
 

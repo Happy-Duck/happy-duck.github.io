@@ -11,7 +11,8 @@
 // Kept apart from index.js because import.meta.glob only exists under
 // Vite — index.js has to stay importable from Node (scripts/prerender.mjs).
 
-const pages = import.meta.glob('./pages/**/*.mdx')
+// Files starting with an underscore (pages/_TEMPLATE.mdx) are never built
+const pages = import.meta.glob(['./pages/**/*.mdx', '!./pages/**/_*.mdx'])
 
 // Reference pages for building and styling MDX components. Dev server
 // only: the branch is dead code in a production build, so nothing ships.

@@ -3096,12 +3096,17 @@ html::-webkit-scrollbar { display: none; }
 }
 
 .entry-body img,
-.entry-body video {
+.entry-body video,
+.entry-body iframe {
   display:       block;
   max-width:     100%;
-  height:        auto;
+  margin:        0 0 1.15rem;
   border-radius: 12px;
 }
+.entry-body img   { height: auto; }
+.entry-body video { width: 100%; height: auto; background: #000; }
+/* An image alone in its paragraph: the paragraph adds no second margin */
+.entry-body p:has(> img:only-child) { margin-bottom: 0; }
 
 /* Inline code */
 .entry-body :not(pre) > code {

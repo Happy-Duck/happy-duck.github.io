@@ -15,8 +15,8 @@ hold the feature-by-feature history, specs, and hard-won gotchas.
   locks freshly-dropped files and crashes fs.watch with EBUSY otherwise)
 - `npm run lint` — MUST stay at zero errors/warnings before every commit
 - `npm run build` — prod build, then `scripts/prerender.mjs` writes a
-  page shell per route + `sitemap.xml` into `dist/` (main bundle ≈ 444 kB
-  / 144 kB gzip; devicons are imported per-icon from
+  page shell per route + `sitemap.xml` into `dist/` (main bundle ≈ 450 kB
+  / 146 kB gzip; devicons are imported per-icon from
   `devicons-react/lib/icons/*` — never from the package index, it's CJS
   and ships ~3,000 icons)
 - `npm run preview` — serve `dist/`; the only way to check prerendered
@@ -144,9 +144,10 @@ hold the feature-by-feature history, specs, and hard-won gotchas.
   verify visuals. In the render loop never call `clock.getElapsedTime()`
   then `getDelta()` (the first consumes the delta → dt≈0, everything
   freezes; shipped that way once); dt comes from the loop timestamp.
-- **View Transitions** (`Projects.jsx`): card↔modal morph; the vt name is
-  owned by ONE element per snapshot (card when closed, modal when open);
-  framer/AnimatePresence stand down when VT is active.
+- **View Transitions** (`lib/router.js`): every navigation cross-fades in
+  a View Transition. The old card↔modal shared-element morph went with
+  the modal; if it comes back as card↔page, the rule still holds — the vt
+  name is owned by ONE element per snapshot (card before, page after).
 - **Scroll-driven animations** (`index.css` @supports block): depth fades
   on the compositor; keyframe percentages MUST mirror the JS ramps —
   update both together.
@@ -156,13 +157,27 @@ hold the feature-by-feature history, specs, and hard-won gotchas.
 ## Pages and content (wave 3)
 
 - **Content registry** (`src/content/`): `work.js`, `projects.js`,
-  `skills.js` are PURE DATA (no JSX, no imports); `index.js` has the
-  lookups, `matchRoute()`, `entryPath()`, and relation helpers. It must
-  stay Node-importable (explicit `.js` extensions, no `import.meta`) —
-  the prerender script reads it. Components import from the registry;
-  never put content lists back into component files. A new kind of page
-  (hobbies, courses) = a new entry in `KINDS`; routing, prerender, and
-  sitemap follow.
+  `skills.js`, `courses.js`, `hobbies.js` are PURE DATA (no JSX, no
+  imports); `index.js` has the lookups, `matchRoute()`, `entryPath()`,
+  and relation helpers. It must stay Node-importable (explicit `.js`
+  extensions, no `import.meta`) — the prerender script reads it.
+  Components import from the registry; never put content lists back into
+  component files. Four kinds of page: work, projects, courses, hobbies.
+  They name fields differently, so read them through `entryTitle()`,
+  `entrySummary()`, `entryDescription()`. A new kind = a new entry in
+  `KINDS`; routing, prerender, and sitemap follow.
+- **Ways in**: project cards are `role="link"` and navigate (the modal is
+  gone); career cards and Captain's Log hobby lines carry a `<Link>`;
+  class bubbles with a page are `<Link>`s. Each carries
+  `data-entry-anchor="<kind>-<slug>"`, and each section a bare
+  `data-entry-anchor="<kind>"` fallback — that is where closing a
+  directly-loaded page scrolls the dive to.
+- **Courses** (`courses.js`): a class has a page iff it has a
+  `description` (`courseHasPage`). Projects attach to a class with
+  `courses: ['cs-418']`; `grid: false` keeps a project off the Projects
+  grid. Status (done / now / next) derives from `CURRENT_TERM` — bump it
+  each semester. NEVER store grades. Several entries carry PLACEHOLDER
+  wording (marked in comments) until the owner supplies details.
 - **Router** (`src/lib/router.js`): History API, no dependency. `usePath()`,
   `navigate()`, `goBack()`; `<Link>` in `components/Link.jsx`. Navigations
   run in a View Transition with the commit `flushSync`ed. Hrefs carry a
@@ -185,7 +200,21 @@ hold the feature-by-feature history, specs, and hard-won gotchas.
   as its own lazy chunk. MDX + remark-gfm + rehype-pretty-code (shiki at
   BUILD time — no highlighter in the bundle). Register page components in
   `MDX_COMPONENTS` (MdxBody.jsx). `/dev/kitchen-sink` (dev server only)
-  is the reference page for prose styles and new components.
+  is the reference page for prose styles and new components;
+  `pages/_TEMPLATE.mdx` is the owner's copy-and-fill starter (files
+  starting with `_` are excluded from the glob). Media lives in
+  `public/media/<kind>/<slug>/`.
+- **Course column** (`CourseColumn.jsx` + `lib/bubbleSim.js`): lazy chunk
+  behind a fixed-height placeholder in `Education.jsx`. Sim ticks via
+  `subscribe` (dt-scaled, IntersectionObserver-gated, state in typed
+  arrays, transforms written directly); a WebGL2 metaball shader draws
+  the wax under DOM label nodes; no WebGL2 → `.course-column--css`
+  circles. Reduced motion never ticks — control changes call
+  `apiRef.refresh()`. `PAIR_REACH` is tuned to the shader's fuse
+  threshold and is VERY sensitive (see the comment and
+  docs/PORTFOLIO_PLAN.md §3) — measure fused-pair counts offline before
+  changing it; the kernel is (r²/d²)² on purpose. The sim module is pure
+  (no DOM), so it can be driven from Node for that.
 - **Prerender** (`scripts/prerender.mjs`): each tag swap must match
   exactly once or the build fails — if you restructure `index.html`'s
   meta tags, update the patterns there. Keep `SITE_TITLE` in
@@ -199,9 +228,9 @@ bio trail ·
 10 content · 11 whale(deep, glides OVER content) · 50 sidebar/gauge ·
 60 fabs (dive log, console) · 65 floor stamp · 70 toasts · 75 page layer
 (PORTALED to body; console fab lifts to 76 while a page is open) ·
-80 terminal ·
-90 case-study modal (PORTALED to body — sections create stacking contexts
-that trap fixed children) · 100 skip link.
+80 terminal · 100 skip link. (Anything fixed that must sit above page
+content gets PORTALED to body — sections create stacking contexts that
+trap fixed children.)
 
 ## Verification workflow (do this before every commit)
 

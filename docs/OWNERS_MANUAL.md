@@ -26,10 +26,10 @@ to preview, save, and publish.
    - [6.4 Skills icons](#64-skills-icons)
    - [6.5 Captain's Log entries](#65-captains-log-entries)
    - [6.6 Contact links and email](#66-contact-links-and-email)
-   - [6.7 The hidden Education section](#67-the-hidden-education-section)
+   - [6.7 Education and the class bubbles](#67-education-and-the-class-bubbles)
    - [6.8 Browser-tab title and search-engine text](#68-browser-tab-title-and-search-engine-text)
    - [6.9 Dive-log species names and jokes](#69-dive-log-species-names-and-jokes)
-   - [6.10 Pages for each job and project](#610-pages-for-each-job-and-project)
+   - [6.10 Pages: jobs, projects, classes, hobbies](#610-pages-jobs-projects-classes-hobbies)
 7. [Swapping images and files](#7-swapping-images-and-files)
    - [7.1 The resume PDF](#71-the-resume-pdf)
    - [7.2 Creature photos](#72-creature-photos)
@@ -164,13 +164,15 @@ happy-duck.github.io/
 │   │   ├── Hero.jsx        ← name, roles, tagline
 │   │   ├── Skills.jsx      ← the icon for each skill (see 6.4)
 │   │   ├── About.jsx       ← Captain's Log
-│   │   ├── Education.jsx   ← currently hidden (see 6.7)
+│   │   ├── Education.jsx   ← degree card above the class bubbles (see 6.7)
 │   │   ├── ContactSidebar.jsx ← email / LinkedIn / GitHub / resume links
 │   │   └── creatures/      ← code for each animated creature
 │   ├── content/        ← YOUR CONTENT: the words on the cards and pages
 │   │   ├── work.js         ← "Career" cards and job pages
 │   │   ├── projects.js     ← project cards and project pages
 │   │   ├── skills.js       ← skill names and tooltips
+│   │   ├── courses.js      ← your classes (the bubble column)
+│   │   ├── hobbies.js      ← Captain's Log lines and hobby pages
 │   │   └── pages/          ← the long write-up for each page (see 6.10)
 │   ├── constants/
 │   │   └── species.js  ← dive-log journal names and one-liners
@@ -248,7 +250,7 @@ page comes back.
 ## 6. Editing each part of the site
 
 The page order (top to bottom) is: **Hero → Career → Projects → Skills →
-Captain's Log → ocean-floor footer.** That order is set in
+Education → Captain's Log → ocean-floor footer.** That order is set in
 `src/App.jsx` (the `<Hero />`, `<Experience />`, … lines near the bottom);
 to reorder sections, reorder those lines.
 
@@ -307,8 +309,8 @@ them different slugs, e.g. `'origami-games'` and `'origami-games-2025'`.
 ### 6.3 Project cards
 
 **File:** `src/content/projects.js` — the list called `PROJECTS`. Each
-block feeds the card, the pop-up **case study** that opens when a visitor
-clicks the card, and the project's own page (see 6.10).
+block feeds the card and the project's own page, which opens when a
+visitor clicks the card (see 6.10).
 
 ```js
 {
@@ -337,17 +339,24 @@ clicks the card, and the project's own page (see 6.10).
   icon picks itself: a Steam address shows the Steam logo, `itch.io` the
   itch logo, `github.com` the GitHub logo, anything else a generic arrow.
   **No link yet? Use `'#'`** — the button hides itself.
-- `details.role` — one line under the title in the pop-up.
-- `details.highlights` — bullet points in the pop-up. It's a mini-list:
+- `details.role` — one line under the title on the project's page.
+- `details.highlights` — bullet points on the project's page. It's a mini-list:
   each bullet is one quoted string ending with a comma. Add or delete
   whole quoted lines.
-- `details.embed` — *optional* playable widget in the pop-up (the Steam
+- `details.embed` — *optional* playable widget on the project's page (the Steam
   and itch.io cards have one). To add one for an itch.io game:
   ```js
   embed: { src: 'https://itch.io/embed/YOUR_GAME_ID?dark=true', height: 167, title: 'Game Name on itch.io' },
   ```
   (Get the number from itch.io → your game → Distribute → Embed game.)
   To remove a widget, delete the whole `embed: { ... },` line.
+- `courses` — *optional*. If the project came out of a class, name the
+  class by its `slug` from `courses.js`: `courses: ['cs-418'],`. The
+  project then appears on that class's page, and the class on the
+  project's page.
+- `grid: false` — *optional*. Gives the project a page without a card
+  in the Projects section. Use it for small class projects that should
+  be reachable from their class but would crowd the main grid.
 - **Add a project** — copy a whole card block, paste it into the list at
   the position you want (cards fill the grid left-to-right, top-to-bottom,
   first in the list = top-left). Each card needs a **unique `slug`**.
@@ -401,17 +410,30 @@ the item's `id`.
 
 ### 6.5 Captain's Log entries
 
-**File:** `src/components/About.jsx`
+**Files:** `src/content/hobbies.js` for the lines, `src/components/About.jsx`
+for the rest.
 
-- **The rotating "> …" lines** — the list `LOG_ENTRIES` at ~line 8. Each
-  entry is one quoted string ending with a comma. Edit, add, or delete
-  whole lines. They type themselves out in a loop, top entry retyping at
-  the bottom — the order in the list is the starting order, and any number
-  of entries works. Apostrophe rule applies (note the existing entries mix
-  `"double quotes"` and `'single quotes'` for exactly that reason).
-- **Location** — `LOCATION` at ~line 17.
+- **The rotating "> …" lines** — in `hobbies.js`. `LOG_INTRO` is the
+  opening line. Every block in the `HOBBIES` list is one more line, and
+  also a page of its own that the line links to:
+  ```js
+  {
+    slug:  'fly-fishing',
+    title: 'Fly fishing',
+    log:   'Avid fly fisherman: fished the Wisconsin Driftless...',
+  },
+  ```
+  `log` is the line as typed in the Captain's Log, `title` is the
+  heading on the hobby's page, and `slug` is the page address
+  (`/hobbies/fly-fishing/`). Edit, add, or delete whole blocks. The lines
+  type themselves out in a loop, top entry retyping at the bottom — the
+  order in the list is the starting order. Apostrophe rule applies (note
+  the existing lines mix `"double quotes"` and `'single quotes'` for
+  exactly that reason). To put photos and stories on a hobby's page,
+  see 6.10.
+- **Location** — `LOCATION` near the top of `About.jsx`.
 - **The header lines** (`UIUC — CS '27 — 4.0 GPA` and the coordinates) —
-  search for `log-meta-line` (~line 299) and edit the text between
+  search for `log-meta-line` in `About.jsx` and edit the text between
   `>` and `<`.
 - The **live transmission** (Discord status) and **engine room** (recent
   GitHub commits) boxes fill themselves from the internet — no editing
@@ -429,25 +451,60 @@ the item's `id`.
   `index.html` too (they appear again in the search-engine data block —
   see 6.8).
 
-### 6.7 The hidden Education section
+### 6.7 Education and the class bubbles
 
-`src/components/Education.jsx` exists and is fully built (degree, GPA,
-coursework pills) but is currently switched off. To show it, open
-`src/App.jsx` and remove the comment marks from two lines:
+The Education section is a degree card with a column of bubbles under
+it, one bubble per class.
 
-- Near the top: change
-  `// import { Education     } from './components/Education'`
-  to
-  `import { Education     } from './components/Education'`
-- In the middle of the `<main>` block: change
-  `{/* <Education /> — shelved for now, uncomment with its import */}`
-  to
-  `<Education />`
+**The degree card** (degree, GPA, minor, the paragraph) —
+`src/components/Education.jsx`. Edit the text between `>` and `<`.
 
-Then edit the degree text, dates, and the `COURSEWORK` list inside
-`Education.jsx` the same way as any other card. To hide it again, reverse
-the process (put `//` back in front of the import, wrap the tag back in
-`{/* ... */}`).
+**The classes** — `src/content/courses.js`, the list called `COURSES`.
+One line per class:
+
+```js
+{ slug: 'cs-225', code: 'CS 225', title: 'Data Structures', term: 'FA25', credits: 4, category: 'core' },
+```
+
+| Label | What it is |
+|---|---|
+| `slug` | Unique id: the code in lowercase with a hyphen. |
+| `code`, `title` | What the bubble and the hover card show. |
+| `term` | When you took it. One of the ids in the `TERMS` list at the top of the file (`FA24`, `SP25`, …). |
+| `credits` | Credit hours. Bigger number, bigger bubble. |
+| `category` | The bubble's color. One of the ids in `COURSE_CATEGORIES`: `core`, `games`, `math`, `breadth`. |
+| `note` | *Optional* extra line in the hover card. |
+
+- **Add a class** — copy a line, change the values, put it under the right
+  semester comment.
+- **A new semester** — add it to the `TERMS` list (`{ id: 'FA27', label:
+  'Fall 2027' },`), then add its classes.
+- **When a semester starts** — change `CURRENT_TERM` near the top to the
+  new term's id. Classes before it show as completed, classes in it as in
+  progress (slightly see-through), and classes after it as planned
+  (faint). Nothing else needs touching.
+- **Rename a category or change its color** — edit `COURSE_CATEGORIES`.
+- **Grades are deliberately not in this file.** Don't add them.
+
+**Making a class clickable** — give it a `summary` and a `description`:
+
+```js
+{
+  slug: 'cs-418', code: 'CS 418', title: 'Interactive Computer Graphics', term: 'FA26', credits: 3, category: 'games',
+  summary:     'One sentence for Google and link previews.',
+  description: 'The opening paragraph on the class page.',
+},
+```
+
+That is all it takes: the bubble gets a glowing ring and opens the
+class's own page at `/courses/cs-418/`. Four classes are set up this
+way now, with placeholder wording marked `PLACEHOLDER` in the file —
+replace it with what you actually built. To put photos, video, and a
+write-up on the class page, see 6.10. To list one of your projects on
+it, add `courses: ['cs-418'],` to that project in `projects.js` (6.3).
+
+To hide the whole Education section, open `src/App.jsx` and put
+`{/* ` before and ` */}` after the `<Education />` line.
 
 ### 6.8 Browser-tab title and search-engine text
 
@@ -480,28 +537,42 @@ animated creature can never be discovered, which makes the journal
 impossible to complete. (Adding a whole new creature is a programming
 project — see `CLAUDE.md` — not a content edit.)
 
-### 6.10 Pages for each job and project
+### 6.10 Pages: jobs, projects, classes, hobbies
 
-Every block in `work.js` and `projects.js` automatically gets its own
-page with its own web address — for example
-`https://happy-duck.github.io/projects/pelagos/` — that you can put on a
-resume or send to someone. Out of the box a page shows what the card
-shows, plus the role, highlights, and playable widget.
+Every job, project, and hobby — and every class you made clickable —
+has its own page with its own web address, for example
+`https://happy-duck.github.io/projects/pelagos/`, that you can put on a
+resume or send to someone. Visitors reach them from the site: clicking a
+project card, the "open file" link on a career card, a glowing class
+bubble, or a hobby line in the Captain's Log.
 
-**Status while this is being built:** pages currently open only from
-their address; clicking a card still opens the pop-up. That switches over
-in the next phase of `docs/PORTFOLIO_PLAN.md`.
+Out of the box a page shows only what its block in the data file says.
+**Hobby pages in particular are one line long until you write them.**
 
-To give a page a longer write-up, create one text file named after the
-block's `slug`:
+To give a page a real write-up, create one text file named after the
+block's `slug`, in the folder for its kind:
 
 ```
-src/content/pages/projects/pelagos.mdx      ← for a project
-src/content/pages/work/brunswick.mdx        ← for a job
+src/content/pages/projects/pelagos.mdx       ← a project
+src/content/pages/work/brunswick.mdx         ← a job
+src/content/pages/courses/cs-418.mdx         ← a class
+src/content/pages/hobbies/fly-fishing.mdx    ← a hobby
 ```
 
-(Create the `pages`, `projects`, and `work` folders the first time —
-right-click in the VS Code Explorer → New Folder.) The file is written in
+**The fast way:** copy `src/content/pages/_TEMPLATE.mdx`, paste it into
+the right folder, rename it, and replace its contents. It already has a
+working example of everything below — headings, a picture, a video clip,
+a YouTube video, code, a table — plus notes on where files go.
+
+**Pictures and video** go in the `public` folder, one folder per page:
+`public/media/projects/pelagos/menu.webp` is written in the page as
+`![what the picture shows](/media/projects/pelagos/menu.webp)`. Keep
+images to `.webp` or `.jpg` under about 300 kB each and video clips
+under about 4 MB; put anything longer on YouTube and embed it (the
+template shows how).
+
+(Create the `projects`, `work`, `courses`, and `hobbies` folders the
+first time — right-click `pages` in the VS Code Explorer → New Folder.) The file is written in
 **Markdown**, the same simple format as this manual:
 
 ```
@@ -731,7 +802,7 @@ The complete publishing checklist, start to finish:
 6. **Hard-refresh** so your browser doesn't show you its cached old copy:
    `Ctrl+F5` (Windows) or `Cmd+Shift+R` (Mac). On a phone, use a private
    tab to check.
-7. Click around: open a project pop-up, download the resume, scroll to
+7. Click around: open a project page, download the resume, scroll to
    the floor. If something's wrong, fix it locally and repeat from
    step 1 — deploying again simply replaces the live site.
 
