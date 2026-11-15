@@ -1,7 +1,9 @@
 // ── Entry page — one job, project, class, or hobby, in full ────────────
-// Renders straight from the content registry: what the card says, plus
-// the role, highlights, and playable embed where an entry has them. The
-// long-form body (src/content/pages/<kind>/<slug>.mdx) slots in below.
+// Everything above the write-up comes straight from the content registry:
+// the title, a short list of facts, the opening paragraph, and the
+// at-a-glance points. The long-form body
+// (src/content/pages/<kind>/<slug>.mdx) follows, then the playable
+// embed where a project has one, then links to related pages.
 import {
   KINDS, STATUS_LABEL,
   entryPath, entryTitle, entryDescription, related,
@@ -9,56 +11,76 @@ import {
 } from '../../content/index.js'
 import { bodyLoader } from '../../content/bodies.js'
 import { MdxBody } from '../mdx/MdxBody'
-import { EntryLinkButton } from '../EntryLinkButton'
 import { Link } from '../Link'
 import { Porthole } from './Porthole'
 
 function headerFor(kind, entry) {
-  if (kind === 'work') {
-    return { title: entry.role, sub: `${entry.company} · ${entry.period}` }
-  }
-  if (kind === 'courses') {
-    return {
-      title: entry.title,
-      sub: `${entry.code} · ${termLabel(entry.term)} · ${STATUS_LABEL[courseStatus(entry)]}`,
-    }
-  }
-  return { title: entry.title, sub: entry.details?.role }
+  if (kind === 'work')    return { title: entry.role, sub: entry.company }
+  if (kind === 'courses') return { title: entry.title, sub: entry.code }
+  return { title: entry.title, sub: null }
 }
 
-// Cross-links that come from explicit ties rather than shared skills:
-// a class lists its projects, a project lists the classes it came from
-function tiesFor(kind, entry) {
-  if (kind === 'courses') {
-    return {
-      label: 'Projects from this class',
-      items: projectsForCourse(entry.slug).map(p => ({
-        href: entryPath('projects', p.slug), kind: KINDS.projects.label, title: p.title,
-      })),
-    }
+// What an outside link is called, from where it goes
+function linkLabel(url) {
+  if (url.includes('steampowered.com')) return 'Steam page'
+  if (url.includes('itch.io'))          return 'itch.io page'
+  if (url.includes('github.com'))       return 'Source on GitHub'
+  return 'Website'
+}
+
+// The short facts beside the title: [label, content] rows
+function factsFor(kind, entry) {
+  const rows = []
+  if (kind === 'work') {
+    rows.push(['When', entry.period])
   }
   if (kind === 'projects') {
-    return {
-      label: 'Built in',
-      items: coursesForProject(entry).filter(courseHasPage).map(c => ({
-        href: entryPath('courses', c.slug), kind: KINDS.courses.label, title: entryTitle('courses', c),
-      })),
+    if (entry.details?.role) rows.push(['Role', entry.details.role])
+    const classes = coursesForProject(entry)
+    if (classes.length > 0) {
+      rows.push(['Class', classes.map((c, i) => (
+        <span key={c.slug}>
+          {i > 0 && ', '}
+          {courseHasPage(c)
+            ? <Link href={entryPath('courses', c.slug)}>{c.code} {c.title}</Link>
+            : `${c.code} ${c.title}`}
+        </span>
+      ))])
     }
   }
-  return { label: '', items: [] }
+  if (kind === 'courses') {
+    rows.push(['Term', `${termLabel(entry.term)} (${STATUS_LABEL[courseStatus(entry)].toLowerCase()})`])
+    rows.push(['Hours', `${entry.credits} credit hours`])
+  }
+  if (entry.stack?.length > 0) rows.push(['Built with', entry.stack.join(', ')])
+
+  const links = [
+    ...(entry.link && entry.link !== '#' ? [{ href: entry.link, label: linkLabel(entry.link) }] : []),
+    ...(entry.links || []),
+  ]
+  if (links.length > 0) {
+    rows.push(['Links', links.map((l, i) => (
+      <span key={l.href}>
+        {i > 0 && ', '}
+        <a href={l.href} target="_blank" rel="noopener noreferrer">{l.label}</a>
+      </span>
+    ))])
+  }
+  return rows
 }
 
-function LinkList({ label, items }) {
+// Links to other pages, as plain rows: the title, and what kind of page
+function PageList({ label, items }) {
   if (items.length === 0) return null
   return (
-    <nav className="entry-related" aria-label={label}>
-      <h2 className="entry-related-label">{label}</h2>
-      <ul className="entry-related-list">
+    <nav className="entry-list" aria-label={label}>
+      <h2 className="entry-list-label">{label}</h2>
+      <ul>
         {items.map(it => (
           <li key={it.href}>
             <Link href={it.href} className="entry-related-link">
-              <span className="entry-related-kind">{it.kind}</span>
-              <span className="entry-related-title">{it.title}</span>
+              <span className="entry-list-title">{it.title}</span>
+              <span className="entry-list-kind">{it.kind}</span>
             </Link>
           </li>
         ))}
@@ -69,12 +91,18 @@ function LinkList({ label, items }) {
 
 export function EntryPage({ kind, entry }) {
   const { title, sub } = headerFor(kind, entry)
-  const d = entry.details
-  const stack = entry.stack || []
-  const links = entry.links || []
-  const hasLink = Boolean(entry.link) && entry.link !== '#'
+  const facts = factsFor(kind, entry)
+  const highlights = entry.details?.highlights || []
+  const embed = entry.details?.embed
   const body = bodyLoader(kind, entry.slug)
-  const ties = tiesFor(kind, entry)
+
+  // Explicit ties first (a class lists its projects), then pages that
+  // share skills or tags
+  const ties = kind === 'courses'
+    ? projectsForCourse(entry.slug).map(p => ({
+        href: entryPath('projects', p.slug), kind: KINDS.projects.label, title: p.title,
+      }))
+    : []
   const more = related(kind, entry.slug).map(p => ({
     href: entryPath(p.kind, p.entry.slug), kind: KINDS[p.kind].label, title: entryTitle(p.kind, p.entry),
   }))
@@ -83,56 +111,45 @@ export function EntryPage({ kind, entry }) {
     <article className="entry">
       <header className="entry-head">
         <div className="entry-head-text">
-          <p className="entry-kicker">{KINDS[kind].label}</p>
           <h1 className="entry-title" tabIndex={-1}>{title}</h1>
           {sub && <p className="entry-sub">{sub}</p>}
-          {stack.length > 0 && (
-            <div className="entry-stack">
-              {stack.map(t => (
-                <span key={t} className="card-pill px-2 py-0.5 rounded-full text-[clamp(0.625rem,0.55rem+0.2vw,0.75rem)] font-mono">
-                  {t}
-                </span>
+          {facts.length > 0 && (
+            <dl className="entry-facts">
+              {facts.map(([label, content]) => (
+                <div key={label} className="entry-fact">
+                  <dt>{label}</dt>
+                  <dd>{content}</dd>
+                </div>
               ))}
-            </div>
-          )}
-          {/* The store / repo button, then any extra links from the data */}
-          {(hasLink || links.length > 0) && (
-            <div className="entry-links">
-              <EntryLinkButton href={entry.link} />
-              {links.map(l => (
-                <EntryLinkButton key={l.href} href={l.href} label={l.label} />
-              ))}
-            </div>
+            </dl>
           )}
         </div>
         <Porthole />
       </header>
 
-      <p className="entry-lede">{entryDescription(kind, entry)}</p>
-
-      {d?.highlights?.length > 0 && (
-        <ul className="entry-highlights">
-          {d.highlights.map(h => (
-            <li key={h}>{h}</li>
-          ))}
-        </ul>
-      )}
-
-      {d?.embed && (
-        <div className="entry-embed">
-          <iframe
-            src={d.embed.src}
-            height={d.embed.height}
-            title={d.embed.title}
-            loading="lazy"
-          />
-        </div>
-      )}
+      <div className="entry-open">
+        <p className="entry-lede">{entryDescription(kind, entry)}</p>
+        {highlights.length > 0 && (
+          <aside className="entry-glance" aria-label="At a glance">
+            <p className="entry-glance-title">At a glance</p>
+            <ul>
+              {highlights.map(h => <li key={h}>{h}</li>)}
+            </ul>
+          </aside>
+        )}
+      </div>
 
       {body && <MdxBody loader={body} />}
 
-      <LinkList label={ties.label} items={ties.items} />
-      <LinkList label="Related" items={more} />
+      {embed && (
+        <section className="entry-embed">
+          <h2>Play it</h2>
+          <iframe src={embed.src} height={embed.height} title={embed.title} loading="lazy" />
+        </section>
+      )}
+
+      <PageList label="From this class" items={ties} />
+      <PageList label="Related pages" items={more} />
     </article>
   )
 }

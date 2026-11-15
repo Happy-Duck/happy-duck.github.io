@@ -2,7 +2,7 @@ import { useRef } from 'react'
 import { motion } from 'framer-motion'
 // Project data lives in src/content/projects.js
 import { PROJECTS, entryAnchor, entryPath } from '../content/index.js'
-import { navigate } from '../lib/router'
+import { cardLinkProps } from '../lib/cardLink'
 import { EntryLinkButton } from './EntryLinkButton'
 
 // Projects marked `grid: false` have a page (and show up under their
@@ -55,22 +55,6 @@ function ParallaxCard({ children, delay = 0, href, label, anchor }) {
     el.style.transition = 'transform 0.55s cubic-bezier(0.22,1,0.36,1), box-shadow 0.55s ease, border-color 0.55s ease'
   }
 
-  const open = (e) => {
-    // Ctrl/Cmd/middle click: a new tab, like any link
-    if (e.metaKey || e.ctrlKey || e.button === 1) {
-      window.open(href, '_blank', 'noopener')
-      return
-    }
-    navigate(href)
-  }
-
-  const onKeyDown = (e) => {
-    if (e.key === 'Enter') {
-      e.preventDefault()
-      navigate(href)
-    }
-  }
-
   return (
     <motion.div
       variants={fadeUp}
@@ -82,14 +66,8 @@ function ParallaxCard({ children, delay = 0, href, label, anchor }) {
       <div
         ref={innerRef}
         className="project-card project-card--clickable h-full"
-        data-no-ping
         data-entry-anchor={anchor}
-        role="link"
-        tabIndex={0}
-        aria-label={`${label} — open the project page`}
-        onClick={open}
-        onAuxClick={open}
-        onKeyDown={onKeyDown}
+        {...cardLinkProps(href, `${label}: open the project page`)}
         onMouseMove={onMouseMove}
         onMouseLeave={onMouseLeave}
       >
@@ -124,14 +102,13 @@ function ProjectCard({ project, delay }) {
           {project.description}
         </p>
 
-        {/* Stack pills + the way in */}
-        <div className="flex flex-wrap items-end gap-1.5 mt-auto pt-1">
+        {/* Stack pills */}
+        <div className="flex flex-wrap gap-1.5 mt-auto pt-1">
           {project.stack.map(t => (
             <span key={t} className="card-pill px-2 py-0.5 rounded-full text-[clamp(0.625rem,0.55rem+0.2vw,0.75rem)] font-mono">
               {t}
             </span>
           ))}
-          <span className="card-open" aria-hidden="true">open file →</span>
         </div>
       </div>
     </ParallaxCard>

@@ -191,7 +191,7 @@ function BubbleCard({ bubble }) {
         {termLabel(bubble.term)} · {bubble.credits} {bubble.credits === 1 ? 'credit hour' : 'credit hours'} · {STATUS_LABEL[bubble.status]}
       </span>
       {bubble.note && <span className="ccard-meta">{bubble.note}</span>}
-      {bubble.hasPage && <span className="ccard-open">open the class page →</span>}
+      {bubble.hasPage && <span className="ccard-open">Click to open the class page</span>}
     </>
   )
 }
@@ -471,7 +471,7 @@ export function CourseColumn() {
                 {...common}
                 href={entryPath('courses', b.slug)}
                 data-entry-anchor={entryAnchor('courses', b.slug)}
-                aria-label={`${b.code}: ${b.title} — open the class page`}
+                aria-label={`${b.code}: ${b.title}. Open the class page`}
                 onFocus={() => setHover(i)}
                 onBlur={() => setHover(-1)}
               >

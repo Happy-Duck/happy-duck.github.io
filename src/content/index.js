@@ -24,12 +24,14 @@ export const SITE_TITLE = 'Rishi Garhyan — XR Engineer & Game Developer'
 
 // kind → URL segment, display label, and the list it draws from. Adding a
 // kind here is all routing, prerender, and the sitemap need.
+//   label   one entry of this kind ("Project"), shown beside links to it
+//   crumb   the kind as a place ("Projects"), shown in the page's top bar
 export const KINDS = {
-  work:     { segment: 'work',     label: 'Career',      entries: WORK },
-  projects: { segment: 'projects', label: 'Project',     entries: PROJECTS },
+  work:     { segment: 'work',     label: 'Job',     crumb: 'Career',     entries: WORK },
+  projects: { segment: 'projects', label: 'Project', crumb: 'Projects',   entries: PROJECTS },
   // Only classes with a description have a page (see courses.js)
-  courses:  { segment: 'courses',  label: 'Coursework',  entries: COURSES.filter(courseHasPage) },
-  hobbies:  { segment: 'hobbies',  label: 'Shore leave', entries: HOBBIES },
+  courses:  { segment: 'courses',  label: 'Class',   crumb: 'Coursework', entries: COURSES.filter(courseHasPage) },
+  hobbies:  { segment: 'hobbies',  label: 'Hobby',   crumb: 'Hobbies',    entries: HOBBIES },
 }
 
 // Hrefs carry a trailing slash: GitHub Pages serves each page from
@@ -48,8 +50,15 @@ export function entryAnchor(kind, slug) {
 
 // One accessor per field, because the four kinds name things differently
 export function entryTitle(kind, entry) {
-  if (kind === 'work')    return `${entry.role} — ${entry.company}`
+  if (kind === 'work')    return `${entry.role} at ${entry.company}`
   if (kind === 'courses') return `${entry.code}: ${entry.title}`
+  return entry.title
+}
+
+// The shortest name that still identifies the entry (top bar, tight spots)
+export function entryShortName(kind, entry) {
+  if (kind === 'work')    return entry.company
+  if (kind === 'courses') return entry.code
   return entry.title
 }
 

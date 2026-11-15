@@ -146,3 +146,48 @@ Sample data throughout. Hover, or focus a chart and use the arrow keys; "View as
   ]}
   caption="Sample data."
 />
+
+## Layout blocks
+
+### Draft notice
+
+<Draft />
+
+### Placeholders
+
+Figure, Gallery, and Clip draw a labelled frame when they have no file yet.
+
+<Figure label="What will go here" caption="A figure with no picture yet." />
+
+<Gallery caption="A gallery with no pictures yet." images={[
+  { label: 'First' },
+  { label: 'Second' },
+  { label: 'Third' },
+]} />
+
+<Clip label="A video clip with no file yet" caption="A clip with no file yet." />
+
+### Note
+
+<Note title="Margin note">
+On a wide screen this sits in the margin to the right of the text. On a narrow one it joins the column.
+</Note>
+
+A paragraph with a note beside it. The note is written just before the paragraph it belongs to. This sentence is here so the paragraph is long enough to show the two sitting side by side.
+
+### Diagram
+
+<Diagram
+  caption="Boxes and arrows on a grid. On a phone the grid turns on its side."
+  nodes={[
+    { id: 'a', label: 'First box', note: 'a second line', col: 0, row: 0 },
+    { id: 'b', label: 'Second box', col: 1, row: 0 },
+    { id: 'c', label: 'Third box', col: 2, row: 0 },
+    { id: 'd', label: 'Fourth box', note: 'below the third', col: 2, row: 1 },
+  ]}
+  links={[
+    { from: 'a', to: 'b', label: 'label' },
+    { from: 'b', to: 'c' },
+    { from: 'b', to: 'd' },
+  ]}
+/>

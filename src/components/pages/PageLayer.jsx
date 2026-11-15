@@ -1,17 +1,21 @@
-// ── Page layer — an expedition file opened over the dive ───────────────
-// Every route except / renders here: an opaque, full-viewport layer
-// portaled to <body> (sections create stacking contexts that trap fixed
-// children), with its own scroll. The dive stays mounted underneath —
-// paused, hidden, and inert (App.jsx) — so the document never scrolls and
-// closing the page puts the diver back at the exact depth they left.
+// ── Page layer — a sheet laid over the dive ────────────────────────────
+// Every route except / renders here: a full-viewport layer portaled to
+// <body> (sections create stacking contexts that trap fixed children)
+// holding one centered sheet with its own scroll. The dive stays mounted
+// underneath — inert and paused (App.jsx) — so the document never
+// scrolls and closing the page puts the diver back at the exact depth
+// they left. On a wide screen the water stays visible, dimmed, either
+// side of the sheet; clicking it closes the page, like stepping back from
+// a chart table.
 //
 // z-75: above the fabs, floor stamp, and toasts; below the terminal (80),
 // which stays usable on top of a page.
 import { useEffect, useRef } from 'react'
 import { createPortal } from 'react-dom'
+import '../../styles/pages.css'
 import { goBack } from '../../lib/router'
 import { useOceanDepth } from '../../hooks/useOceanDepth'
-import { KINDS, SITE_TITLE, entryTitle } from '../../content/index.js'
+import { KINDS, SITE_TITLE, entryTitle, entryShortName } from '../../content/index.js'
 import { devBodyLoader } from '../../content/bodies.js'
 import { MdxBody } from '../mdx/MdxBody'
 import { EntryPage } from './EntryPage'
@@ -19,6 +23,7 @@ import { NotFoundPage } from './NotFoundPage'
 
 export function PageLayer({ route, path }) {
   const scrollRef = useRef(null)
+  const downOutside = useRef(false)
   const { depthMeters } = useOceanDepth()
   const found = route.kind !== 'notfound'
   // Dev-server-only reference pages (src/content/dev) — always null in a
@@ -67,32 +72,48 @@ export function PageLayer({ route, path }) {
     goBack()
   }
 
+  // Clicking the water either side of the sheet closes the page. Both the
+  // press and the release have to land out there, so a text selection
+  // dragged past the edge doesn't count, and neither does the scrollbar
+  // (which sits beyond the scroller's clientWidth).
+  const isOutside = (e) =>
+    !e.target.closest('.page-sheet') && e.clientX < e.currentTarget.clientWidth
+  const onMouseDown = (e) => { downOutside.current = e.button === 0 && isOutside(e) }
+  const onClick = (e) => {
+    const close = downOutside.current && isOutside(e)
+    downOutside.current = false
+    if (close) goBack()
+  }
+
   return createPortal(
     <div className="page-layer" data-no-ping>
       {/* Keyed by path: moving between pages remounts the scroller, so
           each page opens at its top */}
-      <div className="page-scroll" key={path} ref={scrollRef}>
-        <header className="page-bar">
-          <a href="/" className="page-back" onClick={onBack}>
-            <span aria-hidden="true">←</span> Back to the dive
-            {depthMeters > 0 && (
-              <span className="page-back-depth">{depthMeters.toLocaleString()} m</span>
+      <div className="page-scroll" key={path} ref={scrollRef} onMouseDown={onMouseDown} onClick={onClick}>
+        <div className="page-sheet">
+          <header className="page-bar">
+            <a href="/" className="page-back" onClick={onBack}>
+              <svg className="page-back-chev" viewBox="0 0 8 14" aria-hidden="true"><path d="M7 1 L1 7 L7 13" /></svg>
+              Back to the dive
+              {depthMeters > 0 && (
+                <span className="page-back-depth">{depthMeters.toLocaleString()} m</span>
+              )}
+            </a>
+            {found && (
+              <span className="page-crumb">
+                {KINDS[route.kind].crumb} / {entryShortName(route.kind, route.entry)}
+              </span>
             )}
-          </a>
-          {found && (
-            <span className="page-bar-file" aria-hidden="true">
-              expedition file // {KINDS[route.kind].segment} / {route.slug}
-            </span>
-          )}
-        </header>
+          </header>
 
-        <main className="page-main">
-          {found
-            ? <EntryPage kind={route.kind} entry={route.entry} />
-            : devBody
-              ? <article className="entry"><MdxBody loader={devBody} /></article>
-              : <NotFoundPage />}
-        </main>
+          <main className="page-main">
+            {found
+              ? <EntryPage kind={route.kind} entry={route.entry} />
+              : devBody
+                ? <article className="entry"><MdxBody loader={devBody} /></article>
+                : <NotFoundPage />}
+          </main>
+        </div>
       </div>
     </div>,
     document.body,

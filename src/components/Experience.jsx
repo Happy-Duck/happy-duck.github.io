@@ -1,7 +1,7 @@
 import { motion } from 'framer-motion'
 // Career data lives in src/content/work.js
 import { WORK as ENTRIES, entryAnchor, entryPath } from '../content/index.js'
-import { Link } from './Link'
+import { cardLinkProps } from '../lib/cardLink'
 
 // ── Kelp cable ─────────────────────────────────────────────────────────
 // Gentle S-curves: organic, not ruler-straight
@@ -67,8 +67,9 @@ const headerItem = {
 function EntryCard({ entry, fromLeft = false }) {
   return (
     <motion.div
-      className="exp-card"
+      className="exp-card exp-card--clickable"
       data-entry-anchor={entryAnchor('work', entry.slug)}
+      {...cardLinkProps(entryPath('work', entry.slug), `${entry.role}, ${entry.company}: open the page`)}
       initial={{ opacity: 0, x: fromLeft ? -52 : 52 }}
       whileInView={{ opacity: 1, x: 0 }}
       transition={{ duration: 0.72, ease: [0.22, 1, 0.36, 1] }}
@@ -86,19 +87,12 @@ function EntryCard({ entry, fromLeft = false }) {
       <p className="exp-desc text-sm leading-relaxed mb-3">
         {entry.description}
       </p>
-      <div className="flex flex-wrap items-end gap-1.5">
+      <div className="flex flex-wrap gap-1.5">
         {entry.stack.map(t => (
           <span key={t} className="card-pill px-2 py-0.5 rounded-full text-[clamp(0.625rem,0.55rem+0.2vw,0.75rem)] font-mono">
             {t}
           </span>
         ))}
-        <Link
-          href={entryPath('work', entry.slug)}
-          className="card-open"
-          aria-label={`${entry.role}, ${entry.company} — open the page`}
-        >
-          open file →
-        </Link>
       </div>
     </motion.div>
   )

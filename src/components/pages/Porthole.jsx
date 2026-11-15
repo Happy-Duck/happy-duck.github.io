@@ -45,8 +45,7 @@ export function Porthole() {
         <div className="porthole-frame" />
       </div>
       <span className="porthole-caption">
-        <span className="porthole-live">live</span>
-        {depthMeters.toLocaleString()} m · {zone.label}
+        Outside: {depthMeters.toLocaleString()} m, {zone.label.toLowerCase()}
       </span>
     </div>
   )

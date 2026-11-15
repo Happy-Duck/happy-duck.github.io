@@ -3,15 +3,58 @@
 // server) for every one of them rendered, and pages/_TEMPLATE.mdx for
 // copy-paste examples.
 //
+//   <Draft />                                  "this page is placeholder"
 //   <Stats items={[{ value: '30,000+', label: 'Steam downloads' }]} />
-//   <Figure src="/media/projects/pelagos/menu.webp" alt="…" caption="…" />
+//   <Figure src="/media/…/menu.webp" alt="…" caption="…" />
 //   <Gallery images={[{ src: '…', alt: '…', caption: '…' }]} />
+//   <Clip src="/media/…/clip.mp4" poster="…" caption="…" />
 //   <YouTube id="dQw4w9WgXcQ" title="Launch trailer" />
+//   <Diagram nodes={[…]} links={[…]} caption="…" />
+//   <Note title="Aside">…</Note>               sits in the right margin
 //   <Callout title="Why this mattered">…</Callout>
 //   <Redacted until="January 2027">Screenshots of the simulator</Redacted>
 //   <RepoCard repo="Happy-Duck/DiscordSportsBot" />
+//
+// Figure, Gallery, and Clip draw a labelled placeholder frame when they
+// are given no `src` — use `label="what will go here"` while a page is
+// being laid out.
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { createPortal } from 'react-dom'
+
+// ── Draft — marks a page whose content is still placeholder ────────────
+// scripts/prerender.mjs counts these at build time and warns, so filler
+// can't reach the live site unnoticed.
+
+export function Draft() {
+  return (
+    <p className="blk-draft" role="note">
+      Draft layout. The text and media on this page are placeholders.
+    </p>
+  )
+}
+
+// ── Placeholder frame ──────────────────────────────────────────────────
+
+function Placeholder({ label, ratio = '16 / 9', play = false }) {
+  return (
+    <span className="blk-ph" style={{ aspectRatio: ratio }}>
+      <svg className="blk-ph-cross" viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true">
+        <line x1="0" y1="0" x2="100" y2="100" vectorEffect="non-scaling-stroke" />
+        <line x1="100" y1="0" x2="0" y2="100" vectorEffect="non-scaling-stroke" />
+      </svg>
+      {play && (
+        <svg className="blk-ph-play" viewBox="0 0 48 48" aria-hidden="true">
+          <circle cx="24" cy="24" r="23" />
+          <path d="M19 15 L35 24 L19 33 Z" />
+        </svg>
+      )}
+      <span className="blk-ph-label">
+        <span>Placeholder</span>
+        {label}
+      </span>
+    </span>
+  )
+}
 
 // ── Stats — a row of headline numbers ──────────────────────────────────
 
@@ -28,7 +71,19 @@ export function Stats({ items = [] }) {
   )
 }
 
-// ── Callout — a boxed aside ────────────────────────────────────────────
+// ── Note — a short aside set in the right margin ───────────────────────
+// Put it directly before the paragraph it belongs beside.
+
+export function Note({ title, children }) {
+  return (
+    <aside className="blk-note">
+      {title && <p className="blk-note-title">{title}</p>}
+      {children}
+    </aside>
+  )
+}
+
+// ── Callout — a set-apart passage in the text column ───────────────────
 
 export function Callout({ title, children }) {
   return (
@@ -39,12 +94,12 @@ export function Callout({ title, children }) {
   )
 }
 
-// ── Redacted — a placeholder for media that can't be shown yet ─────────
+// ── Redacted — a frame for media that can't be shown yet ───────────────
 
-export function Redacted({ until, children }) {
+export function Redacted({ until, children, ratio = '16 / 9' }) {
   return (
-    <div className="blk-redacted" role="note">
-      <span className="blk-redacted-stamp">Under embargo{until ? ` until ${until}` : ''}</span>
+    <div className="blk-redacted" role="note" style={{ aspectRatio: ratio }}>
+      <span className="blk-redacted-why">Not public{until ? ` until ${until}` : ' yet'}</span>
       {children && <span className="blk-redacted-what">{children}</span>}
     </div>
   )
@@ -84,18 +139,28 @@ function Lightbox({ images, index, onClose, onStep }) {
       aria-label={img.alt || 'Image'}
       onMouseDown={(e) => { if (e.target === e.currentTarget) onClose() }}
     >
-      <button ref={closeRef} type="button" className="blk-lightbox-close" onClick={onClose} aria-label="Close image">×</button>
-      {many && <button type="button" className="blk-lightbox-nav blk-lightbox-nav--prev" onClick={() => onStep(-1)} aria-label="Previous image">‹</button>}
+      <button ref={closeRef} type="button" className="blk-lightbox-btn blk-lightbox-close" onClick={onClose} aria-label="Close image">
+        <svg viewBox="0 0 16 16" aria-hidden="true"><path d="M3 3 L13 13 M13 3 L3 13" /></svg>
+      </button>
+      {many && (
+        <button type="button" className="blk-lightbox-btn" onClick={() => onStep(-1)} aria-label="Previous image">
+          <svg viewBox="0 0 16 16" aria-hidden="true"><path d="M10 3 L5 8 L10 13" /></svg>
+        </button>
+      )}
       <figure className="blk-lightbox-figure">
         <img src={img.src} alt={img.alt || ''} />
         {(img.caption || many) && (
           <figcaption>
             {img.caption}
-            {many && <span className="blk-lightbox-count">{index + 1} / {images.length}</span>}
+            {many && <span className="blk-lightbox-count">{index + 1} of {images.length}</span>}
           </figcaption>
         )}
       </figure>
-      {many && <button type="button" className="blk-lightbox-nav blk-lightbox-nav--next" onClick={() => onStep(1)} aria-label="Next image">›</button>}
+      {many && (
+        <button type="button" className="blk-lightbox-btn" onClick={() => onStep(1)} aria-label="Next image">
+          <svg viewBox="0 0 16 16" aria-hidden="true"><path d="M6 3 L11 8 L6 13" /></svg>
+        </button>
+      )}
     </div>,
     document.body,
   )
@@ -109,40 +174,89 @@ function useLightbox(count) {
 }
 
 // ── Figure — one image with a caption; click to enlarge ────────────────
+// `wide` lets it run the full width of the page instead of the text column.
 
-export function Figure({ src, alt = '', caption, width, height }) {
+export function Figure({ src, alt = '', caption, label, ratio, wide = false, width, height }) {
   const box = useLightbox(1)
-  const images = [{ src, alt, caption }]
   return (
-    <figure className="blk-figure">
-      <button type="button" className="blk-figure-btn" onClick={() => box.open(0)} aria-label={`Enlarge image: ${alt || caption || ''}`}>
-        <img src={src} alt={alt} width={width} height={height} loading="lazy" decoding="async" />
-      </button>
+    <figure className={`blk-figure${wide ? ' blk-wide' : ''}`}>
+      {src ? (
+        <button type="button" className="blk-figure-btn" onClick={() => box.open(0)} aria-label={`Enlarge image: ${alt || caption || ''}`}>
+          <img src={src} alt={alt} width={width} height={height} loading="lazy" decoding="async" />
+        </button>
+      ) : (
+        <Placeholder label={label || alt} ratio={ratio} />
+      )}
       {caption && <figcaption>{caption}</figcaption>}
-      {box.index >= 0 && <Lightbox images={images} index={0} onClose={box.close} onStep={box.step} />}
+      {box.index >= 0 && <Lightbox images={[{ src, alt, caption }]} index={0} onClose={box.close} onStep={box.step} />}
     </figure>
   )
 }
 
-// ── Gallery — a grid of images; click any to page through them ─────────
+// ── Gallery — several images; click any to page through them ───────────
+// With `lead`, the first image is shown large and the rest beside it.
 
-export function Gallery({ images = [] }) {
-  const box = useLightbox(images.length)
+// The grid has 12 columns. Three to a row is the default (span 4); the
+// last row is re-cut so no picture is ever left alone: a remainder of one
+// makes the last four share a row (span 3), a remainder of two makes the
+// last two split it (span 6). With `lead`, the first picture takes a
+// 2-by-2 block and the next two stack beside it.
+function gallerySpans(count, lead) {
+  const spans = Array(count).fill(4)
+  const start = lead && count >= 3 ? 3 : 0
+  const rest = (count - start) % 3
+  if (rest === 1 && count - start >= 4) spans.fill(3, count - 4)
+  if (rest === 1 && count - start === 1) spans[count - 1] = 12
+  if (rest === 2) spans.fill(6, count - 2)
+  return spans
+}
+
+export function Gallery({ images = [], lead = false, caption }) {
+  const real = images.filter(im => im.src)
+  const box = useLightbox(real.length)
+  const useLead = lead && images.length >= 3
+  const spans = gallerySpans(images.length, useLead)
+  const cell = (i) => (useLead && i === 0 ? undefined : { gridColumn: `span ${spans[i]}` })
   return (
-    <div className="blk-gallery">
-      {images.map((im, i) => (
-        <button
-          key={im.src}
-          type="button"
-          className="blk-gallery-item"
-          onClick={() => box.open(i)}
-          aria-label={`Enlarge image ${i + 1} of ${images.length}: ${im.alt || im.caption || ''}`}
-        >
-          <img src={im.src} alt={im.alt || ''} loading="lazy" decoding="async" />
-        </button>
-      ))}
-      {box.index >= 0 && <Lightbox images={images} index={box.index} onClose={box.close} onStep={box.step} />}
-    </div>
+    <figure className={`blk-gallery blk-wide${useLead ? ' blk-gallery--lead' : ''}`}>
+      <div className="blk-gallery-grid">
+        {images.map((im, i) => (
+          im.src ? (
+            <button
+              key={im.src}
+              type="button"
+              className="blk-gallery-item"
+              style={cell(i)}
+              onClick={() => box.open(real.indexOf(im))}
+              aria-label={`Enlarge image ${real.indexOf(im) + 1} of ${real.length}: ${im.alt || im.caption || ''}`}
+            >
+              <img src={im.src} alt={im.alt || ''} loading="lazy" decoding="async" />
+            </button>
+          ) : (
+            <span key={`${im.label}-${i}`} className="blk-gallery-item blk-gallery-item--ph" style={cell(i)}>
+              <Placeholder label={im.label || im.alt} ratio="auto" />
+            </span>
+          )
+        ))}
+      </div>
+      {caption && <figcaption>{caption}</figcaption>}
+      {box.index >= 0 && <Lightbox images={real} index={box.index} onClose={box.close} onStep={box.step} />}
+    </figure>
+  )
+}
+
+// ── Clip — a short video file that plays in place ──────────────────────
+
+export function Clip({ src, poster, caption, label, ratio = '16 / 9', wide = false }) {
+  return (
+    <figure className={`blk-figure blk-clip${wide ? ' blk-wide' : ''}`}>
+      {src ? (
+        <video src={src} poster={poster} controls muted playsInline preload="none" style={{ aspectRatio: ratio }} />
+      ) : (
+        <Placeholder label={label} ratio={ratio} play />
+      )}
+      {caption && <figcaption>{caption}</figcaption>}
+    </figure>
   )
 }
 
@@ -150,25 +264,123 @@ export function Gallery({ images = [] }) {
 // Nothing is loaded from YouTube (no player, no cookies) until the
 // visitor presses play.
 
-export function YouTube({ id, title = 'Video' }) {
+export function YouTube({ id, title = 'Video', caption }) {
   const [playing, setPlaying] = useState(false)
   return (
-    <div className="blk-video">
-      {playing ? (
-        <iframe
-          src={`https://www.youtube-nocookie.com/embed/${id}?autoplay=1&rel=0`}
-          title={title}
-          allow="autoplay; encrypted-media; picture-in-picture; fullscreen"
-          allowFullScreen
-        />
-      ) : (
-        <button type="button" className="blk-video-poster" onClick={() => setPlaying(true)} aria-label={`Play video: ${title}`}>
-          <img src={`https://i.ytimg.com/vi/${id}/hqdefault.jpg`} alt="" loading="lazy" decoding="async" />
-          <span className="blk-video-play" aria-hidden="true" />
-          <span className="blk-video-title">{title}</span>
-        </button>
-      )}
-    </div>
+    <figure className="blk-figure blk-clip">
+      <div className="blk-video">
+        {playing ? (
+          <iframe
+            src={`https://www.youtube-nocookie.com/embed/${id}?autoplay=1&rel=0`}
+            title={title}
+            allow="autoplay; encrypted-media; picture-in-picture; fullscreen"
+            allowFullScreen
+          />
+        ) : (
+          <button type="button" className="blk-video-poster" onClick={() => setPlaying(true)} aria-label={`Play video: ${title}`}>
+            <img src={`https://i.ytimg.com/vi/${id}/hqdefault.jpg`} alt="" loading="lazy" decoding="async" />
+            <svg className="blk-video-play" viewBox="0 0 48 48" aria-hidden="true">
+              <circle cx="24" cy="24" r="23" />
+              <path d="M19 15 L35 24 L19 33 Z" />
+            </svg>
+          </button>
+        )}
+      </div>
+      <figcaption>{caption || title}</figcaption>
+    </figure>
+  )
+}
+
+// ── Diagram — boxes and arrows on a grid ───────────────────────────────
+//   nodes: [{ id, label, note, col, row }]     col/row count from 0
+//   links: [{ from, to, label }]
+// On a narrow screen the grid is turned on its side, so a left-to-right
+// flow becomes top-to-bottom instead of shrinking to nothing.
+
+const CELL_W = 176
+const CELL_H = 60
+const GAP_X = 96
+const GAP_Y = 58
+
+export function Diagram({ nodes = [], links = [], caption, label = 'Diagram' }) {
+  const wrapRef = useRef(null)
+  const [narrow, setNarrow] = useState(false)
+
+  useEffect(() => {
+    const el = wrapRef.current
+    if (!el) return
+    const ro = new ResizeObserver(([e]) => setNarrow(e.contentRect.width < 560))
+    ro.observe(el)
+    return () => ro.disconnect()
+  }, [])
+
+  const placed = nodes.map(n => {
+    const col = narrow ? n.row || 0 : n.col || 0
+    const row = narrow ? n.col || 0 : n.row || 0
+    return { ...n, x: col * (CELL_W + GAP_X), y: row * (CELL_H + GAP_Y), col, row }
+  })
+  const byId = Object.fromEntries(placed.map(n => [n.id, n]))
+  const w = Math.max(...placed.map(n => n.x)) + CELL_W
+  const h = Math.max(...placed.map(n => n.y)) + CELL_H
+
+  const edges = links.map(l => {
+    const a = byId[l.from]
+    const b = byId[l.to]
+    if (!a || !b) return null
+    const ax = a.x + CELL_W / 2
+    const ay = a.y + CELL_H / 2
+    const bx = b.x + CELL_W / 2
+    const by = b.y + CELL_H / 2
+    let pts
+    if (a.row === b.row) {
+      const dir = bx > ax ? 1 : -1
+      pts = [[ax + dir * CELL_W / 2, ay], [bx - dir * CELL_W / 2, by]]
+    } else if (a.col === b.col) {
+      const dir = by > ay ? 1 : -1
+      pts = [[ax, ay + dir * CELL_H / 2], [bx, by - dir * CELL_H / 2]]
+    } else {
+      // Elbow: out sideways, then down or up into the target
+      const dx = bx > ax ? 1 : -1
+      const dy = by > ay ? 1 : -1
+      pts = [[ax + dx * CELL_W / 2, ay], [bx, ay], [bx, by - dy * CELL_H / 2]]
+    }
+    const mid = [(pts[0][0] + pts[1][0]) / 2, (pts[0][1] + pts[1][1]) / 2]
+    return { key: `${l.from}-${l.to}`, d: pts.map((p, i) => `${i ? 'L' : 'M'}${p[0]},${p[1]}`).join(' '), mid, label: l.label }
+  }).filter(Boolean)
+
+  return (
+    <figure className="blk-figure blk-diagram" ref={wrapRef}>
+      <svg
+        viewBox={`-2 -2 ${w + 4} ${h + 4}`}
+        style={{ maxWidth: w + 4 }}
+        role="img"
+        aria-label={`${label}: ${nodes.map(n => n.label).join(', ')}`}
+      >
+        <defs>
+          <marker id="blk-arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+            <path d="M0 0 L10 5 L0 10 Z" className="blk-diagram-head" />
+          </marker>
+        </defs>
+        {edges.map(e => (
+          <g key={e.key}>
+            <path d={e.d} className="blk-diagram-link" markerEnd="url(#blk-arrow)" />
+            {e.label && (
+              <text x={e.mid[0]} y={e.mid[1] - 7} className="blk-diagram-linklabel" textAnchor="middle">{e.label}</text>
+            )}
+          </g>
+        ))}
+        {placed.map(n => (
+          <g key={n.id}>
+            <rect x={n.x} y={n.y} width={CELL_W} height={CELL_H} rx="4" className="blk-diagram-node" />
+            <text x={n.x + CELL_W / 2} y={n.y + (n.note ? 26 : 35)} className="blk-diagram-label" textAnchor="middle">{n.label}</text>
+            {n.note && (
+              <text x={n.x + CELL_W / 2} y={n.y + 44} className="blk-diagram-note" textAnchor="middle">{n.note}</text>
+            )}
+          </g>
+        ))}
+      </svg>
+      {caption && <figcaption>{caption}</figcaption>}
+    </figure>
   )
 }
 
@@ -200,25 +412,22 @@ function useRepo(repo) {
   return data
 }
 
-const monthYear = new Intl.DateTimeFormat('en-US', { month: 'short', year: 'numeric' })
+const monthYear = new Intl.DateTimeFormat('en-US', { month: 'long', year: 'numeric' })
 
 export function RepoCard({ repo }) {
   const data = useRepo(repo)
+  const meta = data
+    ? [
+        data.language,
+        data.stars > 0 && `${data.stars} ${data.stars === 1 ? 'star' : 'stars'}`,
+        data.pushed && `last pushed ${monthYear.format(new Date(data.pushed))}`,
+      ].filter(Boolean).join(', ')
+    : 'on GitHub'
   return (
     <a className="blk-repo" href={`https://github.com/${repo}`} target="_blank" rel="noopener noreferrer">
       <span className="blk-repo-name">{repo}</span>
       {data?.description && <span className="blk-repo-desc">{data.description}</span>}
-      <span className="blk-repo-meta">
-        {data ? (
-          <>
-            {data.language && <span>{data.language}</span>}
-            {data.stars > 0 && <span>★ {data.stars}</span>}
-            {data.pushed && <span>last push {monthYear.format(new Date(data.pushed))}</span>}
-          </>
-        ) : (
-          <span>view on GitHub</span>
-        )}
-      </span>
+      <span className="blk-repo-meta">{meta}</span>
     </a>
   )
 }

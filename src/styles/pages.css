@@ -1,0 +1,955 @@
+/* ═══════════════════════════════════════════════════════════════════
+   PAGES — the sheet laid over the dive, and everything on it
+   (components/pages/*, components/mdx/*). Imported by PageLayer.jsx.
+
+   Design rules for this file, so it stays one voice:
+   - Type and spacing carry the page. No tinted cards with glowing
+     borders, no pill chips, no uppercase letter-spaced labels, no
+     hover-lift. A thing gets a box only if it is a frame for media.
+   - Corners are 4px. Rules are 1px hairlines in --rule.
+   - Text is sentence case. Small labels are small, not capitalized.
+   - The mono face is for code and for the two instrument readouts (the
+     depth beside "Back to the dive" and under the porthole). Nowhere else.
+   ═══════════════════════════════════════════════════════════════════ */
+
+.page-layer {
+  --page-bg:   #030b1a;
+  --page-dim:  rgba(1, 6, 16, 0.74);
+  --panel:     #081526;
+  --ink:       #dde9f3;
+  --ink-2:     #a8bfd2;
+  --ink-3:     #7890a6;
+  --rule:      rgba(150, 190, 225, 0.15);
+  --link:      #74d2f3;
+  --measure:   41rem;      /* the text column */
+  --sheet-w:   1120px;
+  --sheet-pad: clamp(1.25rem, 5vw, 4rem);
+
+  position: fixed;
+  inset:    0;
+  z-index:  75;
+  color:    var(--ink);
+}
+
+/* ── The dive while a page is open ─────────────────────────────────── */
+/* Content and UI are hidden; the water itself stays in view (it shows,
+   dimmed, either side of the sheet and through the porthole). It is
+   paused unless the porthole is on screen — lib/oceanPause.js stands the
+   JS loops down, this stills the CSS ones. */
+.dive--stowed { visibility: hidden; }
+.dive--stowed .ocean-backdrop,
+.dive--stowed .dive-ocean { visibility: visible; }
+.dive--stowed *,
+.dive--stowed *::before,
+.dive--stowed *::after { animation-play-state: paused !important; }
+:root.porthole-open .dive--stowed .dive-ocean *,
+:root.porthole-open .dive--stowed .dive-ocean *::before,
+:root.porthole-open .dive--stowed .dive-ocean *::after { animation-play-state: running !important; }
+
+/* Pages are for reading — the dive's no-select default is lifted */
+.page-layer,
+.page-layer *,
+.page-layer *::before,
+.page-layer *::after { user-select: text; -webkit-user-select: text; }
+
+/* ── Scroller and sheet ────────────────────────────────────────────── */
+
+.page-scroll {
+  height:              100%;
+  overflow-y:          auto;
+  overscroll-behavior: contain;
+  scrollbar-width:     thin;
+  scrollbar-color:     rgba(150, 190, 225, 0.28) transparent;
+  cursor:              pointer;   /* the water either side closes the page */
+}
+
+/* The sheet. Its spread shadow is the dimming over the water either
+   side; overflow: clip keeps the porthole's own shadow (below) inside
+   the sheet without breaking the sticky bar the way hidden would. */
+.page-sheet {
+  width:        min(var(--sheet-w), 100%);
+  min-height:   100%;
+  margin:       0 auto;
+  overflow:     clip;
+  background:   var(--page-bg);
+  box-shadow:   0 0 0 100vmax var(--page-dim);
+  cursor:       auto;
+}
+@media (min-width: 1121px) {
+  .page-sheet { border-inline: 1px solid var(--rule); }
+}
+
+.page-bar {
+  position:        sticky;
+  top:             0;
+  z-index:         3;
+  display:         flex;
+  align-items:     center;
+  justify-content: space-between;
+  gap:             1rem;
+  min-height:      3.25rem;
+  padding:         0 var(--sheet-pad);
+  background:      rgba(3, 11, 26, 0.94);
+  border-bottom:   1px solid var(--rule);
+  font-size:       0.84rem;
+}
+
+.page-layer .page-back {
+  display:         inline-flex;
+  align-items:     center;
+  gap:             0.55rem;
+  min-height:      44px;
+  color:           var(--ink);
+  text-decoration: none;
+  white-space:     nowrap;
+}
+.page-layer .page-back:hover { color: #fff; }
+.page-back-chev {
+  width:           7px;
+  height:          12px;
+  fill:            none;
+  stroke:          currentColor;
+  stroke-width:    1.6;
+  stroke-linecap:  round;
+  stroke-linejoin: round;
+}
+.page-back-depth {
+  margin-left:  0.35rem;
+  padding-left: 0.75rem;
+  border-left:  1px solid var(--rule);
+  font-family:  'Share Tech Mono', ui-monospace, monospace;
+  font-size:    0.8rem;
+  color:        var(--ink-3);
+}
+.page-crumb {
+  color:         var(--ink-3);
+  overflow:      hidden;
+  text-overflow: ellipsis;
+  white-space:   nowrap;
+}
+@media (max-width: 640px) {
+  .page-crumb { display: none; }
+}
+
+.page-main { padding: clamp(2rem, 5vw, 3.75rem) var(--sheet-pad) 6rem; }
+
+.page-layer a { color: var(--link); text-underline-offset: 3px; }
+.page-layer a:hover { color: #fff; }
+.page-layer h1[tabindex="-1"]:focus { outline: none; }
+
+/* ── Entry header ──────────────────────────────────────────────────── */
+
+.entry-head {
+  display:               grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap:                   1.5rem 3rem;
+  align-items:           start;
+  margin-bottom:         2.5rem;
+}
+
+.entry-title {
+  margin:         0;
+  font-size:      clamp(2.1rem, 1.3rem + 3.6vw, 3.7rem);
+  font-weight:    900;
+  line-height:    1.03;
+  letter-spacing: -0.028em;
+  color:          #f2f8fc;
+  text-wrap:      balance;
+}
+.entry-sub {
+  margin:      0.7rem 0 0;
+  font-size:   1.2rem;
+  font-weight: 500;
+  color:       var(--ink-2);
+}
+
+.entry-facts {
+  display:    grid;
+  gap:        0.5rem;
+  max-width:  var(--measure);
+  margin:     1.75rem 0 0;
+  padding:    1rem 0 0;
+  border-top: 1px solid var(--rule);
+  font-size:  0.94rem;
+}
+.entry-fact {
+  display:               grid;
+  grid-template-columns: 6.25rem minmax(0, 1fr);
+  gap:                   0 1rem;
+}
+.entry-fact dt { color: var(--ink-3); }
+.entry-fact dd { margin: 0; color: var(--ink); line-height: 1.5; }
+
+/* ── Porthole — a hole in the sheet onto the live dive ─────────────── */
+/* See pages/Porthole.jsx. While the porthole is on screen the sheet's
+   own background is off and the glass casts the same color as a 200vmax
+   shadow (clipped to the sheet): everything but the circle stays
+   covered, and the hole scrolls with the frame on the compositor.
+
+   That shadow stands in for the page background, so everything else on
+   the page has to paint ABOVE it. Paint phases alone don't guarantee
+   that (it went over the title once), so it is explicit: all page
+   content sits at z-index 1, and the glass — with no z-index, under a
+   header that creates no stacking context — stays beneath. Don't give
+   .entry-head, .porthole, or .porthole-window a z-index. */
+
+:root.porthole-open .page-sheet { background: transparent; }
+:root.porthole-open .porthole-glass { box-shadow: 0 0 0 200vmax var(--page-bg); }
+
+.entry-head-text,
+.entry > :not(.entry-head),
+.porthole-caption,
+.porthole-frame {
+  position: relative;
+  z-index:  1;
+}
+
+.porthole {
+  --porthole:     176px;
+  --porthole-rim: 11px;
+  display:        flex;
+  flex-direction: column;
+  align-items:    center;
+  gap:            0.9rem;
+  padding:        var(--porthole-rim) var(--porthole-rim) 0;
+}
+.porthole-window { position: relative; }
+.porthole-glass {
+  width:         var(--porthole);
+  height:        var(--porthole);
+  border-radius: 50%;
+}
+/* Before the observer reports, and once scrolled away: dark glass */
+:root:not(.porthole-open) .porthole-glass { background: #041530; }
+
+/* Lens: darkened edge and a glare. */
+.porthole-window > .porthole-frame {
+  position:      absolute;
+  inset:         0;
+  border-radius: 50%;
+  background:
+    radial-gradient(circle at 30% 24%, rgba(255, 255, 255, 0.14) 0%, transparent 34%),
+    radial-gradient(circle at 50% 50%, transparent 56%, rgba(0, 6, 20, 0.55) 100%);
+  box-shadow: inset 0 0 22px 4px rgba(0, 6, 20, 0.7);
+  pointer-events: none;
+}
+/* Rim */
+.porthole-frame::after {
+  content:       "";
+  position:      absolute;
+  inset:         calc(var(--porthole-rim) * -1);
+  border-radius: 50%;
+  border:        var(--porthole-rim) solid #1f3148;
+  box-shadow:
+    0 -1px 0 1px rgba(160, 205, 235, 0.22),
+    inset 0 0 0 1px rgba(0, 0, 0, 0.7),
+    0 10px 26px rgba(0, 0, 0, 0.5);
+  pointer-events: none;
+}
+.porthole-caption {
+  font-family: 'Share Tech Mono', ui-monospace, monospace;
+  font-size:   0.74rem;
+  white-space: nowrap;
+  color:       var(--ink-3);
+}
+
+/* ── Opening paragraph + at a glance ───────────────────────────────── */
+
+.entry-open {
+  display:               grid;
+  grid-template-columns: minmax(0, var(--measure)) minmax(0, 1fr);
+  gap:                   1.5rem 3.5rem;
+  align-items:           start;
+  margin-bottom:         2.25rem;
+}
+.entry-lede {
+  margin:      0;
+  font-size:   1.2rem;
+  line-height: 1.62;
+  color:       var(--ink);
+}
+.entry-glance {
+  padding-top: 0.3rem;
+  font-size:   0.9rem;
+  line-height: 1.5;
+  color:       var(--ink-2);
+}
+.entry-glance-title { margin: 0 0 0.5rem; font-weight: 700; color: var(--ink); }
+.entry-glance ul { margin: 0; padding: 0; list-style: none; }
+.entry-glance li { padding: 0.5rem 0; border-top: 1px solid var(--rule); }
+
+/* ── Body (the MDX write-up) ───────────────────────────────────────── */
+/* The body spans the sheet. Running text is held to the measure on the
+   left; media blocks may use the full width; notes sit in the margin the
+   text leaves on the right. */
+
+.entry-body {
+  font-size:   1.04rem;
+  line-height: 1.72;
+  color:       var(--ink-2);
+}
+.entry-body > * { max-width: var(--measure); }
+.entry-body > .blk-wide,
+.entry-body > .viz,
+.entry-body > hr { max-width: none; }
+.entry-body > :first-child { margin-top: 0; }
+
+.entry-body-loading { color: var(--ink-3); }
+
+.entry-body h1,
+.entry-body h2,
+.entry-body h3 { color: #eef5fa; text-wrap: balance; }
+.entry-body h1 {
+  margin:         0 0 1.25rem;
+  font-size:      clamp(2.1rem, 1.3rem + 3.6vw, 3.7rem);
+  font-weight:    900;
+  line-height:    1.03;
+  letter-spacing: -0.028em;
+}
+/* Each section opens with a rule across the whole sheet */
+.entry-body h2,
+.entry-embed h2,
+.entry-list-label {
+  max-width:      none;
+  margin:         3.25rem 0 1.1rem;
+  padding-top:    1.5rem;
+  border-top:     1px solid var(--rule);
+  font-size:      1.5rem;
+  font-weight:    800;
+  line-height:    1.2;
+  letter-spacing: -0.012em;
+  clear:          both;
+}
+.entry-body h3 {
+  margin:      2rem 0 0.5rem;
+  font-size:   1.08rem;
+  font-weight: 700;
+  line-height: 1.3;
+}
+
+.entry-body p { margin: 0 0 1.15rem; }
+.entry-body strong { color: var(--ink); font-weight: 700; }
+
+.entry-body ul,
+.entry-body ol { margin: 0 0 1.15rem; padding: 0 0 0 1.3rem; }
+.entry-body ul { list-style: disc; }
+.entry-body ol { list-style: decimal; }
+.entry-body li { margin: 0.3rem 0; padding-left: 0.2rem; }
+.entry-body li::marker { color: var(--ink-3); }
+.entry-body li > ul,
+.entry-body li > ol { margin: 0.3rem 0 0; }
+
+.entry-body blockquote {
+  margin:      1.75rem 0;
+  padding:     0;
+  font-size:   1.3rem;
+  line-height: 1.45;
+  color:       var(--ink);
+}
+.entry-body blockquote > :last-child { margin-bottom: 0; }
+
+.entry-body hr { margin: 2.75rem 0; border: 0; border-top: 1px solid var(--rule); }
+
+.entry-body img,
+.entry-body video,
+.entry-body iframe {
+  display:       block;
+  max-width:     100%;
+  border-radius: 4px;
+}
+.entry-body img   { height: auto; }
+.entry-body video { width: 100%; height: auto; background: #000; }
+
+/* Inline code */
+.entry-body :not(pre) > code {
+  padding:       0.1em 0.36em;
+  border-radius: 3px;
+  background:    var(--panel);
+  color:         var(--ink);
+  font-family:   ui-monospace, 'Cascadia Code', Menlo, monospace;
+  font-size:     0.86em;
+}
+/* Code blocks — token colors are inline styles written at build time by
+   shiki (vite.config.js); only the frame is styled here */
+.entry-body figure[data-rehype-pretty-code-figure] { margin: 0 0 1.5rem; }
+.entry-body pre {
+  margin:          0;
+  padding:         1rem 1.15rem;
+  overflow-x:      auto;
+  border-radius:   4px;
+  background:      #020812;
+  font-family:     ui-monospace, 'Cascadia Code', Menlo, monospace;
+  font-size:       0.84rem;
+  line-height:     1.65;
+  tab-size:        2;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(150, 190, 225, 0.28) transparent;
+}
+.entry-body pre > code { display: grid; }
+
+/* Tables scroll sideways on their own instead of widening the page */
+.entry-body table {
+  display:         block;
+  width:           max-content;
+  max-width:       100%;
+  overflow-x:      auto;
+  margin:          0 0 1.5rem;
+  border-collapse: collapse;
+  font-size:       0.94rem;
+  font-variant-numeric: tabular-nums;
+}
+.entry-body th,
+.entry-body td {
+  padding:       0.5rem 1.4rem 0.5rem 0;
+  border-bottom: 1px solid var(--rule);
+  text-align:    left;
+}
+.entry-body thead th { font-weight: 500; color: var(--ink-3); }
+.entry-body tbody td:first-child { color: var(--ink); }
+
+/* ── Embed, page lists ─────────────────────────────────────────────── */
+
+.entry-embed iframe {
+  display:       block;
+  width:         min(100%, 646px);
+  border:        0;
+  border-radius: 4px;
+  background:    rgba(0, 0, 0, 0.25);
+}
+
+.entry-list ul { margin: 0; padding: 0; list-style: none; max-width: var(--measure); }
+.entry-list li { border-bottom: 1px solid var(--rule); }
+.entry-list .entry-related-link {
+  display:         flex;
+  align-items:     baseline;
+  justify-content: space-between;
+  gap:             1.5rem;
+  padding:         0.75rem 0;
+  color:           var(--ink);
+  text-decoration: none;
+}
+.entry-list-title { font-weight: 600; }
+.entry-list-kind  { flex: none; font-size: 0.86rem; color: var(--ink-3); }
+.entry-list .entry-related-link:hover .entry-list-title {
+  color:                 #fff;
+  text-decoration:       underline;
+  text-underline-offset: 3px;
+}
+
+/* ── Lost at Sea (in-app 404) ──────────────────────────────────────── */
+
+.page-lost { max-width: var(--measure); padding: 4rem 0; }
+.page-lost-depth {
+  font-family: 'Share Tech Mono', ui-monospace, monospace;
+  font-size:   0.8rem;
+  color:       var(--ink-3);
+}
+.page-lost-code {
+  margin:         0.4rem 0 1rem;
+  font-size:      clamp(4rem, 16vw, 8rem);
+  font-weight:    900;
+  line-height:    1;
+  letter-spacing: -0.03em;
+  color:          #f2f8fc;
+}
+.page-lost-text { margin: 0 0 1.5rem; font-size: 1.15rem; line-height: 1.6; color: var(--ink-2); }
+
+/* ═══════════════════════════════════════════════════════════════════
+   BLOCKS (components/mdx/blocks.jsx)
+   ═══════════════════════════════════════════════════════════════════ */
+
+/* ── Draft notice ──────────────────────────────────────────────────── */
+.entry-body .blk-draft {
+  max-width:     none;
+  margin:        0 0 2rem;
+  padding:       0.55rem 0.85rem;
+  border:        1px dashed rgba(255, 190, 110, 0.45);
+  border-radius: 4px;
+  font-size:     0.88rem;
+  color:         #f0c58f;
+}
+
+/* ── Placeholder frame ─────────────────────────────────────────────── */
+.blk-ph {
+  position:        relative;
+  display:         flex;
+  align-items:     center;
+  justify-content: center;
+  width:           100%;
+  height:          100%;
+  border-radius:   4px;
+  background:      var(--panel);
+  overflow:        hidden;
+}
+.blk-ph-cross { position: absolute; inset: 0; width: 100%; height: 100%; }
+.blk-ph-cross line { stroke: rgba(150, 190, 225, 0.11); stroke-width: 1; }
+.blk-ph-play {
+  position: absolute;
+  top:      50%;
+  left:     50%;
+  width:    64px;
+  height:   64px;
+  margin:   -32px 0 0 -32px;
+}
+.blk-ph-play circle { fill: rgba(3, 11, 26, 0.8); stroke: var(--ink-3); stroke-width: 1; }
+.blk-ph-play path   { fill: var(--ink-2); }
+.blk-ph-label {
+  position:       relative;
+  display:        flex;
+  flex-direction: column;
+  align-items:    center;
+  gap:            0.15rem;
+  max-width:      90%;
+  padding:        0.4rem 0.7rem;
+  border-radius:  3px;
+  background:     var(--panel);
+  font-size:      0.84rem;
+  line-height:    1.35;
+  text-align:     center;
+  color:          var(--ink-2);
+}
+.blk-ph-label > span { font-size: 0.74rem; color: var(--ink-3); }
+.blk-ph-play ~ .blk-ph-label { margin-top: 7.5rem; }
+
+/* ── Figure / Clip ─────────────────────────────────────────────────── */
+.blk-figure { margin: 2rem 0; }
+.entry-body .blk-figure figcaption,
+.blk-gallery figcaption {
+  max-width:   var(--measure);
+  margin-top:  0.6rem;
+  font-size:   0.86rem;
+  line-height: 1.5;
+  color:       var(--ink-3);
+}
+.blk-figure-btn,
+.blk-gallery-item {
+  display:       block;
+  width:         100%;
+  padding:       0;
+  border:        0;
+  border-radius: 4px;
+  background:    var(--panel);
+  overflow:      hidden;
+  cursor:        zoom-in;
+}
+.entry-body .blk-figure-btn img { width: 100%; border-radius: 0; }
+.blk-figure-btn:focus-visible,
+.blk-gallery-item:focus-visible { outline: 2px solid var(--link); outline-offset: 3px; }
+
+/* ── Gallery ───────────────────────────────────────────────────────── */
+.blk-gallery { margin: 2rem 0; }
+/* 12 columns; each item's span is set inline by Gallery (blocks.jsx) so
+   the last row never strands a single picture */
+.blk-gallery-grid {
+  display:               grid;
+  grid-template-columns: repeat(12, minmax(0, 1fr));
+  gap:                   6px;
+}
+.blk-gallery-item { aspect-ratio: 16 / 10; }
+.blk-gallery-item--ph { cursor: default; }
+.entry-body .blk-gallery-item img {
+  width:         100%;
+  height:        100%;
+  border-radius: 0;
+  object-fit:    cover;
+}
+/* Lead layout: the first image large, the rest stacked beside it */
+.blk-gallery--lead .blk-gallery-item:first-child {
+  grid-column:  span 8;
+  grid-row:     span 2;
+  aspect-ratio: auto;
+}
+/* Phone: two to a row whatever the spans say; a lead picture, or an odd
+   one out at the end, takes the full width */
+@media (max-width: 640px) {
+  .blk-gallery-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .blk-gallery-grid .blk-gallery-item { grid-column: auto !important; }
+  .blk-gallery--lead .blk-gallery-item:first-child,
+  .blk-gallery-grid .blk-gallery-item:last-child:nth-child(odd) {
+    grid-column:  1 / -1 !important;
+    grid-row:     auto;
+    aspect-ratio: 16 / 9;
+  }
+  .blk-gallery--lead .blk-gallery-item:last-child:nth-child(odd) { grid-column: auto !important; aspect-ratio: 16 / 10; }
+  .blk-gallery--lead .blk-gallery-item:last-child:nth-child(even) { grid-column: 1 / -1 !important; aspect-ratio: 16 / 9; }
+}
+
+/* ── YouTube ───────────────────────────────────────────────────────── */
+.blk-video {
+  position:      relative;
+  aspect-ratio:  16 / 9;
+  border-radius: 4px;
+  background:    #000;
+  overflow:      hidden;
+}
+.entry-body .blk-video iframe,
+.blk-video-poster {
+  position:      absolute;
+  inset:         0;
+  width:         100%;
+  height:        100%;
+  padding:       0;
+  border:        0;
+  border-radius: 0;
+}
+.blk-video-poster { background: #000; cursor: pointer; }
+.entry-body .blk-video-poster img {
+  width:         100%;
+  height:        100%;
+  border-radius: 0;
+  object-fit:    cover;
+  opacity:       0.82;
+}
+.blk-video-poster:hover img { opacity: 1; }
+.blk-video-play {
+  position: absolute;
+  top:      50%;
+  left:     50%;
+  width:    64px;
+  height:   64px;
+  margin:   -32px 0 0 -32px;
+}
+.blk-video-play circle { fill: rgba(3, 11, 26, 0.8); stroke: #fff; stroke-width: 1; }
+.blk-video-play path   { fill: #fff; }
+
+/* ── Diagram ───────────────────────────────────────────────────────── */
+.blk-diagram svg { display: block; width: 100%; height: auto; overflow: visible; }
+.blk-diagram-node  { fill: var(--panel); stroke: rgba(150, 190, 225, 0.32); stroke-width: 1; }
+.blk-diagram-label { fill: var(--ink);   font-size: 13.5px; font-weight: 600; }
+.blk-diagram-note  { fill: var(--ink-3); font-size: 11.5px; }
+.blk-diagram-link  { fill: none; stroke: var(--ink-3); stroke-width: 1.25; }
+.blk-diagram-head  { fill: var(--ink-3); }
+.blk-diagram-linklabel { fill: var(--ink-2); font-size: 11.5px; }
+
+/* ── Stats ─────────────────────────────────────────────────────────── */
+.blk-stats {
+  display:   flex;
+  flex-wrap: wrap;
+  gap:       1.25rem 0;
+  margin:    0 0 2.25rem;
+}
+.blk-stat { padding: 0 2.25rem 0 0; margin-right: 2.25rem; border-right: 1px solid var(--rule); }
+.blk-stat:last-child { margin-right: 0; padding-right: 0; border-right: 0; }
+.blk-stat-value {
+  margin:         0;
+  font-size:      2.1rem;
+  font-weight:    800;
+  line-height:    1.1;
+  letter-spacing: -0.02em;
+  color:          #f2f8fc;
+}
+.blk-stat-label { margin-top: 0.3rem; font-size: 0.9rem; color: var(--ink-3); }
+
+/* ── Note (margin) ─────────────────────────────────────────────────── */
+.entry-body .blk-note {
+  float:       right;
+  clear:       right;
+  width:       15.5rem;
+  max-width:   none;
+  margin:      0.3rem 0 1.25rem 3rem;
+  padding-top: 0.6rem;
+  border-top:  1px solid var(--rule);
+  font-size:   0.88rem;
+  line-height: 1.5;
+  color:       var(--ink-3);
+}
+.entry-body .blk-note p { margin: 0 0 0.5rem; }
+.entry-body .blk-note > :last-child { margin-bottom: 0; }
+.entry-body .blk-note-title { font-weight: 700; color: var(--ink-2); }
+
+/* ── Callout ───────────────────────────────────────────────────────── */
+.blk-callout {
+  margin:        1.75rem 0;
+  padding:       1rem 1.2rem;
+  border-radius: 4px;
+  background:    var(--panel);
+  color:         var(--ink);
+}
+.entry-body .blk-callout-title { margin: 0 0 0.3rem; font-weight: 700; color: #f2f8fc; }
+.blk-callout-body > :last-child { margin-bottom: 0; }
+
+/* ── Redacted ──────────────────────────────────────────────────────── */
+.blk-redacted {
+  display:         flex;
+  flex-direction:  column;
+  align-items:     center;
+  justify-content: center;
+  gap:             0.35rem;
+  margin:          2rem 0;
+  padding:         1.2rem;
+  border-radius:   4px;
+  background:      repeating-linear-gradient(135deg, #071325 0 14px, #091a30 14px 28px);
+  text-align:      center;
+}
+.blk-redacted-why  { font-weight: 700; color: var(--ink); }
+.blk-redacted-what { font-size: 0.9rem; color: var(--ink-3); }
+
+/* ── RepoCard ──────────────────────────────────────────────────────── */
+.entry-body a.blk-repo {
+  display:         grid;
+  gap:             0.2rem;
+  margin:          1.75rem 0;
+  padding:         0.9rem 0;
+  border-top:      1px solid var(--rule);
+  border-bottom:   1px solid var(--rule);
+  text-decoration: none;
+}
+.blk-repo-name {
+  font-family: ui-monospace, 'Cascadia Code', Menlo, monospace;
+  font-size:   0.94rem;
+  color:       var(--link);
+}
+.entry-body a.blk-repo:hover .blk-repo-name { color: #fff; text-decoration: underline; text-underline-offset: 3px; }
+.blk-repo-desc { font-size: 0.94rem; line-height: 1.5; color: var(--ink-2); }
+.blk-repo-meta { font-size: 0.84rem; color: var(--ink-3); }
+
+/* ── Lightbox — portaled to <body>, so no page variables here ──────── */
+.blk-lightbox {
+  position:        fixed;
+  inset:           0;
+  z-index:         85;
+  display:         flex;
+  align-items:     center;
+  justify-content: center;
+  gap:             0.75rem;
+  padding:         3.5rem 0.75rem 1rem;
+  background:      rgba(1, 5, 14, 0.95);
+}
+.blk-lightbox-figure {
+  margin:         0;
+  display:        flex;
+  flex-direction: column;
+  align-items:    center;
+  gap:            0.7rem;
+  min-width:      0;
+}
+.blk-lightbox-figure img {
+  max-width:     100%;
+  max-height:    calc(100vh - 8rem);
+  border-radius: 4px;
+  object-fit:    contain;
+}
+.blk-lightbox-figure figcaption {
+  display:     flex;
+  gap:         1rem;
+  font-family: ui-sans-serif, system-ui, sans-serif;
+  font-size:   0.88rem;
+  color:       #a8bfd2;
+  user-select: text;
+}
+.blk-lightbox-count { color: #7890a6; white-space: nowrap; }
+.blk-lightbox-btn {
+  flex:          none;
+  display:       grid;
+  place-items:   center;
+  width:         44px;
+  height:        44px;
+  padding:       0;
+  border:        0;
+  border-radius: 50%;
+  background:    rgba(150, 190, 225, 0.12);
+  cursor:        pointer;
+}
+.blk-lightbox-btn:hover { background: rgba(150, 190, 225, 0.24); }
+.blk-lightbox-btn svg {
+  width:           16px;
+  height:          16px;
+  fill:            none;
+  stroke:          #dde9f3;
+  stroke-width:    1.6;
+  stroke-linecap:  round;
+  stroke-linejoin: round;
+}
+.blk-lightbox-close { position: absolute; top: 0.75rem; right: 0.75rem; }
+
+/* ═══════════════════════════════════════════════════════════════════
+   CHART (components/mdx/Chart.jsx)
+   Pages are always dark, so there is one set of values. The eight series
+   slots are a fixed order, validated for color-blind separation against
+   --viz-surface (adjacent pairs for lines and bars; the first three for
+   every pairing, which is why scatter caps at three groups). Don't
+   reorder them or change --viz-surface without re-running the check.
+   ═══════════════════════════════════════════════════════════════════ */
+.viz {
+  --viz-surface: #061229;
+  --viz-ink:     #e6f1f9;
+  --viz-ink-2:   #b5cbdc;
+  --viz-muted:   #7f97ab;
+  --viz-grid:    #12233d;
+  --viz-axis:    #24405f;
+  --viz-other:   #6f8397;
+  --viz-s1: #3987e5;
+  --viz-s2: #d95926;
+  --viz-s3: #199e70;
+  --viz-s4: #c98500;
+  --viz-s5: #d55181;
+  --viz-s6: #008300;
+  --viz-s7: #9085e9;
+  --viz-s8: #e66767;
+
+  margin:        2rem 0;
+  padding:       1rem 1.1rem 0.8rem;
+  border-radius: 4px;
+  background:    var(--viz-surface);
+  font-family:   system-ui, -apple-system, "Segoe UI", sans-serif;
+  color:         var(--viz-ink);
+}
+
+.viz-head {
+  display:         flex;
+  flex-wrap:       wrap;
+  align-items:     baseline;
+  justify-content: space-between;
+  gap:             0.4rem 1.2rem;
+  margin-bottom:   0.6rem;
+}
+.viz-title { font-size: 0.98rem; font-weight: 650; color: var(--viz-ink); }
+.viz .viz-legend {
+  display:    flex;
+  flex-wrap:  wrap;
+  gap:        0.3rem 1rem;
+  margin:     0;
+  padding:    0;
+  list-style: none;
+  font-size:  0.78rem;
+  color:      var(--viz-ink-2);
+}
+.viz .viz-legend li { display: inline-flex; align-items: center; gap: 0.4rem; margin: 0; padding: 0; }
+.viz-key { display: inline-block; flex: none; }
+.viz-key--line    { width: 14px; height: 2px;  border-radius: 1px; }
+.viz-key--bar     { width: 10px; height: 10px; border-radius: 2px; }
+.viz-key--scatter { width: 9px;  height: 9px;  border-radius: 50%; }
+
+.viz-plot { position: relative; border-radius: 4px; touch-action: pan-y; }
+.viz-plot:focus-visible { outline: 2px solid var(--viz-s1); outline-offset: 4px; }
+.viz-plot svg { display: block; max-width: 100%; }
+
+.viz-grid  { stroke: var(--viz-grid); stroke-width: 1; }
+.viz-axis  { stroke: var(--viz-axis); stroke-width: 1; }
+.viz-cross { stroke: var(--viz-muted); stroke-width: 1; }
+.viz-ring  { stroke: var(--viz-surface); stroke-width: 2; }
+.viz-tick  { fill: var(--viz-muted); font-size: 11px; font-variant-numeric: tabular-nums; }
+.viz-axis-title { fill: var(--viz-muted); font-size: 11px; }
+.viz-label      { fill: var(--viz-ink-2); font-size: 11.5px; font-weight: 550; }
+
+.viz-tip {
+  position:       absolute;
+  z-index:        2;
+  display:        flex;
+  flex-direction: column;
+  gap:            0.2rem;
+  min-width:      7rem;
+  padding:        0.5rem 0.65rem;
+  border:         1px solid var(--viz-axis);
+  border-radius:  4px;
+  background:     #030b1c;
+  font-size:      0.78rem;
+  white-space:    nowrap;
+  pointer-events: none;
+}
+.viz-tip-head { color: var(--viz-muted); font-size: 0.72rem; }
+.viz-tip-row  { display: flex; align-items: center; gap: 0.45rem; color: var(--viz-ink-2); }
+.viz-tip-row strong { color: var(--viz-ink); font-weight: 650; font-variant-numeric: tabular-nums; }
+.viz-tip-key { width: 12px; height: 2px; border-radius: 1px; flex: none; }
+
+.viz-foot {
+  display:         flex;
+  align-items:     baseline;
+  justify-content: space-between;
+  gap:             1rem;
+  margin-top:      0.4rem;
+}
+.viz .viz-caption { margin: 0; font-size: 0.8rem; line-height: 1.5; color: var(--viz-muted); }
+.viz-toggle {
+  margin-left:           auto;
+  padding:               0.25rem 0;
+  border:                0;
+  background:            none;
+  font:                  inherit;
+  font-size:             0.76rem;
+  color:                 var(--viz-ink-2);
+  text-decoration:       underline;
+  text-decoration-color: var(--viz-axis);
+  text-underline-offset: 3px;
+  white-space:           nowrap;
+  cursor:                pointer;
+}
+.viz-toggle:hover { color: var(--viz-ink); }
+
+.viz-table-wrap { margin-top: 0.7rem; overflow-x: auto; }
+.viz .viz-table {
+  display:         table;
+  width:           100%;
+  margin:          0;
+  border-collapse: collapse;
+  font-size:       0.8rem;
+  font-variant-numeric: tabular-nums;
+}
+.viz .viz-table th,
+.viz .viz-table td {
+  padding:       0.35rem 0.7rem 0.35rem 0;
+  border-bottom: 1px solid var(--viz-grid);
+  text-align:    left;
+  color:         var(--viz-ink-2);
+}
+.viz .viz-table thead th { color: var(--viz-muted); font-weight: 500; }
+.viz .viz-table tbody th { color: var(--viz-ink);   font-weight: 500; }
+
+/* ═══════════════════════════════════════════════════════════════════
+   NARROW SCREENS, AND THE CONSOLE BUTTON
+   ═══════════════════════════════════════════════════════════════════ */
+
+/* No right margin to speak of: notes and the at-a-glance list join the
+   text column */
+@media (max-width: 1000px) {
+  .entry-open { grid-template-columns: minmax(0, 1fr); }
+  .entry-glance { max-width: var(--measure); }
+  .entry-body .blk-note {
+    float:     none;
+    width:     auto;
+    max-width: var(--measure);
+    margin:    1.5rem 0;
+  }
+}
+
+/* Phone: the porthole sits above the title, caption beside it */
+@media (max-width: 640px) {
+  .entry-head { grid-template-columns: minmax(0, 1fr); margin-bottom: 2rem; }
+  .porthole {
+    --porthole:     104px;
+    --porthole-rim: 8px;
+    order:          -1;
+    flex-direction: row;
+    justify-self:   start;
+    gap:            1.1rem;
+    padding:        var(--porthole-rim) 0 var(--porthole-rim) var(--porthole-rim);
+  }
+  .porthole-caption { white-space: normal; }
+  .entry-fact { grid-template-columns: 5rem minmax(0, 1fr); }
+  .entry-lede { font-size: 1.1rem; }
+  .blk-stat { margin-right: 1.25rem; padding-right: 1.25rem; }
+  .blk-stat-value { font-size: 1.7rem; }
+}
+
+/* The console button rides above an open page, in the page's palette
+   (the root theme may still be the sunlit one underneath). On a phone a
+   fab floating over the bottom of a page sits on top of the text, so it
+   moves into the page bar's empty right corner instead. */
+:root.page-open .term-fab {
+  z-index:             76;
+  --card-bg:           rgba(3, 11, 26, 0.9);
+  --card-border:       rgba(150, 190, 225, 0.2);
+  --card-border-hover: rgba(150, 190, 225, 0.6);
+  --card-link:         #a8bfd2;
+  --card-link-hover:   #ffffff;
+}
+@media (max-width: 640px) {
+  :root.page-open .term-fab {
+    top:     5px;
+    right:   12px;
+    bottom:  auto;
+    left:    auto;
+    padding: 8px 12px;
+  }
+  :root.page-open .term-fab-tip { display: none; }
+}

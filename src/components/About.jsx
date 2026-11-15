@@ -198,7 +198,7 @@ function LivePresence() {
 
   return (
     <div className="log-presence">
-      <span className="log-presence-label">live transmission //</span>
+      <span className="log-presence-label">live transmission</span>
       <div className="log-presence-content">
         {thumb && (
           <img src={thumb} alt="" className="log-presence-thumb" loading="lazy" />
@@ -221,7 +221,7 @@ function ShippingManifest() {
 
   return (
     <div className="log-manifest">
-      <span className="log-presence-label">engine room — recent transmissions //</span>
+      <span className="log-presence-label">engine room: recent transmissions</span>
       <ul className="manifest-list">
         {items.map(it => (
           <li key={it.id} className="manifest-item">
