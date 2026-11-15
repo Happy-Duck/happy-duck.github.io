@@ -97,6 +97,33 @@ Nothing loads from YouTube until play is pressed.
 
 <RepoCard repo="Happy-Duck/DiscordSportsBot" />
 
+### Before and after
+
+Drag the divider, tap anywhere on the picture, or focus it and use the arrow keys.
+
+<Compare
+  before="/media/projects/pelagos/steam-1.jpg"
+  after="/media/projects/pelagos/steam-2.jpg"
+  alt="two Pelagos screenshots standing in for a real pair"
+  caption="Two unrelated screenshots, here only to show the divider working."
+/>
+
+<Compare beforeLabel="First pass" afterLabel="Shipped" caption="With no pictures yet, and its own labels." />
+
+### Timeline
+
+<Timeline items={[
+  { when: 'Month, year', title: 'A step with a title', text: 'And a sentence about it.' },
+  { when: 'Month, year', title: 'A step with only a title' },
+  { when: 'Month, year', title: 'The last step', text: 'Oldest first reads best.' },
+]} />
+
+### Download
+
+<Download href="/Rishi Garhyan Resume.pdf" title="A file that exists" note="one page" />
+
+<Download title="A file that has not been added yet" />
+
 ## Charts
 
 Sample data throughout. Hover, or focus a chart and use the arrow keys; "View as table" shows every value.

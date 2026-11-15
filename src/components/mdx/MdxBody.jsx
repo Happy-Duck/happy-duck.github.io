@@ -41,6 +41,9 @@ const MDX_COMPONENTS = {
   Callout:  block('Callout'),
   Redacted: block('Redacted'),
   RepoCard: block('RepoCard'),
+  Compare:  block('Compare'),
+  Timeline: block('Timeline'),
+  Download: block('Download'),
 }
 
 const modules = new Map()

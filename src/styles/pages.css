@@ -208,7 +208,7 @@
 .entry-body > hr { max-width: none; }
 .entry-body > :first-child { margin-top: 0; }
 /* Blocks start below a margin note, never squeezed in beside it */
-.entry-body > :is(figure, section, table, .viz, .blk-stats, .blk-callout, .blk-redacted) { clear: both; }
+.entry-body > :is(figure, section, table, .viz, .blk-stats, .blk-callout, .blk-redacted, .blk-timeline, .blk-download) { clear: both; }
 
 .entry-body-loading { color: var(--ink-3); }
 
@@ -617,6 +617,137 @@
 .entry-body a.blk-repo:hover .blk-repo-name { color: #fff; text-decoration: underline; text-underline-offset: 3px; }
 .blk-repo-desc { font-size: 0.94rem; line-height: 1.5; color: var(--ink-2); }
 .blk-repo-meta { font-size: 0.84rem; color: var(--ink-3); }
+
+/* ── Compare (before / after) ──────────────────────────────────────── */
+/* Two pictures stacked; the upper one (before) is clipped at --pos, which
+   the range input laid over the frame sets. The input is invisible but
+   takes every drag, tap, and arrow key. */
+.blk-compare-frame {
+  position:      relative;
+  border-radius: 4px;
+  background:    var(--panel);
+  overflow:      hidden;
+}
+.blk-compare-side { position: absolute; inset: 0; }
+.blk-compare-side--before { clip-path: inset(0 calc(100% - var(--pos)) 0 0); }
+.entry-body .blk-compare-side img {
+  width:         100%;
+  height:        100%;
+  max-width:     none;
+  border-radius: 0;
+  object-fit:    cover;
+}
+/* A placeholder pair has to look like two pictures, so the upper is a shade lighter */
+.blk-compare-side--before .blk-ph { background: #0d2038; }
+.blk-compare-tag {
+  position:      absolute;
+  left:          0.6rem;
+  bottom:        0.6rem;
+  padding:       0.15rem 0.5rem;
+  border-radius: 3px;
+  background:    rgba(3, 11, 26, 0.82);
+  font-size:     0.78rem;
+  line-height:   1.5;
+  color:         var(--ink);
+}
+.blk-compare-tag--after { left: auto; right: 0.6rem; }
+.blk-compare-range {
+  position:     absolute;
+  inset:        0;
+  width:        100%;
+  height:       100%;
+  margin:       0;
+  opacity:      0;
+  cursor:       ew-resize;
+  touch-action: pan-y;
+}
+.blk-compare-divider {
+  position:       absolute;
+  top:            0;
+  bottom:         0;
+  left:           var(--pos);
+  width:          2px;
+  margin-left:    -1px;
+  background:     #fff;
+  pointer-events: none;
+}
+.blk-compare-divider svg {
+  position: absolute;
+  top:      50%;
+  left:     50%;
+  width:    34px;
+  height:   34px;
+  margin:   -17px 0 0 -17px;
+}
+.blk-compare-divider circle { fill: rgba(3, 11, 26, 0.86); stroke: #fff; stroke-width: 1.25; }
+.blk-compare-divider path   { fill: none; stroke: #fff; stroke-width: 1.6; stroke-linecap: round; stroke-linejoin: round; }
+.blk-compare-range:focus-visible + .blk-compare-divider svg {
+  border-radius:  50%;
+  outline:        2px solid var(--link);
+  outline-offset: 2px;
+}
+/* Placeholder pair: each label sits in the middle of its own half, clear
+   of the divider's starting place */
+.blk-compare-side .blk-ph-label {
+  position:  absolute;
+  top:       50%;
+  left:      75%;
+  max-width: 44%;
+  transform: translate(-50%, -50%);
+}
+.blk-compare-side--before .blk-ph-label { left: 25%; background: #0d2038; }
+
+/* ── Timeline ──────────────────────────────────────────────────────── */
+.entry-body .blk-timeline {
+  margin:     1.75rem 0;
+  padding:    0;
+  list-style: none;
+  border-top: 1px solid var(--rule);
+}
+.entry-body .blk-timeline-row {
+  display:               grid;
+  grid-template-columns: 9rem minmax(0, 1fr);
+  gap:                   0 1.5rem;
+  margin:                0;
+  padding:               0.75rem 0;
+  border-bottom:         1px solid var(--rule);
+}
+.blk-timeline-when  { font-size: 0.9rem; line-height: 1.9; color: var(--ink-3); font-variant-numeric: tabular-nums; }
+.blk-timeline-what  { display: grid; gap: 0.1rem; }
+.blk-timeline-title { font-weight: 700; color: var(--ink); }
+.blk-timeline-text  { font-size: 0.96rem; line-height: 1.6; }
+@media (max-width: 640px) {
+  .entry-body .blk-timeline-row { grid-template-columns: 1fr; }
+}
+
+/* ── Download ──────────────────────────────────────────────────────── */
+.entry-body .blk-download {
+  display:               grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  align-items:           center;
+  gap:                   0 0.85rem;
+  margin:                1.75rem 0;
+  padding:               0.85rem 0;
+  border-top:            1px solid var(--rule);
+  border-bottom:         1px solid var(--rule);
+  text-decoration:       none;
+}
+.blk-download-icon {
+  grid-row:        span 2;
+  width:           22px;
+  height:          22px;
+  fill:            none;
+  stroke:          var(--ink-2);
+  stroke-width:    1.5;
+  stroke-linecap:  round;
+  stroke-linejoin: round;
+}
+.blk-download-title { font-weight: 700; line-height: 1.4; color: var(--link); }
+.blk-download-meta  { font-size: 0.84rem; line-height: 1.5; color: var(--ink-3); }
+.entry-body a.blk-download:hover .blk-download-title { color: #fff; text-decoration: underline; text-underline-offset: 3px; }
+.entry-body a.blk-download:hover .blk-download-icon  { stroke: #fff; }
+.blk-download--ph .blk-download-title { color: var(--ink-2); }
+.blk-download--ph { border-style: dashed; border-left: 0; border-right: 0; }
 
 /* ── Lightbox — portaled to <body>, so no page variables here ──────── */
 .blk-lightbox {

@@ -15,10 +15,14 @@
 //   <Callout title="Why this mattered">…</Callout>
 //   <Redacted until="January 2027">Screenshots of the simulator</Redacted>
 //   <RepoCard repo="Happy-Duck/DiscordSportsBot" />
+//   <Compare before="/media/…/old.webp" after="/media/…/new.webp" alt="…" />
+//   <Timeline items={[{ when: 'March 2025', title: '…', text: '…' }]} />
+//   <Download href="/media/…/paper.pdf" title="The paper" note="12 pages" />
 //
 // Figure, Gallery, and Clip draw a labelled placeholder frame when they
 // are given no `src` — use `label="what will go here"` while a page is
-// being laid out.
+// being laid out. Compare (no `before`/`after`) and Download (no `href`)
+// do the same.
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { createPortal } from 'react-dom'
 
@@ -431,6 +435,95 @@ export function CodeTour({ steps = [], children }) {
         </div>
       </div>
     </figure>
+  )
+}
+
+// ── Compare — two pictures of the same thing, with a divider to drag ───
+// Both pictures should be the same shape. The divider is a real range
+// input laid over the frame, so it works by drag, tap, and arrow keys
+// with nothing written for any of them. Either side draws a placeholder
+// when it has no file yet.
+
+export function Compare({
+  before, after, beforeLabel = 'Before', afterLabel = 'After',
+  alt = '', caption, ratio = '16 / 9', wide = false, start = 50,
+}) {
+  const [pos, setPos] = useState(start)
+  const side = (src, name) => (
+    src
+      ? <img src={src} alt={`${name}: ${alt}`} loading="lazy" decoding="async" draggable="false" />
+      : <Placeholder label={`${name} picture`} ratio="auto" />
+  )
+  return (
+    <figure className={`blk-figure blk-compare${wide ? ' blk-wide' : ''}`}>
+      <div className="blk-compare-frame" style={{ aspectRatio: ratio, '--pos': `${pos}%` }}>
+        <div className="blk-compare-side">
+          {side(after, afterLabel)}
+          <span className="blk-compare-tag blk-compare-tag--after">{afterLabel}</span>
+        </div>
+        <div className="blk-compare-side blk-compare-side--before">
+          {side(before, beforeLabel)}
+          <span className="blk-compare-tag">{beforeLabel}</span>
+        </div>
+        <input
+          className="blk-compare-range"
+          type="range"
+          min="0"
+          max="100"
+          step="1"
+          value={pos}
+          onChange={(e) => setPos(Number(e.target.value))}
+          aria-label={`How much of the ${beforeLabel.toLowerCase()} picture to show`}
+          aria-valuetext={`${pos}% ${beforeLabel.toLowerCase()}, ${100 - pos}% ${afterLabel.toLowerCase()}`}
+        />
+        <span className="blk-compare-divider" aria-hidden="true">
+          <svg viewBox="0 0 28 28"><circle cx="14" cy="14" r="13" /><path d="M11 9 L6.5 14 L11 19 M17 9 L21.5 14 L17 19" /></svg>
+        </span>
+      </div>
+      {caption && <figcaption>{caption}</figcaption>}
+    </figure>
+  )
+}
+
+// ── Timeline — dated steps, oldest first ───────────────────────────────
+//   items: [{ when: 'March 2025', title: 'First playable', text: '…' }]
+
+export function Timeline({ items = [] }) {
+  return (
+    <ol className="blk-timeline">
+      {items.map(it => (
+        <li key={`${it.when}-${it.title}`} className="blk-timeline-row">
+          <span className="blk-timeline-when">{it.when}</span>
+          <span className="blk-timeline-what">
+            <span className="blk-timeline-title">{it.title}</span>
+            {it.text && <span className="blk-timeline-text">{it.text}</span>}
+          </span>
+        </li>
+      ))}
+    </ol>
+  )
+}
+
+// ── Download — a file the reader can open (a paper, a poster) ──────────
+// The kind of file is read from its name. Without `href` it draws as a
+// placeholder row, for a file that has not been added yet.
+
+export function Download({ href, title, note }) {
+  const kind = href ? (href.split('?')[0].match(/\.([a-z0-9]+)$/i)?.[1] || 'file').toUpperCase() : null
+  const meta = [kind, note].filter(Boolean).join(', ')
+  const body = (
+    <>
+      <svg className="blk-download-icon" viewBox="0 0 20 20" aria-hidden="true">
+        <path d="M10 3 V12.5 M6 9 L10 13 L14 9 M4 16.5 H16" />
+      </svg>
+      <span className="blk-download-title">{title}</span>
+      <span className="blk-download-meta">{href ? meta : ['File to come', note].filter(Boolean).join(', ')}</span>
+    </>
+  )
+  return href ? (
+    <a className="blk-download" href={href} target="_blank" rel="noopener noreferrer">{body}</a>
+  ) : (
+    <p className="blk-download blk-download--ph">{body}</p>
   )
 }
 

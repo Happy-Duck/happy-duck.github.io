@@ -77,9 +77,32 @@ A short video file that plays in place:
 
 <Clip src="/media/projects/example/clip.mp4" poster="/media/projects/example/clip-poster.webp" caption="What the clip shows." />
 
+Two pictures of the same thing with a divider to drag between them. Both
+should be the same shape. `beforeLabel` and `afterLabel` change the words
+in the corners:
+
+<Compare
+  before="/media/projects/example/before.webp"
+  after="/media/projects/example/after.webp"
+  alt="What both pictures show"
+  caption="What changed between the two."
+/>
+
 <Callout title="A passage set apart">
 The one thing a skimming reader should not miss.
 </Callout>
+
+Dated steps, oldest first. `text` is optional:
+
+<Timeline items={[
+  { when: 'March 2025', title: 'What happened', text: 'A sentence about it.' },
+  { when: 'June 2025', title: 'What happened next' },
+]} />
+
+A file to open, such as a paper or a poster. Leave out `href` until you
+have the file and it draws as a placeholder:
+
+<Download href="/media/projects/example/paper.pdf" title="The paper" note="12 pages" />
 
 ## How it works
 
