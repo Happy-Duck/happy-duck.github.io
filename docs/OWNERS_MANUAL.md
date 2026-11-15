@@ -580,6 +580,7 @@ the template and change the text between the quotes:
 | `<Clip src="…" poster="…" caption="…" />` | A short video file that plays in place. |
 | `<Diagram nodes={[…]} links={[…]} />` | Boxes joined by arrows. Each box has a `col` and `row` (counting from 0) saying where it sits. |
 | `<Note title="…">…</Note>` | A short aside in the right-hand margin. Put it just before the paragraph it belongs beside. |
+| `<CodeTour steps={[…]}>` … `</CodeTour>` | Wrapped around a code block: walks the reader through it a few lines at a time. Each step is `{ lines: 2, text: '…' }` or `{ lines: [3, 5], text: '…' }`, counting lines from 1. |
 | `<Draft />` | The yellow "this page is placeholder" notice. See below. |
 
 `Figure`, `Gallery`, and `Clip` can stand in for media you don't have

@@ -254,10 +254,14 @@ hold the feature-by-feature history, specs, and hard-won gotchas.
   `pages/_TEMPLATE.mdx` is the owner's copy-and-fill starter (files
   starting with `_` are excluded from the glob). Media lives in
   `public/media/<kind>/<slug>/`.
-- **Page blocks** (`components/mdx/blocks.jsx`, `Chart.jsx`): Draft,
-  Stats, Note, Callout, Figure, Gallery, Clip, YouTube, Diagram,
-  Redacted, RepoCard, Chart (Figure/Gallery/Clip draw a labelled
-  placeholder frame when given no `src`) — each
+- **Page blocks** (`components/mdx/blocks.jsx`, `Chart.jsx`,
+  `EngineControls.jsx`): Draft, Stats, Note, Callout, Figure, Gallery,
+  Clip, YouTube, Diagram, CodeTour, Redacted, RepoCard, Chart,
+  EngineControls (Figure/Gallery/Clip draw a labelled placeholder frame
+  when given no `src`; CodeTour toggles `data-lit` on the build-time
+  `[data-line]` spans rather than re-highlighting; EngineControls drives
+  the live dive from the page about this site and MUST restore scroll
+  position and time of day on unmount) — each
   `lazy()` in `MDX_COMPONENTS`, so none ship in the main bundle. A new
   block needs: an entry there, an example in the kitchen sink AND the
   template, and a line in the Owner's Manual. Anything that opens over a

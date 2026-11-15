@@ -7,11 +7,11 @@ line as work lands. Edit with the Write/Edit tools only.
 | Phase | What | Status |
 |---|---|---|
 | 0 | Foundations: registry, router, page layer, pause, prerender, MDX | DONE |
-| 1 | Project pages | MOSTLY: cards open pages, write-up template, page blocks and charts. Left: code tours, before/after slider, media script, summary toggle, the write-ups themselves |
+| 1 | Project pages | MOSTLY: cards open pages, write-up template, page blocks, charts, code tours. Left: before/after slider, media script, the write-ups themselves |
 | 2 | Job and hobby pages | PARTLY: every hobby and job has a page and a way in. No write-ups yet (waiting on the owner's photos and stories) |
 | 3 | Course bubble column | DONE (four class pages carry placeholder wording) |
 | 4 | Findability | MOSTLY: skill ping, depth-gauge stops, terminal ls/open, tailored ?for= links. Left: credentials strip (needs the PDFs), a section menu on phones. CUT by the owner: Ship's Manifest, hero availability line |
-| 5 | Showpieces and polish | Porthole built, then REMOVED at the owner's call. Engine Room and the rest not started |
+| 5 | Showpieces and polish | Engine Room DONE (wording awaits the owner). Porthole built, then REMOVED at the owner's call. Left: per-page social images, print stylesheet |
 
 ## Context
 
@@ -358,6 +358,29 @@ Owner feedback after seeing the sheet and the placeholder pages.
 - **Findability built**: skill ping, depth-gauge stops, terminal
   `ls`/`open`, `?for=` links. `?for=xr` currently changes nothing: no
   project carries the `xr` tag yet (the CS 417 games will).
+
+## The Engine Room (2026-11-15) — DONE
+
+`/projects/this-site/`: the site as its own project, with a card.
+
+- **The controls are real, not a demo.** `EngineControls` dispatches the
+  same events as the terminal and scrolls the actual document; the
+  result is visible because the dive runs beside the sheet. It restores
+  the starting scroll position and time of day on unmount, so the
+  "closing returns you to the depth you left" rule still holds.
+- **The write-up is real content, not filler**, drawn from the code and
+  from CLAUDE.md, with code tours quoting `metersAt` and the dt lines
+  verbatim. It still opens with a `<Draft note=…>` because two things
+  are the owner's: the wording, and how the build is credited (the
+  `role` in projects.js is a placeholder, "Design and development").
+- **`CodeTour` marks lines, it does not re-render code.** It reaches into
+  the build-time-highlighted block and toggles `data-lit` on
+  `[data-line]` spans, so shiki stays out of the bundle.
+- **Diagram routing changed**: a link between different rows and
+  columns used to turn inside the target column and could run through
+  a box; it now turns in the gap between columns. The smoke test walks
+  each connector and checks no point lies inside a box.
+- Seven project cards now, so the last row of the grid holds one.
 
 ## Things to settle before they bite
 
