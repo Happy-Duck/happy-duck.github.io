@@ -8,6 +8,8 @@ pnpm-debug.log*
 lerna-debug.log*
 
 node_modules
+# originals of pictures shrunk by npm run media (see scripts/optimize-media.mjs)
+media-originals
 dist
 dist-ssr
 *.local

@@ -25,6 +25,12 @@
 // do the same.
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { createPortal } from 'react-dom'
+// { '/media/…/picture.webp': [width, height] }, written by `npm run media`
+// (scripts/optimize-media.mjs). Giving an <img> its size up front lets
+// the browser hold its place before it loads, so the text does not jump.
+import MEDIA_SIZES from '../../content/media-sizes.json'
+
+const sizeOf = (src) => MEDIA_SIZES[src] || []
 
 // ── Draft — marks a page whose content is still placeholder ────────────
 // scripts/prerender.mjs counts these at build time and warns, so filler
@@ -185,11 +191,12 @@ function useLightbox(count) {
 
 export function Figure({ src, alt = '', caption, label, ratio, wide = false, width, height }) {
   const box = useLightbox(1)
+  const [w, h] = sizeOf(src)
   return (
     <figure className={`blk-figure${wide ? ' blk-wide' : ''}`}>
       {src ? (
         <button type="button" className="blk-figure-btn" onClick={() => box.open(0)} aria-label={`Enlarge image: ${alt || caption || ''}`}>
-          <img src={src} alt={alt} width={width} height={height} loading="lazy" decoding="async" />
+          <img src={src} alt={alt} width={width ?? w} height={height ?? h} loading="lazy" decoding="async" />
         </button>
       ) : (
         <Placeholder label={label || alt} ratio={ratio} />
@@ -446,9 +453,12 @@ export function CodeTour({ steps = [], children }) {
 
 export function Compare({
   before, after, beforeLabel = 'Before', afterLabel = 'After',
-  alt = '', caption, ratio = '16 / 9', wide = false, start = 50,
+  alt = '', caption, ratio, wide = false, start = 50,
 }) {
   const [pos, setPos] = useState(start)
+  // the frame takes the shape of the pictures when their size is known
+  const [w, h] = sizeOf(before || after)
+  const shape = ratio || (w ? `${w} / ${h}` : '16 / 9')
   const side = (src, name) => (
     src
       ? <img src={src} alt={`${name}: ${alt}`} loading="lazy" decoding="async" draggable="false" />
@@ -456,7 +466,7 @@ export function Compare({
   )
   return (
     <figure className={`blk-figure blk-compare${wide ? ' blk-wide' : ''}`}>
-      <div className="blk-compare-frame" style={{ aspectRatio: ratio, '--pos': `${pos}%` }}>
+      <div className="blk-compare-frame" style={{ aspectRatio: shape, '--pos': `${pos}%` }}>
         <div className="blk-compare-side">
           {side(after, afterLabel)}
           <span className="blk-compare-tag blk-compare-tag--after">{afterLabel}</span>
