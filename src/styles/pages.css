@@ -1062,3 +1062,105 @@
 @media (max-width: 640px) {
   .blk-engine-row { grid-template-columns: minmax(0, 1fr); }
 }
+
+/* ── Print ─────────────────────────────────────────────────────────── */
+/* A page prints as a plain document: dark ink on white paper, no water,
+   no controls, web addresses spelled out after links. Code blocks and
+   charts keep their dark panels, because their colors were chosen
+   against one; print-color-adjust makes the browser print them as is. */
+@media print {
+  @page { margin: 16mm 15mm; }
+
+  :root.page-open,
+  :root.page-open body {
+    height:     auto !important;
+    min-height: 0 !important;
+    overflow:   visible !important;
+    background: #fff !important;
+  }
+  /* Everything that is not the page: the dive, the console, toasts */
+  :root.page-open body > :not(.page-layer) { display: none !important; }
+
+  .page-layer {
+    --page-bg:   #fff;
+    --panel:     #eef1f4;
+    --ink:       #111;
+    --ink-2:     #26303a;
+    --ink-3:     #56616c;
+    --rule:      #c6ccd3;
+    --link:      #111;
+    --sheet-pad: 0px;
+    position:   static;
+    background: #fff;
+    color:      #111;
+  }
+  .page-scroll { height: auto; overflow: visible; }
+  .page-sheet  { width: auto; min-height: 0; }
+  .page-bar    { display: none; }
+  .page-main   { padding: 0; }
+
+  .entry-title,
+  .entry-body h1,
+  .entry-body h2,
+  .entry-body h3,
+  .entry-list-label,
+  .blk-stat-value,
+  .entry-body .blk-callout-title { color: #000; }
+  .entry-body { font-size: 10.5pt; line-height: 1.55; }
+  .entry-body h2,
+  .entry-body h3 { break-after: avoid; }
+
+  /* Where a link goes, for a reader holding paper */
+  .entry-body a[href^="http"]::after,
+  .entry-fact a[href^="http"]::after {
+    content:    ' (' attr(href) ')';
+    font-size:  0.85em;
+    color:      #56616c;
+    word-break: break-all;
+  }
+  .entry-body a.blk-repo::after { content: none; }
+
+  /* Things that only work on a screen */
+  .entry-embed,
+  .blk-engine,
+  .blk-compare-range,
+  .blk-compare-divider,
+  .viz-toggle,
+  .viz-tip { display: none !important; }
+
+  /* Blocks stay in one piece across a page break */
+  .entry-body :is(figure, pre, table, .viz, .blk-callout, .blk-redacted, .blk-timeline-row, .blk-download, .blk-repo, .blk-stats) {
+    break-inside: avoid;
+  }
+
+  /* Dark panels that must print dark */
+  .entry-body pre,
+  .viz,
+  .blk-video,
+  .blk-compare-tag,
+  .blk-draft {
+    -webkit-print-color-adjust: exact;
+    print-color-adjust:         exact;
+  }
+  /* A code tour prints as the whole block, every line at full strength */
+  .blk-tour { display: block; }
+  .blk-tour-code [data-line] { opacity: 1 !important; background: none !important; }
+  .blk-tour-side { display: none; }
+
+  /* Before / after prints as the two halves, split down the middle */
+  .blk-compare-frame { --pos: 50% !important; }
+
+  .blk-ph,
+  .blk-figure-btn,
+  .blk-gallery-item { background: #eef1f4; }
+  /* Browsers leave backgrounds off paper by default, so tinted panels
+     get an outline to stay visible as boxes */
+  .blk-ph,
+  .blk-callout { border: 1px solid #c6ccd3; }
+  .blk-ph-cross line { stroke: #c6ccd3; }
+  .blk-ph-label { background: #eef1f4; }
+  .blk-redacted { background: #eef1f4; border: 1px solid #c6ccd3; }
+  .entry-body .blk-draft { border-color: #a36a1c; color: #7a4a0c; }
+  .blk-repo-name,
+  .blk-download-title { color: #111; }
+}
