@@ -1,0 +1,44 @@
+<Draft />
+
+## The class
+
+Placeholder text. What the course covers, from drawing a triangle to lighting and textures, and that everything runs in the browser.
+
+<Note title="Live demos">
+These are WebGL programs, so they could run right here on the page instead of being shown as pictures. Say the word and that gets built.
+</Note>
+
+A second paragraph on why this class matters for the work you want to do.
+
+## The programs
+
+Placeholder text. A sentence introducing the set, then one short paragraph per program below.
+
+<Gallery lead caption="Placeholders, one per assignment." images={[
+  { label: 'First program' },
+  { label: 'Second program' },
+  { label: 'Third program' },
+  { label: 'Fourth program' },
+  { label: 'Fifth program' },
+]} />
+
+### First program
+
+Placeholder text. What it draws and the idea it taught.
+
+### Second program
+
+Placeholder text. What it draws and the idea it taught.
+
+## One idea worth explaining
+
+Placeholder text. Pick the concept from the class that finally clicked and explain it the way you wish it had been explained to you.
+
+```glsl
+// Placeholder code
+void main() {
+  vec3 n = normalize(vNormal);
+  float diffuse = max(dot(n, uLightDir), 0.0);
+  fragColor = vec4(uColor * diffuse, 1.0);
+}
+```

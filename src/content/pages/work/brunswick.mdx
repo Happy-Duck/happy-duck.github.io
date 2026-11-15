@@ -1,0 +1,61 @@
+<Draft />
+
+<Stats items={[
+  { value: '60 fps', label: 'runtime target' },
+  { value: '3', label: 'protocols: TCP, UDP, CAN' },
+  { value: 'Top 3', label: 'of 800+ interns, Research Park awards' },
+]} />
+
+## What I own
+
+Placeholder text. A plain account of the job: what the simulator is for, who uses it, and which parts are yours. Three or four sentences, written for someone who has never heard of Future Helm.
+
+<Note title="Until January">
+Future Helm is not public until CES. Pictures and video of it are held back on this page until then.
+</Note>
+
+A second paragraph on the team around you: who you hand work to, and who reviews it.
+
+<Redacted until="January 2027">The simulator running: a wide screenshot or a short clip</Redacted>
+
+## The data layer
+
+Placeholder text. This is the part that can be explained without showing anything under embargo. Walk through the diagram: the simulator produces vessel, engine, and navigation state; the data layer carries it; the display app shows it.
+
+<Diagram
+  caption="Placeholder diagram, drawn from the job description. Correct the boxes and add what is missing."
+  nodes={[
+    { id: 'sim', label: 'UE5 simulator', note: 'vessel, engine, navigation', col: 0, row: 0 },
+    { id: 'layer', label: 'C++ data layer', note: 'TCP, UDP, CAN', col: 1, row: 0 },
+    { id: 'mfd', label: 'Display app', note: "a teammate's", col: 2, row: 0 },
+  ]}
+  links={[
+    { from: 'sim', to: 'layer', label: 'live state' },
+    { from: 'layer', to: 'mfd', label: 'telemetry' },
+  ]}
+/>
+
+A paragraph on why three protocols, and what each one carries.
+
+## Holding 60 frames a second
+
+Placeholder text. The optimization story: what was slow, how you found it, and the two changes that fixed it (level-of-detail tuning, and messaging on events instead of polling every frame).
+
+<Chart
+  type="bar"
+  title="Frame time by change"
+  unit="ms"
+  x={['Before', 'LOD tuning', 'Event messaging', 'Both']}
+  series={[{ name: 'Frame time', values: [26.3, 20.1, 21.8, 16.4] }]}
+  caption="Sample numbers, not measurements. Replace with real ones or remove the chart."
+/>
+
+## Navigation prototypes
+
+Placeholder text. Collision prevention and spline-based navigation: what the prototype does today and what it would take to make it real.
+
+<Redacted until="January 2027">A clip of the navigation prototype</Redacted>
+
+## Recognition
+
+Placeholder text. The Research Park award: what it is, who decides, and what the nomination said.

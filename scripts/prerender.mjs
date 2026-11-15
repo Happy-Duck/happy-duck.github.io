@@ -12,12 +12,13 @@
 // It also writes dist/sitemap.xml from the same registry, so the sitemap
 // can never drift from the pages that exist.
 
-import { mkdirSync, readFileSync, writeFileSync } from 'node:fs'
+import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs'
 import { dirname, join } from 'node:path'
 import { fileURLToPath } from 'node:url'
 import { SITE_URL, KINDS, allEntries, entrySummary, entryDescription } from '../src/content/index.js'
 
-const dist = join(dirname(fileURLToPath(import.meta.url)), '..', 'dist')
+const root = join(dirname(fileURLToPath(import.meta.url)), '..')
+const dist = join(root, 'dist')
 const shell = readFileSync(join(dist, 'index.html'), 'utf8')
 
 const esc = (s) => String(s)
@@ -127,4 +128,27 @@ writeFileSync(join(dist, 'sitemap.xml'), [
 ].join('\n'))
 
 console.log(`prerender: ${pages.length} pages + sitemap.xml`)
-for (const p of pages) console.log(`  ${p.path}`)
+
+// ── Draft check ────────────────────────────────────────────────────────
+// A write-up that still carries the <Draft /> tag is placeholder text and
+// media. A plain build lists those pages; `--no-drafts` (which
+// `npm run deploy` passes) refuses to continue, so filler cannot reach
+// the live site by accident. To publish a page, replace its placeholder
+// content and delete the <Draft /> line — or delete the .mdx file, and
+// the page goes back to showing only what the data file says.
+
+const drafts = pages.filter(p => {
+  const file = join(root, 'src', 'content', 'pages', p.kind, `${p.entry.slug}.mdx`)
+  return existsSync(file) && /<Draft\b/.test(readFileSync(file, 'utf8'))
+})
+
+if (drafts.length > 0) {
+  const strict = process.argv.includes('--no-drafts')
+  console.log(`\n${strict ? 'STOPPED' : 'note'}: ${drafts.length} of ${pages.length} pages still hold placeholder content (<Draft />):`)
+  for (const p of drafts) console.log(`  ${p.path}`)
+  if (strict) {
+    console.log('\nNothing was published. Finish those pages (and remove their <Draft /> line),')
+    console.log('or delete their .mdx files, then deploy again.')
+    process.exit(1)
+  }
+}

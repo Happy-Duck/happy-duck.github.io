@@ -1,0 +1,58 @@
+<Draft />
+
+## The room
+
+Placeholder text. What Riggs Escape is: the story of the room, how many players, and how long they get.
+
+<Figure wide label="The finished room, or the prop in place" caption="A wide picture runs the full width of the page." />
+
+## My part
+
+Placeholder text. The two props you wrote the electronics for, the sticker dispenser and the keg safe door, and what each one has to do when a puzzle is solved.
+
+<Diagram
+  caption="Placeholder diagram, drawn from the repository description. Correct the boxes and add what is missing."
+  nodes={[
+    { id: 'input', label: 'Puzzle input', note: 'what players do', col: 0, row: 0 },
+    { id: 'uno', label: 'Arduino Uno', note: 'the code in the repo', col: 1, row: 0 },
+    { id: 'sticker', label: 'Sticker dispenser', col: 2, row: 0 },
+    { id: 'door', label: 'Keg safe door', col: 2, row: 1 },
+  ]}
+  links={[
+    { from: 'input', to: 'uno' },
+    { from: 'uno', to: 'sticker' },
+    { from: 'uno', to: 'door' },
+  ]}
+/>
+
+## Wiring and code
+
+<Note title="Margin note">
+A photo of the wiring next to the snippet that drives it works well here.
+</Note>
+
+Placeholder text. How the circuit is laid out and what the program does on each loop.
+
+<Gallery caption="Placeholders for build photos." images={[
+  { label: 'The breadboard' },
+  { label: 'Inside the prop' },
+  { label: 'Testing on the bench' },
+]} />
+
+```cpp
+// Placeholder code
+void loop() {
+  if (digitalRead(SOLVED_PIN) == HIGH && !opened) {
+    openLatch();
+    opened = true;
+  }
+}
+```
+
+<RepoCard repo="Happy-Duck/MetaPuzzleArduinoCode" />
+
+## Play-testing
+
+Placeholder text. What happened the first time real players tried it, and what you changed afterward.
+
+<Clip label="A group solving the puzzle" />

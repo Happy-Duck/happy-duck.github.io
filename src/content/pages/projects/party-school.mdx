@@ -1,0 +1,48 @@
+<Draft />
+
+<Clip wide label="Gameplay capture: a round of one minigame, start to finish" />
+
+## What it is
+
+Placeholder text. Two or three sentences on the pitch: a sandbox party game where the map is a real city and the minigames happen in it. Say who it is for and how many people play at once.
+
+<Note title="Team">
+Five people. This note is a good place to credit the others by name and say who did what.
+</Note>
+
+A second paragraph on how a session flows, from joining a lobby to the end of a round.
+
+## My part
+
+Placeholder text. The page should be clear about which pieces were yours. From the card: the shared project base every minigame builds on, code review for the team, the city map, and the racing minigame.
+
+<Diagram
+  caption="Placeholder diagram, drawn from the project description. Correct the boxes and add what is missing."
+  nodes={[
+    { id: 'map', label: 'City map', note: 'Map Tiles API via BLOSM', col: 0, row: 0 },
+    { id: 'core', label: 'Shared core project', note: 'multiplayer base', col: 1, row: 0 },
+    { id: 'race', label: 'Racing minigame', note: 'Chaos Vehicles', col: 2, row: 0 },
+    { id: 'others', label: 'Other minigames', note: 'teammates', col: 2, row: 1 },
+  ]}
+  links={[
+    { from: 'map', to: 'core', label: 'streamed in' },
+    { from: 'core', to: 'race' },
+    { from: 'core', to: 'others' },
+  ]}
+/>
+
+## A real city in the engine
+
+Placeholder text. How the map gets from Google into Unreal, what broke along the way, and what the frame rate looks like with a whole city loaded.
+
+<Gallery caption="Three or more pictures form a grid." images={[
+  { label: 'The city from above' },
+  { label: 'Street level' },
+  { label: 'The same block in the editor' },
+]} />
+
+## The racing minigame
+
+Placeholder text. What the cars feel like, how the vehicle setup works, and what is still unfinished.
+
+<Figure label="A car on a city street, mid-race" caption="Captions are optional." />

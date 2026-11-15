@@ -1,0 +1,45 @@
+<Draft />
+
+## What it does
+
+Placeholder text. Which sports and leagues it covers, what a person types, and what comes back. One example command and its reply is worth more than a feature list.
+
+<Figure label="A slash command and the bot's reply, in Discord" caption="A screenshot of the bot answering." />
+
+## How it is put together
+
+Placeholder text. A paragraph walking through the diagram below: a command arrives, the bot asks a sports API, and the answer is cached and sent back. Scheduled alerts run on their own loop.
+
+<Diagram
+  caption="Placeholder diagram, drawn from the project description. Correct the boxes and add what is missing."
+  nodes={[
+    { id: 'user', label: 'Slash command', note: 'in Discord', col: 0, row: 0 },
+    { id: 'bot', label: 'Bot', note: 'discord.py, asyncio', col: 1, row: 0 },
+    { id: 'api', label: 'Sports APIs', note: 'REST', col: 2, row: 0 },
+    { id: 'db', label: 'Database', note: 'SQL', col: 1, row: 1 },
+  ]}
+  links={[
+    { from: 'user', to: 'bot' },
+    { from: 'bot', to: 'api', label: 'scores, stats' },
+    { from: 'bot', to: 'db' },
+  ]}
+/>
+
+<Note title="Margin note">
+The code below is a stand-in to show how a snippet looks. Swap in a real one from the repo.
+</Note>
+
+```python
+# Placeholder code
+@tasks.loop(minutes=5)
+async def check_schedule():
+    for game in await fetch_upcoming():
+        if game.starts_within(minutes=30):
+            await alert_subscribers(game)
+```
+
+## What was hard
+
+Placeholder text. Rate limits, time zones, or keeping scheduled tasks alive across restarts: pick the one that cost the most time and tell that story.
+
+<RepoCard repo="Happy-Duck/DiscordSportsBot" />

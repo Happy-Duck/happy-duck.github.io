@@ -1,0 +1,46 @@
+<Draft />
+
+## The question
+
+Placeholder text. What the paper set out to learn: when a detector has to run in real time, how much accuracy do you give up for speed, and where is the sensible point to stop?
+
+<Note title="Paper">
+The PDF of the paper can be linked from here, or from the list of links at the top of the page.
+</Note>
+
+A second paragraph on the two model families and why they are a fair comparison.
+
+## Results
+
+Placeholder text. One or two sentences that say what the chart shows before the reader looks at it.
+
+<Chart
+  type="scatter"
+  title="Accuracy against latency"
+  xLabel="Latency (ms per image)"
+  yLabel="Accuracy (mAP)"
+  points={[
+    { name: 'Small', x: 6, y: 37, group: 'YOLOv8' },
+    { name: 'Medium', x: 11, y: 45, group: 'YOLOv8' },
+    { name: 'Large', x: 19, y: 50, group: 'YOLOv8' },
+    { name: 'R50', x: 48, y: 40, group: 'Faster R-CNN' },
+    { name: 'R101', x: 63, y: 42, group: 'Faster R-CNN' },
+  ]}
+  caption="Sample numbers, not the paper's results. Replace every point."
+/>
+
+| Model (sample rows) | mAP | Latency | Frames per second |
+| ------------------- | --- | ------- | ----------------- |
+| Placeholder A       | 00  | 00 ms   | 00                |
+| Placeholder B       | 00  | 00 ms   | 00                |
+| Placeholder C       | 00  | 00 ms   | 00                |
+
+## What the numbers mean
+
+Placeholder text. The interpretation: which model you would pick for which job, and what the benchmark does not capture.
+
+<Figure label="The same frame run through both detectors, side by side" caption="A comparison image." />
+
+## Method
+
+Placeholder text. Dataset, hardware, how latency was measured, and anything a reader would need to reproduce the numbers.
