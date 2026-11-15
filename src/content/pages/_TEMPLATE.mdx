@@ -23,27 +23,36 @@
   (under about 4 MB, .mp4). Longer video: upload to YouTube and use the
   YouTube block.
 
-  To see every block below rendered, run the preview and open
+  No file yet? Figure, Gallery, and Clip draw a crossed-out placeholder
+  frame if you leave out src and write label="what will go here".
+
+  Keep the <Draft /> line below while any of the page is still filler:
+  the site refuses to publish a page that has it. Delete the line when
+  the page is real.
+
+  To see every block rendered, run the preview and open
   localhost:5173/dev/kitchen-sink
 */}
 
+<Draft />
+
 <Stats items={[
-  { value: '30,000+', label: 'What the number counts' },
-  { value: '60 fps', label: 'Keep labels short' },
+  { value: '30,000+', label: 'what the number counts' },
+  { value: '60 fps', label: 'keep labels short' },
 ]} />
 
-## What it is
+<YouTube id="VIDEO_ID" title="What the video shows" />
+
+## A heading for the first section
 
 One or two paragraphs. What is this, who was it for, and what did it end
 up doing? Lead with the result if there is one.
 
-<YouTube id="VIDEO_ID" title="What the video shows" />
+<Note title="A margin note">
+A short aside. Write it just before the paragraph it should sit beside.
+</Note>
 
-## What I built
-
-- The parts that were yours
-- The hard problem and how you got past it
-- A number, if you have one
+The paragraph the note sits beside.
 
 <Figure
   src="/media/projects/example/screenshot.webp"
@@ -51,22 +60,44 @@ up doing? Lead with the result if there is one.
   caption="An optional caption under the picture."
 />
 
-Several pictures at once. Click any of them to page through full-size:
+A picture that runs the full width of the page:
 
-<Gallery images={[
+<Figure wide label="No file yet: this draws a placeholder frame" />
+
+Several pictures at once. Click any of them to page through full-size.
+With `lead`, the first is shown large:
+
+<Gallery lead caption="An optional caption for the set." images={[
   { src: '/media/projects/example/one.webp', alt: 'What the first picture shows', caption: 'Optional caption' },
   { src: '/media/projects/example/two.webp', alt: 'What the second picture shows' },
+  { label: 'A picture you do not have yet' },
 ]} />
 
-A short video clip that plays in place:
+A short video file that plays in place:
 
-<video src="/media/projects/example/clip.mp4" controls muted playsInline preload="none" poster="/media/projects/example/clip-poster.webp" />
+<Clip src="/media/projects/example/clip.mp4" poster="/media/projects/example/clip-poster.webp" caption="What the clip shows." />
 
-<Callout title="Why this mattered">
-  The one thing a skimming reader should not miss.
+<Callout title="A passage set apart">
+The one thing a skimming reader should not miss.
 </Callout>
 
 ## How it works
+
+Boxes joined by arrows. `col` and `row` say where each box sits, counting
+from 0:
+
+<Diagram
+  caption="What the diagram shows."
+  nodes={[
+    { id: 'a', label: 'First box', note: 'a second line', col: 0, row: 0 },
+    { id: 'b', label: 'Second box', col: 1, row: 0 },
+    { id: 'c', label: 'Third box', col: 2, row: 0 },
+  ]}
+  links={[
+    { from: 'a', to: 'b', label: 'what flows' },
+    { from: 'b', to: 'c' },
+  ]}
+/>
 
 Code is highlighted automatically. Put the language after the backticks:
 
@@ -89,7 +120,7 @@ A chart. `type` is `line`, `bar`, or `scatter`:
 
 <Chart
   type="scatter"
-  title="Accuracy vs. latency"
+  title="Accuracy against latency"
   xLabel="Latency (ms per image)"
   yLabel="Accuracy (mAP)"
   points={[

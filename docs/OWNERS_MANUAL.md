@@ -576,6 +576,25 @@ the template and change the text between the quotes:
 | `<Chart type="line" … />` | A line, bar, or scatter chart from numbers you type in. |
 | `<Redacted until="…">…</Redacted>` | A placeholder for something you can't show yet. |
 | `<RepoCard repo="Happy-Duck/Name" />` | A GitHub repository with its live stats. |
+| `<Clip src="…" poster="…" caption="…" />` | A short video file that plays in place. |
+| `<Diagram nodes={[…]} links={[…]} />` | Boxes joined by arrows. Each box has a `col` and `row` (counting from 0) saying where it sits. |
+| `<Note title="…">…</Note>` | A short aside in the right-hand margin. Put it just before the paragraph it belongs beside. |
+| `<Draft />` | The yellow "this page is placeholder" notice. See below. |
+
+`Figure`, `Gallery`, and `Clip` can stand in for media you don't have
+yet: leave out `src` and write `label="what will go here"`, and they
+draw a crossed-out frame of the right size. Add `wide` to a `Figure` or
+`Clip` to let it run the full width of the page instead of the text
+column, and `lead` to a `Gallery` to show its first picture large.
+
+**Every page currently holds placeholder content** so the layout can be
+judged: filler text that says what belongs in each spot, crossed-out
+frames, sample charts. Each of those pages starts with a `<Draft />`
+line. As you replace a page's filler with the real thing, delete that
+line. **`npm run deploy` refuses to publish while any page still has
+it** and lists which ones; that is deliberate. If you want to go live
+before a page is written, delete its `.mdx` file and the page falls
+back to just its card content.
 
 Two rules that keep these from breaking: every `alt="…"` should say what
 the picture shows (screen readers read it aloud), and inside the curly

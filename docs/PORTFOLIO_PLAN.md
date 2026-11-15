@@ -10,7 +10,7 @@ line as work lands. Edit with the Write/Edit tools only.
 | 1 | Project pages | MOSTLY: cards open pages, write-up template, page blocks and charts. Left: code tours, before/after slider, media script, summary toggle, the write-ups themselves |
 | 2 | Job and hobby pages | PARTLY: every hobby and job has a page and a way in. No write-ups yet (waiting on the owner's photos and stories) |
 | 3 | Course bubble column | DONE (four class pages carry placeholder wording) |
-| 4 | Findability | not started |
+| 4 | Findability | not started. The owner CUT the Ship's Manifest and the hero availability line (2026-11-14) |
 | 5 | Showpieces and polish | PARTLY: porthole header done. Engine Room and the rest not started |
 
 ## Context
@@ -223,11 +223,11 @@ What differs from the plan above, and what was learned:
 
 ## Phase 4 — Findability
 
-- Ship's Manifest ★ and mission profiles ★.
+- Mission profiles ★. (~~Ship's Manifest~~: cut by the owner, who does not want a quick-skim page.)
 - Sonar skill ping ★ on the Skills section; stack pills on pages link back; project filter chips and featured-first order.
 - Section anchors; [DepthGauge.jsx](../src/components/DepthGauge.jsx) gains clickable waypoints; a small menu fab on mobile.
 - Terminal: `ls [work|projects|hobbies|courses]`, `open <slug>`, `courses`; Ctrl+K opens it in open mode.
-- Hero: availability line and two calls to action (resume, projects).
+- ~~Hero availability line~~: cut by the owner. Do not add one, or the signal-buoy idea that depended on it.
 - Credentials strip: Research Park award finalist, IMMERSE poster, the computer vision paper.
 
 ## Phase 5 — Showpieces and polish
@@ -269,6 +269,56 @@ What differs from the plan above, and what was learned:
 - Open question for the owner: replace the shipwreck chest's "the real
   treasure" label (they find it big-headed). Options were proposed;
   nothing is to be changed until they pick one.
+
+## Page design, second pass (2026-11-14) — DONE
+
+The owner asked for four things at once: career cards clickable like
+project cards, pages that close when you click beside the content,
+placeholder content on every page to judge the layout, and the
+"tells of AI web dev" replaced.
+
+- **Pages are a sheet now.** One centered sheet (`.page-sheet`, 1120px)
+  over the dive; the water stays visible, dimmed, either side. Clicking
+  it closes the page (press and release must both land outside; the
+  scrollbar and a drag-selection that ends outside do not count).
+  Below 1121px there are no gutters, so only Back and Esc close.
+- **How the layers work.** The sheet's own `box-shadow: 0 0 0 100vmax`
+  is the dimming over the gutters. The sheet is `overflow: clip` (not
+  hidden: hidden breaks the sticky bar), which clips the porthole's
+  200vmax shadow to the sheet. The ocean layers stay visible the whole
+  time a page is open; what the porthole controls is whether they run.
+- **Layout.** Title, facts list, opening paragraph with the at-a-glance
+  points beside it, then the write-up. Text keeps to a 41rem measure on
+  the left; `.blk-wide` media uses the full sheet; `Note` floats into
+  the right margin. Page styles live in `src/styles/pages.css`, whose
+  header states the design rules.
+- **What was removed as AI tells** (and should not come back): tiny
+  uppercase letter-spaced mono labels above titles, pill chips on
+  pages, 1px-glow-border cards, hover-lift, left-accent-bar callouts,
+  pulsing "live" dots and rings, glow on dots, text arrows (→), the
+  "open file →" card label, trailing `//` decorations, faux-terminal
+  breadcrumbs, em dashes in UI strings, three-identical-cards rows,
+  rotated "stamp" labels, star glyphs. The owner said there were "at
+  least a few" without naming them, so this list is a best pass.
+- **Left alone on the dive, flagged to the owner:** stack pills on the
+  cards, the frosted-glass cards themselves, the small mono uppercase
+  labels (dates, Captain's Log), and em dashes in the owner's own copy
+  ("Solo developer — design, code, and publishing", the site title).
+- **Placeholder content on all 19 pages**, each opening with
+  `<Draft />`. Filler text describes what belongs in each spot rather
+  than inventing facts. Real numbers are kept; invented ones are
+  labelled sample or placeholder. Pelagos uses its seven real
+  screenshots from the public Steam listing
+  (`public/media/projects/pelagos/`); its trailer is a placeholder
+  because Steam only serves it as an HLS/DASH stream.
+- **Deploy guard.** `scripts/prerender.mjs` lists pages that still
+  contain `<Draft`; `npm run deploy` passes `--no-drafts`, which exits 1
+  before publishing if any remain.
+- **Test artifact worth knowing.** In headless Edge a clip screenshot of
+  the title occasionally (about 1 page in 15, dev server only) comes
+  back blank and is drawn on a retake 200 ms later; full screenshots
+  taken right after are always correct. Treated as software-raster lag,
+  not reproduced as a lasting state, not seen on the production build.
 
 ## Things to settle before they bite
 

@@ -15,8 +15,8 @@ hold the feature-by-feature history, specs, and hard-won gotchas.
   locks freshly-dropped files and crashes fs.watch with EBUSY otherwise)
 - `npm run lint` — MUST stay at zero errors/warnings before every commit
 - `npm run build` — prod build, then `scripts/prerender.mjs` writes a
-  page shell per route + `sitemap.xml` into `dist/` (main bundle ≈ 450 kB
-  / 146 kB gzip; devicons are imported per-icon from
+  page shell per route + `sitemap.xml` into `dist/` (main bundle ≈ 443 kB
+  / 144 kB gzip; devicons are imported per-icon from
   `devicons-react/lib/icons/*` — never from the package index, it's CJS
   and ships ~3,000 icons)
 - `npm run preview` — serve `dist/`; the only way to check prerendered
@@ -24,7 +24,8 @@ hold the feature-by-feature history, specs, and hard-won gotchas.
 - `npm run deploy` — build + push `dist/` to the `gh-pages` branch. This is
   the ONLY thing that changes the live site; merging to master does not.
   It publishes whatever is checked out — do NOT run it from the wave 3
-  branch until the owner says that work is ready.
+  branch until the owner says that work is ready. It stops by itself
+  while any page still holds placeholder content (see Placeholder content).
 
 ## Core architecture — the depth system
 
@@ -166,8 +167,9 @@ hold the feature-by-feature history, specs, and hard-won gotchas.
   They name fields differently, so read them through `entryTitle()`,
   `entrySummary()`, `entryDescription()`. A new kind = a new entry in
   `KINDS`; routing, prerender, and sitemap follow.
-- **Ways in**: project cards are `role="link"` and navigate (the modal is
-  gone); career cards and Captain's Log hobby lines carry a `<Link>`;
+- **Ways in**: project AND career cards are whole-card links (the modal
+  is gone) — spread `cardLinkProps(href, label)` from `lib/cardLink.js`,
+  don't add an "open" label or arrow; Captain's Log hobby lines carry a `<Link>`;
   class bubbles with a page are `<Link>`s. Each carries
   `data-entry-anchor="<kind>-<slug>"`, and each section a bare
   `data-entry-anchor="<kind>"` fallback — that is where closing a
@@ -184,12 +186,25 @@ hold the feature-by-feature history, specs, and hard-won gotchas.
   trailing slash (GitHub Pages serves `<path>/index.html`); the router
   strips it for matching.
 - **Page layer** (`components/pages/PageLayer.jsx`): every route except `/`
-  is an opaque layer portaled to body at z-75, own scroll. THE DIVE NEVER
-  UNMOUNTS — `App.jsx` wraps it in `.dive`, and with a page open it is
-  `.dive--stowed` (hidden, CSS animations paused) + `inert`. The document
-  never scrolls, so closing a page restores the exact depth. Terminal
-  lives OUTSIDE `.dive` so it works over a page. `.page-layer` re-declares
-  the deep-sea theme vars, so pages look the same at any dive depth.
+  is a layer portaled to body at z-75 holding ONE CENTERED SHEET
+  (`.page-sheet`, 1120px) with its own scroll. THE DIVE NEVER UNMOUNTS —
+  `App.jsx` wraps it in `.dive`, and with a page open it is
+  `.dive--stowed` + `inert`: content and UI hidden, the water layers
+  (`.dive-ocean`, `.ocean-backdrop`) still visible, dimmed, in the
+  gutters. Clicking a gutter closes the page (press AND release outside
+  the sheet; scrollbar excluded). The sheet's `box-shadow: 0 0 0 100vmax`
+  IS the gutter dimming, and the sheet is `overflow: clip` — never
+  `hidden`, which breaks the sticky bar. The document never scrolls, so
+  closing a page restores the exact depth. Terminal lives OUTSIDE
+  `.dive` so it works over a page.
+- **Page styles** are all in `src/styles/pages.css` (imported by
+  PageLayer), NOT index.css. Its header lists the design rules — the
+  owner had AI-looking patterns removed and does not want them back: no
+  uppercase letter-spaced mono eyebrow labels, no pill chips, no
+  glow-border cards, no hover-lift, no left-accent-bar callouts, no
+  pulsing dots/rings, no text arrows (→) or `//` decorations, no em
+  dashes in UI strings, 4px corners, sentence case. Mono type is for
+  code and the two depth readouts only.
 - **Pause contract** (`src/lib/oceanPause.js`): `isPaused()` is true while a
   page is open AND its porthole is off screen. The depth loop skips
   subscribers; any loop with its own rAF MUST check `isPaused()` wherever
@@ -198,7 +213,7 @@ hold the feature-by-feature history, specs, and hard-won gotchas.
 - **Porthole** (`pages/Porthole.jsx`): a real hole in the page layer onto
   the live dive. While it is on screen (`:root.porthole-open`) the layer's
   background is off and `.porthole-glass` casts a 200vmax box-shadow in
-  the same `--page-bg`. Three rules, each paid for:
+  the same `--page-bg`, clipped to the sheet. Three rules, each paid for:
   (1) EVERYTHING else on a page must paint above that shadow — page
   content is `z-index: 1`; never give `.entry-head`, `.porthole`, or
   `.porthole-window` a z-index, and anything new placed outside `.entry`
@@ -217,8 +232,10 @@ hold the feature-by-feature history, specs, and hard-won gotchas.
   `pages/_TEMPLATE.mdx` is the owner's copy-and-fill starter (files
   starting with `_` are excluded from the glob). Media lives in
   `public/media/<kind>/<slug>/`.
-- **Page blocks** (`components/mdx/blocks.jsx`, `Chart.jsx`): Stats,
-  Callout, Figure, Gallery, YouTube, Redacted, RepoCard, Chart — each
+- **Page blocks** (`components/mdx/blocks.jsx`, `Chart.jsx`): Draft,
+  Stats, Note, Callout, Figure, Gallery, Clip, YouTube, Diagram,
+  Redacted, RepoCard, Chart (Figure/Gallery/Clip draw a labelled
+  placeholder frame when given no `src`) — each
   `lazy()` in `MDX_COMPONENTS`, so none ship in the main bundle. A new
   block needs: an entry there, an example in the kitchen sink AND the
   template, and a line in the Owner's Manual. Anything that opens over a
@@ -241,6 +258,12 @@ hold the feature-by-feature history, specs, and hard-won gotchas.
   docs/PORTFOLIO_PLAN.md §3) — measure fused-pair counts offline before
   changing it; the kernel is (r²/d²)² on purpose. The sim module is pure
   (no DOM), so it can be driven from Node for that.
+- **Placeholder content**: every page currently has a draft write-up
+  opening with `<Draft />`. Filler text must describe what belongs
+  there, never invent facts about the owner's work; invented numbers are
+  captioned as sample. The build lists pages still containing `<Draft`,
+  and `npm run deploy` (`--no-drafts`) refuses to publish while any
+  remain. Remove the tag only when a page's content is real.
 - **Prerender** (`scripts/prerender.mjs`): each tag swap must match
   exactly once or the build fails — if you restructure `index.html`'s
   meta tags, update the patterns there. Keep `SITE_TITLE` in
@@ -273,7 +296,11 @@ playwright-core — reinstall it. Source files are CRLF on disk but Git
 Bash tools (grep, sed, cat -A) HIDE the CRs: a Node script that matches
 multi-line strings must normalize `\r\n` first or it finds nothing. Never `git stash -u` in this folder:
 OneDrive denies removing empty dirs, so the stash is saved but the working
-tree is left as-is and `stash pop` then refuses. To drive the router from
+tree is left as-is and `stash pop` then refuses. Start test servers on your OWN ports (`npm run dev -- --port 5199
+--strictPort`), never 5173 — the owner may have their dev server there,
+and one was killed by a cleanup that matched on the command line. Git
+Bash rewrites arguments that start with `/` into Windows paths; pass
+URL paths without the leading slash. To drive the router from
 a dev-server smoke script:
 `page.evaluate(async () => (await import('/src/lib/router.js')).navigate('/work/brunswick/'))`.
 
