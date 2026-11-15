@@ -70,6 +70,17 @@ function renderPage({ kind, entry, path, title }) {
     `<meta property="og:description" content="${d}" />`)
   html = swap(html, 'og:url', /<meta property="og:url" content="[^"]*" \/>/,
     `<meta property="og:url" content="${url}" />`)
+  // The page's own share picture, when `npm run media` has made one
+  // (scripts/social-cards.mjs); otherwise the site-wide one stays
+  const card = `/social/${kind}-${entry.slug}.jpg`
+  if (existsSync(join(dist, card))) {
+    html = swap(html, 'og:image', /<meta property="og:image" content="[^"]*" \/>/,
+      `<meta property="og:image" content="${SITE_URL}${card}" />`)
+    html = swap(html, 'twitter:image', /<meta name="twitter:image" content="[^"]*" \/>/,
+      `<meta name="twitter:image" content="${SITE_URL}${card}" />`)
+  } else {
+    missingCards.push(path)
+  }
   html = swap(html, 'twitter:title', /<meta name="twitter:title" content="[^"]*" \/>/,
     `<meta name="twitter:title" content="${t}" />`)
   html = swap(html, 'twitter:description', /<meta name="twitter:description" content="[^"]*" \/>/,
@@ -98,6 +109,7 @@ function renderPage({ kind, entry, path, title }) {
   return html
 }
 
+const missingCards = []
 const pages = allEntries()
 
 for (const page of pages) {
@@ -128,6 +140,9 @@ writeFileSync(join(dist, 'sitemap.xml'), [
 ].join('\n'))
 
 console.log(`prerender: ${pages.length} pages + sitemap.xml`)
+if (missingCards.length > 0) {
+  console.log(`note: ${missingCards.length} ${missingCards.length === 1 ? 'page has' : 'pages have'} no share picture yet (run npm run media): ${missingCards.join(' ')}`)
+}
 
 // ── Draft check ────────────────────────────────────────────────────────
 // A write-up that still carries the <Draft /> tag is placeholder text and

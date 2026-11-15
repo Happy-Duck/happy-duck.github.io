@@ -11,6 +11,9 @@
 //   courses  optional: slugs from courses.js for the class it came out of
 //   grid     optional: false = has a page but no card in the Projects grid
 //   links    optional extra buttons on the page: [{ label, href }]
+//   cover    optional: a picture under /media/ for the card shown when the
+//            page's link is shared (made by `npm run media`); without one
+//            the card is the page title over the site's water
 //   details  role / highlights / optional playable embed, shown on the page
 //
 // details.highlights wording drawn from the card descriptions + README —
@@ -26,6 +29,7 @@ export const PROJECTS = [
     link:        'https://store.steampowered.com/app/2645390/Pelagos_A_Marine_Adventure',
     tags:        ['games'],
     skills:      ['unity', 'csharp'],
+    cover:       '/media/projects/pelagos/steam-3.webp',
     details: {
       role: 'Solo developer: design, code, and publishing',
       highlights: [

@@ -7,7 +7,7 @@
     "dev": "vite",
     "build": "vite build && node scripts/prerender.mjs",
     "lint": "eslint .",
-    "media": "node scripts/optimize-media.mjs",
+    "media": "node scripts/optimize-media.mjs && node scripts/social-cards.mjs",
     "preview": "vite preview",
     "deploy": "vite build && node scripts/prerender.mjs --no-drafts && gh-pages -d dist"
   },
