@@ -30,6 +30,7 @@ to preview, save, and publish.
    - [6.8 Browser-tab title and search-engine text](#68-browser-tab-title-and-search-engine-text)
    - [6.9 Dive-log species names and jokes](#69-dive-log-species-names-and-jokes)
    - [6.10 Pages: jobs, projects, classes, hobbies](#610-pages-jobs-projects-classes-hobbies)
+   - [6.11 Things that take care of themselves](#611-things-that-take-care-of-themselves)
 7. [Swapping images and files](#7-swapping-images-and-files)
    - [7.1 The resume PDF](#71-the-resume-pdf)
    - [7.2 Creature photos](#72-creature-photos)
@@ -290,9 +291,9 @@ Each job is one block. The same block feeds the card on the main page
 | `period` | Dates, shown in small caps | `'May 2026 – Present'` |
 | `summary` | ONE sentence. Shown under the link in Google and when the page is shared in Discord, LinkedIn, etc. | any sentence |
 | `description` | The paragraph | any sentence(s) |
-| `stack` | The little pills | `['Unity', 'C#', 'VR']` |
-| `tags` | Broad categories, used to suggest related pages: `games`, `xr`, `graphics`, `tools`, `research` | `['xr']` |
-| `skills` | Which of your Skills icons this job used, by their `id` in `src/content/skills.js`. Used to suggest related pages. | `['unity', 'csharp']` |
+| `stack` | The tools line at the bottom of the card | `['Unity', 'C#', 'VR']` |
+| `tags` | Broad categories: `games`, `xr`, `graphics`, `tools`, `research`. On projects they drive tailored links (see 6.11). | `['xr']` |
+| `skills` | Which of your Skills icons this job used, by their `id` in `src/content/skills.js`. When a visitor presses a skill icon, the cards that list it light up. | `['unity', 'csharp']` |
 
 - **Edit** — change text inside quotes.
 - **Add a job** — copy an existing block from `{` through `},` and paste
@@ -602,13 +603,14 @@ braces the usual list rules from section 5 apply — quotes around text,
 commas between items, no quotes around numbers. To see all of them
 working, run the preview and open `localhost:5173/dev/kitchen-sink`.
 
-**Extra buttons on a page.** Any block in the data files can carry
-`links: [{ label: 'MP2 source', href: 'https://github.com/…' }],` — each
-becomes a button under the page's title. (`link:` on a project is still
-the main store button.)
+**Extra links on a page.** Any block in the data files can carry
+`links: [{ label: 'MP2 source', href: 'https://github.com/…' }],` and each
+one is listed under "Links" beside the page's title. (`link:` on a
+project is still the main store link, and the button on its card.)
 
-**The round window** at the top of every page is the live ocean at the
-depth the visitor came from. There is nothing to set up or edit.
+**Closing a page.** On a wide screen the ocean stays visible either side
+of the page; clicking it, pressing Esc, or "Back to the dive" all return
+to where the visitor was.
 
 **Pictures and video** go in the `public` folder, one folder per page:
 `public/media/projects/pelagos/menu.webp` is written in the page as
@@ -638,6 +640,21 @@ kind of formatting and exactly how it will look, run the preview
 No list to update and nothing to register: save the file and the page
 picks it up. Delete the file and the page goes back to showing just the
 card content.
+
+### 6.11 Things that take care of themselves
+
+- **Skill icons are buttons.** Pressing one outlines every career and
+  project card whose `skills` list includes it and names them under the
+  icons. To change what answers, edit the `skills` lists (6.2, 6.3).
+- **The depth gauge** on the right edge has a tick for each section;
+  clicking one jumps there. New sections need a programmer.
+- **Tailored links.** Add `?for=` and a tag to the site address and the
+  projects with that tag come first: `happy-duck.github.io/?for=tools`
+  leads with SportsBot, `?for=graphics` with the vision research. Use a
+  different link on each kind of application. Tags come from the
+  `tags` lists in `projects.js`; a tag no project has changes nothing.
+- **The console** (the `>_` button): `ls projects` lists pages and
+  `open pelagos` opens one.
 
 ---
 

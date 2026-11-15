@@ -10,8 +10,8 @@ line as work lands. Edit with the Write/Edit tools only.
 | 1 | Project pages | MOSTLY: cards open pages, write-up template, page blocks and charts. Left: code tours, before/after slider, media script, summary toggle, the write-ups themselves |
 | 2 | Job and hobby pages | PARTLY: every hobby and job has a page and a way in. No write-ups yet (waiting on the owner's photos and stories) |
 | 3 | Course bubble column | DONE (four class pages carry placeholder wording) |
-| 4 | Findability | not started. The owner CUT the Ship's Manifest and the hero availability line (2026-11-14) |
-| 5 | Showpieces and polish | PARTLY: porthole header done. Engine Room and the rest not started |
+| 4 | Findability | MOSTLY: skill ping, depth-gauge stops, terminal ls/open, tailored ?for= links. Left: credentials strip (needs the PDFs), a section menu on phones. CUT by the owner: Ship's Manifest, hero availability line |
+| 5 | Showpieces and polish | Porthole built, then REMOVED at the owner's call. Engine Room and the rest not started |
 
 ## Context
 
@@ -319,6 +319,45 @@ placeholder content on every page to judge the layout, and the
   back blank and is drawn on a retake 200 ms later; full screenshots
   taken right after are always correct. Treated as software-raster lag,
   not reproduced as a lasting state, not seen on the production build.
+
+## Third pass (2026-11-15) — DONE
+
+Owner feedback after seeing the sheet and the placeholder pages.
+
+- **Freeze bug.** Scrolling a page froze the water beside it: the dive
+  paused whenever the porthole left the view. The dive now runs for as
+  long as water is in view beside the sheet (window wider than 1120px)
+  and pauses only when the sheet covers the whole window.
+- **Undimmed strips.** Creatures showed at full brightness along the
+  sheet edges and behind the scrollbar, because the dim was the sheet's
+  spread shadow (it starts outside a translucent border and is clipped
+  before the scrollbar). The dim is now `.page-layer`'s background.
+  Verified by comparing pixel brightness of the seam and the scrollbar
+  strip against the gutter.
+- **Porthole removed.** The owner found it redundant with the visible
+  sides and left the call open; it and its shadow machinery are gone.
+- **Related pages removed** from every page. "From this class" stays.
+- **Page text is not selectable**, matching the dive.
+- **Shipwreck chest label removed** (the owner called it unnecessary;
+  the five replacement options are moot).
+- **Education card is full width.**
+- **The dive was de-templated** on the owner's instruction to fix the AI
+  tells that predated wave 3. Researched lists of such tells agree on a
+  cluster: glassmorphism on everything, pill badges, glow hover
+  effects, rounded-everything, purple/blue gradients, emoji, arrow
+  buttons, three equal cards. What the dive had and lost: backdrop blur
+  on 16 surfaces, tool pills, 10 uppercase rules and 29 wide
+  letter-spacings, 14–18px and pill radii, card glow + 3D tilt + lift,
+  pulsing contact rings and breathing glow, title glow, em dashes in
+  copy and meta tags. Kept on purpose: the floor stamp's caps (it is a
+  stamp), mono type in the Captain's Log lines and terminal (they are
+  consoles), creature bioluminescence, the centered hero.
+- **Card backgrounds went from ~0.3–0.78 alpha to ~0.93** to stay
+  readable without blur. Creatures no longer show through cards. This is
+  the most visible change and the one most likely to get owner feedback.
+- **Findability built**: skill ping, depth-gauge stops, terminal
+  `ls`/`open`, `?for=` links. `?for=xr` currently changes nothing: no
+  project carries the `xr` tag yet (the CS 417 games will).
 
 ## Things to settle before they bite
 

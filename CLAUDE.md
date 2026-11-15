@@ -15,7 +15,7 @@ hold the feature-by-feature history, specs, and hard-won gotchas.
   locks freshly-dropped files and crashes fs.watch with EBUSY otherwise)
 - `npm run lint` — MUST stay at zero errors/warnings before every commit
 - `npm run build` — prod build, then `scripts/prerender.mjs` writes a
-  page shell per route + `sitemap.xml` into `dist/` (main bundle ≈ 443 kB
+  page shell per route + `sitemap.xml` into `dist/` (main bundle ≈ 445 kB
   / 144 kB gzip; devicons are imported per-icon from
   `devicons-react/lib/icons/*` — never from the package index, it's CJS
   and ships ~3,000 icons)
@@ -84,8 +84,9 @@ hold the feature-by-feature history, specs, and hard-won gotchas.
   within 1.4r. Passive visibility does NOT count; `markSeen()` stays
   immediate.
 - **Terminal** (`src/components/Terminal.jsx`): opens on typed `cmd` or
-  backtick or the `>_` fab. Commands dispatch events other systems listen
-  for: `ocean:ping` (sonar), `ocean:summon-whale`, `ocean:set-tod` (live
+  backtick or the `>_` fab. `ls [kind]` lists pages and `open <slug>`
+  opens one (both read the content registry). Commands dispatch events
+  other systems listen for: `ocean:ping` (sonar), `ocean:summon-whale`, `ocean:set-tod` (live
   palette swap re-patching BG stops + ray uniforms). Debug commands live
   under `debug`: `tod`, `depth <m>`, `reset`. New debug tooling goes HERE,
   not as UI buttons.
@@ -170,7 +171,8 @@ hold the feature-by-feature history, specs, and hard-won gotchas.
 - **Ways in**: project AND career cards are whole-card links (the modal
   is gone) — spread `cardLinkProps(href, label)` from `lib/cardLink.js`,
   don't add an "open" label or arrow; Captain's Log hobby lines carry a `<Link>`;
-  class bubbles with a page are `<Link>`s. Each carries
+  class bubbles with a page are `<Link>`s; skill-ping answers and
+  terminal `open` navigate too. Each card carries
   `data-entry-anchor="<kind>-<slug>"`, and each section a bare
   `data-entry-anchor="<kind>"` fallback — that is where closing a
   directly-loaded page scrolls the dive to.
@@ -192,11 +194,12 @@ hold the feature-by-feature history, specs, and hard-won gotchas.
   `.dive--stowed` + `inert`: content and UI hidden, the water layers
   (`.dive-ocean`, `.ocean-backdrop`) still visible, dimmed, in the
   gutters. Clicking a gutter closes the page (press AND release outside
-  the sheet; scrollbar excluded). The sheet's `box-shadow: 0 0 0 100vmax`
-  IS the gutter dimming, and the sheet is `overflow: clip` — never
-  `hidden`, which breaks the sticky bar. The document never scrolls, so
-  closing a page restores the exact depth. Terminal lives OUTSIDE
-  `.dive` so it works over a page.
+  the sheet; scrollbar excluded). The dimming is `.page-layer`'s own
+  background, so it covers the whole window — a dim cast by the sheet
+  (shadow, border) left creatures undimmed at the sheet edges and behind
+  the scrollbar. The document never scrolls, so closing a page restores
+  the exact depth. Terminal lives OUTSIDE `.dive` so it works over a
+  page. Page text is NOT selectable, same as the dive.
 - **Page styles** are all in `src/styles/pages.css` (imported by
   PageLayer), NOT index.css. Its header lists the design rules — the
   owner had AI-looking patterns removed and does not want them back: no
@@ -204,25 +207,44 @@ hold the feature-by-feature history, specs, and hard-won gotchas.
   glow-border cards, no hover-lift, no left-accent-bar callouts, no
   pulsing dots/rings, no text arrows (→) or `//` decorations, no em
   dashes in UI strings, 4px corners, sentence case. Mono type is for
-  code and the two depth readouts only.
+  code and the depth readout only.
+- **The dive follows the same rules** (restyled 2026-11-15): cards are
+  solid panels — NO `backdrop-filter` anywhere, 6px corners, no glow,
+  lift, or tilt on hover (the border changes); tools are one plain line
+  (`.card-stack`), not pills; no `text-transform: uppercase` or wide
+  `letter-spacing` (the floor stamp is the one exception — it is a
+  rubber stamp); contact buttons are plain round icon buttons with no
+  pulse or glow; no em dashes in copy, titles, or meta tags. Glow
+  belongs to the creatures, not to the interface.
+- **Skill ping** (`Skills.jsx`): each skill is a button; pressing it
+  dispatches `ocean:ping` from the icon, toggles `.card--answer` on
+  every `[data-skills~=id]` card (career + project cards carry
+  `data-skills`), and lists `pagesForSkill(id)` as links.
+- **Depth gauge stops** (`DepthGauge.jsx`): any section with `id` +
+  `data-waypoint="Label"` gets a clickable tick; positions are
+  re-measured by a ResizeObserver on body (page length changes when
+  the lazy course column arrives).
+- **Tailored links** (`lib/profile.js`): `?for=<tag>` moves projects
+  with that tag (projects.js `tags`) to the front of the grid, kept in
+  sessionStorage for the visit. Career order never changes.
 - **Pause contract** (`src/lib/oceanPause.js`): `isPaused()` is true while a
-  page is open AND its porthole is off screen. The depth loop skips
+  page is open AND no water is in view beside it, i.e. the window is no
+  wider than the sheet (PageLayer reports this via `setWaterVisible`;
+  `:root.water-open` is the CSS signal). On a wide screen the dive keeps
+  running under an open page — pausing it there read as a frozen
+  background bug. The depth loop skips
   subscribers; any loop with its own rAF MUST check `isPaused()` wherever
   it checks `document.hidden`. Transitions fire `ocean:pause`; the rays
   worker gets a posted visibility message (never terminated).
-- **Porthole** (`pages/Porthole.jsx`): a real hole in the page layer onto
-  the live dive. While it is on screen (`:root.porthole-open`) the layer's
-  background is off and `.porthole-glass` casts a 200vmax box-shadow in
-  the same `--page-bg`, clipped to the sheet. Three rules, each paid for:
-  (1) EVERYTHING else on a page must paint above that shadow — page
-  content is `z-index: 1`; never give `.entry-head`, `.porthole`, or
-  `.porthole-window` a z-index, and anything new placed outside `.entry`
-  needs its own. The shadow once covered the title while every DOM check
-  passed — verify pages with SCREENSHOTS of the text.
-  (2) `--page-bg` stays a flat color; a gradient pops at the hand-off.
-  (3) Only `.dive-ocean` (an UNPOSITIONED wrapper in App.jsx — it must
-  not create a stacking context) and `.ocean-backdrop` are un-hidden; a
-  new water layer goes inside `.dive-ocean`, new UI stays outside it.
+- **No porthole.** A window in the page header onto the dive was built
+  and removed: with the water visible both sides it showed the same thing
+  twice. `.dive-ocean` (an UNPOSITIONED wrapper in App.jsx — it must not
+  create a stacking context) and `.ocean-backdrop` are what stay visible
+  under a page; a new water layer goes inside `.dive-ocean`, new UI stays
+  outside it.
+- **No Related lists.** The owner had them removed from every page. A
+  class page lists the projects that came out of it; that is the only
+  cross-link block.
 - **Page bodies** (`src/content/bodies.js` + `components/mdx/`): add
   `src/content/pages/<kind>/<slug>.mdx` and that entry's page renders it,
   as its own lazy chunk. MDX + remark-gfm + rehype-pretty-code (shiki at
