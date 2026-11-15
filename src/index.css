@@ -2561,6 +2561,97 @@ html::-webkit-scrollbar { display: none; }
   font-variant-numeric: tabular-nums;
 }
 
+/* Section menu — the gauge on a phone: a depth readout in the top corner
+   that opens the list of sections (DepthGauge.jsx). Mono is allowed here
+   because it is the depth readout. */
+.depth-menu { display: none; }
+
+@media (max-width: 768px) {
+  .depth-menu {
+    display:  block;
+    position: fixed;
+    top:      12px;
+    right:    12px;
+    z-index:  50;
+  }
+  .depth-menu-scrim { position: fixed; inset: 0; }
+  .depth-menu-btn,
+  .depth-menu-list { position: relative; }
+  .depth-menu-btn {
+    display:         flex;
+    align-items:     center;
+    justify-content: flex-end;
+    gap:             8px;
+    min-width:       92px;
+    min-height:      40px;
+    padding:         0 12px;
+    border-radius:   6px;
+    border:          1px solid var(--card-border);
+    background:      var(--card-bg);
+    color:           var(--card-title);
+    cursor:          pointer;
+    font-family:     'Share Tech Mono', ui-monospace, monospace;
+    font-size:       0.84rem;
+    font-variant-numeric: tabular-nums;
+    box-shadow:      0 4px 18px rgba(0,0,0,0.30);
+    transition:
+      border-color     0.25s ease,
+      background-color var(--theme-dur) var(--theme-ease);
+  }
+  .depth-menu-btn[aria-expanded="true"] { border-color: var(--card-border-hover); }
+  .depth-menu-chev {
+    width:           10px;
+    height:          7px;
+    fill:            none;
+    stroke:          currentColor;
+    stroke-width:    1.6;
+    stroke-linecap:  round;
+    stroke-linejoin: round;
+  }
+  .depth-menu-btn[aria-expanded="true"] .depth-menu-chev { transform: rotate(180deg); }
+
+  .depth-menu-list {
+    position:       absolute;
+    top:            calc(100% + 6px);
+    right:          0;
+    display:        flex;
+    flex-direction: column;
+    min-width:      14rem;
+    padding:        4px;
+    border-radius:  6px;
+    border:         1px solid var(--card-border);
+    /* the card color laid over the water color, so the list is opaque
+       and no card text shows through it */
+    background:     linear-gradient(var(--card-bg), var(--card-bg)), var(--ocean-bg-color, #04101f);
+    box-shadow:     0 4px 18px rgba(0,0,0,0.30);
+  }
+  .depth-menu-item {
+    display:         flex;
+    align-items:     baseline;
+    justify-content: space-between;
+    gap:             1.5rem;
+    min-height:      44px;
+    padding:         0 10px;
+    border:          0;
+    border-radius:   4px;
+    background:      none;
+    color:           var(--card-body);
+    cursor:          pointer;
+    font:            inherit;
+    font-size:       0.95rem;
+    line-height:     44px;
+    text-align:      left;
+  }
+  .depth-menu-item[aria-current] { color: var(--card-title); font-weight: 700; }
+  .depth-menu-at {
+    font-family: 'Share Tech Mono', ui-monospace, monospace;
+    font-size:   0.78rem;
+    font-weight: 400;
+    font-variant-numeric: tabular-nums;
+    opacity:     0.8;
+  }
+}
+
 /* ═══════════════════════════════════════════════════════════════════
    CREATURE ANIMATIONS
    ═══════════════════════════════════════════════════════════════════ */
