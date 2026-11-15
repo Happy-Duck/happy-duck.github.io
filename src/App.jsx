@@ -69,7 +69,7 @@ export default function App() {
   }, [pageOpen])
 
   // Direct landing: also move the dive to the entry's card right away, so
-  // the page's porthole looks out at the right depth. Layout is still
+  // the water beside the sheet is the water at that depth. Layout is still
   // settling this early (fonts, the lazy course column), which is why the
   // scroll is repeated once and then again when the page closes (above).
   useEffect(() => {
@@ -81,8 +81,9 @@ export default function App() {
 
   return (
     <>
-      {/* The dive — everything below stays mounted while a page is open,
-          but hidden, inert, and paused (see lib/oceanPause.js) */}
+      {/* The dive — everything below stays mounted while a page is open:
+          inert, its content hidden, its water still in view beside the
+          sheet on a wide screen (see lib/oceanPause.js) */}
       <div className={pageOpen ? 'dive dive--stowed' : 'dive'} inert={pageOpen}>
 
       {/* Skip link — first focusable element, keyboard/screen-reader only */}
@@ -106,8 +107,9 @@ export default function App() {
 
       <div className="relative overflow-hidden">
 
-        {/* The water itself. Grouped so a page's porthole can show just
-            these layers (no content, no UI) — see pages/Porthole.jsx. The
+        {/* The water itself. Grouped so that, with a page open, just
+            these layers stay in view beside the sheet (no content, no
+            UI) — see styles/pages.css. The
             wrapper is unpositioned on purpose: it must not create a
             stacking context, the layers interleave with <main> by z-index. */}
         <div className="dive-ocean">

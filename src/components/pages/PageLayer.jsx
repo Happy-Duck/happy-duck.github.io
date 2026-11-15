@@ -2,9 +2,8 @@
 // Every route except / renders here: a full-viewport layer portaled to
 // <body> (sections create stacking contexts that trap fixed children)
 // holding one centered sheet with its own scroll. The dive stays mounted
-// underneath — inert and paused (App.jsx) — so the document never
-// scrolls and closing the page puts the diver back at the exact depth
-// they left. On a wide screen the water stays visible, dimmed, either
+// underneath, inert (App.jsx), so the document never scrolls and
+// closing the page puts the diver back at the exact depth they left. On a wide screen the water stays visible, dimmed, either
 // side of the sheet; clicking it closes the page, like stepping back from
 // a chart table.
 //
@@ -14,6 +13,7 @@ import { useEffect, useRef } from 'react'
 import { createPortal } from 'react-dom'
 import '../../styles/pages.css'
 import { goBack } from '../../lib/router'
+import { setWaterVisible } from '../../lib/oceanPause'
 import { useOceanDepth } from '../../hooks/useOceanDepth'
 import { KINDS, SITE_TITLE, entryTitle, entryShortName } from '../../content/index.js'
 import { devBodyLoader } from '../../content/bodies.js'
@@ -48,6 +48,20 @@ export function PageLayer({ route, path }) {
       window.removeEventListener('keydown', onKey)
       document.body.style.overflow = ''
       if (prev && prev !== document.body && prev.focus) prev.focus({ preventScroll: true })
+    }
+  }, [])
+
+  // The dive keeps running only while its water shows beside the sheet,
+  // which is whenever the window is wider than the sheet (pages.css:
+  // --sheet-w). Narrower than that, the sheet covers it and it pauses.
+  useEffect(() => {
+    const wide = window.matchMedia('(min-width: 1121px)')
+    const report = () => setWaterVisible(wide.matches)
+    report()
+    wide.addEventListener('change', report)
+    return () => {
+      wide.removeEventListener('change', report)
+      setWaterVisible(false)
     }
   }, [])
 

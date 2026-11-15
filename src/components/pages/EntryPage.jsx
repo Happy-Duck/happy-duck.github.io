@@ -3,16 +3,15 @@
 // the title, a short list of facts, the opening paragraph, and the
 // at-a-glance points. The long-form body
 // (src/content/pages/<kind>/<slug>.mdx) follows, then the playable
-// embed where a project has one, then links to related pages.
+// embed where a project has one. A class page ends with its projects.
 import {
   KINDS, STATUS_LABEL,
-  entryPath, entryTitle, entryDescription, related,
+  entryPath, entryDescription,
   projectsForCourse, coursesForProject, courseHasPage, courseStatus, termLabel,
 } from '../../content/index.js'
 import { bodyLoader } from '../../content/bodies.js'
 import { MdxBody } from '../mdx/MdxBody'
 import { Link } from '../Link'
-import { Porthole } from './Porthole'
 
 function headerFor(kind, entry) {
   if (kind === 'work')    return { title: entry.role, sub: entry.company }
@@ -96,16 +95,12 @@ export function EntryPage({ kind, entry }) {
   const embed = entry.details?.embed
   const body = bodyLoader(kind, entry.slug)
 
-  // Explicit ties first (a class lists its projects), then pages that
-  // share skills or tags
+  // A class lists the projects that came out of it
   const ties = kind === 'courses'
     ? projectsForCourse(entry.slug).map(p => ({
         href: entryPath('projects', p.slug), kind: KINDS.projects.label, title: p.title,
       }))
     : []
-  const more = related(kind, entry.slug).map(p => ({
-    href: entryPath(p.kind, p.entry.slug), kind: KINDS[p.kind].label, title: entryTitle(p.kind, p.entry),
-  }))
 
   return (
     <article className="entry">
@@ -124,7 +119,6 @@ export function EntryPage({ kind, entry }) {
             </dl>
           )}
         </div>
-        <Porthole />
       </header>
 
       <div className="entry-open">
@@ -149,7 +143,6 @@ export function EntryPage({ kind, entry }) {
       )}
 
       <PageList label="From this class" items={ties} />
-      <PageList label="Related pages" items={more} />
     </article>
   )
 }

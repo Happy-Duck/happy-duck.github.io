@@ -8,8 +8,10 @@
      hover-lift. A thing gets a box only if it is a frame for media.
    - Corners are 4px. Rules are 1px hairlines in --rule.
    - Text is sentence case. Small labels are small, not capitalized.
-   - The mono face is for code and for the two instrument readouts (the
-     depth beside "Back to the dive" and under the porthole). Nowhere else.
+   - The mono face is for code and for the depth readout beside "Back to
+     the dive". Nowhere else.
+   - Text is not selectable, same as the dive (code blocks excepted, by
+     the global rule in index.css).
    ═══════════════════════════════════════════════════════════════════ */
 
 .page-layer {
@@ -25,32 +27,27 @@
   --sheet-w:   1120px;
   --sheet-pad: clamp(1.25rem, 5vw, 4rem);
 
-  position: fixed;
-  inset:    0;
-  z-index:  75;
-  color:    var(--ink);
+  position:   fixed;
+  inset:      0;
+  z-index:    75;
+  background: var(--page-dim);
+  color:      var(--ink);
 }
 
 /* ── The dive while a page is open ─────────────────────────────────── */
-/* Content and UI are hidden; the water itself stays in view (it shows,
-   dimmed, either side of the sheet and through the porthole). It is
-   paused unless the porthole is on screen — lib/oceanPause.js stands the
-   JS loops down, this stills the CSS ones. */
+/* Content and UI are hidden; the water itself stays in view, dimmed,
+   either side of the sheet, and keeps moving. Where the sheet covers
+   the whole window there is nothing to see, so it is paused instead —
+   lib/oceanPause.js stands the JS loops down, this stills the CSS ones. */
 .dive--stowed { visibility: hidden; }
 .dive--stowed .ocean-backdrop,
 .dive--stowed .dive-ocean { visibility: visible; }
 .dive--stowed *,
 .dive--stowed *::before,
 .dive--stowed *::after { animation-play-state: paused !important; }
-:root.porthole-open .dive--stowed .dive-ocean *,
-:root.porthole-open .dive--stowed .dive-ocean *::before,
-:root.porthole-open .dive--stowed .dive-ocean *::after { animation-play-state: running !important; }
-
-/* Pages are for reading — the dive's no-select default is lifted */
-.page-layer,
-.page-layer *,
-.page-layer *::before,
-.page-layer *::after { user-select: text; -webkit-user-select: text; }
+:root.water-open .dive--stowed .dive-ocean *,
+:root.water-open .dive--stowed .dive-ocean *::before,
+:root.water-open .dive--stowed .dive-ocean *::after { animation-play-state: running !important; }
 
 /* ── Scroller and sheet ────────────────────────────────────────────── */
 
@@ -63,20 +60,15 @@
   cursor:              pointer;   /* the water either side closes the page */
 }
 
-/* The sheet. Its spread shadow is the dimming over the water either
-   side; overflow: clip keeps the porthole's own shadow (below) inside
-   the sheet without breaking the sticky bar the way hidden would. */
+/* The sheet: opaque, edge to edge of its own width. The dimming over
+   the water beside it is .page-layer's background, so nothing (not the
+   sheet's edges, not the strip behind the scrollbar) is left undimmed. */
 .page-sheet {
-  width:        min(var(--sheet-w), 100%);
-  min-height:   100%;
-  margin:       0 auto;
-  overflow:     clip;
-  background:   var(--page-bg);
-  box-shadow:   0 0 0 100vmax var(--page-dim);
-  cursor:       auto;
-}
-@media (min-width: 1121px) {
-  .page-sheet { border-inline: 1px solid var(--rule); }
+  width:      min(var(--sheet-w), 100%);
+  min-height: 100%;
+  margin:     0 auto;
+  background: var(--page-bg);
+  cursor:     auto;
 }
 
 .page-bar {
@@ -139,13 +131,7 @@
 
 /* ── Entry header ──────────────────────────────────────────────────── */
 
-.entry-head {
-  display:               grid;
-  grid-template-columns: minmax(0, 1fr) auto;
-  gap:                   1.5rem 3rem;
-  align-items:           start;
-  margin-bottom:         2.5rem;
-}
+.entry-head { margin-bottom: 2.5rem; }
 
 .entry-title {
   margin:         0;
@@ -179,79 +165,6 @@
 }
 .entry-fact dt { color: var(--ink-3); }
 .entry-fact dd { margin: 0; color: var(--ink); line-height: 1.5; }
-
-/* ── Porthole — a hole in the sheet onto the live dive ─────────────── */
-/* See pages/Porthole.jsx. While the porthole is on screen the sheet's
-   own background is off and the glass casts the same color as a 200vmax
-   shadow (clipped to the sheet): everything but the circle stays
-   covered, and the hole scrolls with the frame on the compositor.
-
-   That shadow stands in for the page background, so everything else on
-   the page has to paint ABOVE it. Paint phases alone don't guarantee
-   that (it went over the title once), so it is explicit: all page
-   content sits at z-index 1, and the glass — with no z-index, under a
-   header that creates no stacking context — stays beneath. Don't give
-   .entry-head, .porthole, or .porthole-window a z-index. */
-
-:root.porthole-open .page-sheet { background: transparent; }
-:root.porthole-open .porthole-glass { box-shadow: 0 0 0 200vmax var(--page-bg); }
-
-.entry-head-text,
-.entry > :not(.entry-head),
-.porthole-caption,
-.porthole-frame {
-  position: relative;
-  z-index:  1;
-}
-
-.porthole {
-  --porthole:     176px;
-  --porthole-rim: 11px;
-  display:        flex;
-  flex-direction: column;
-  align-items:    center;
-  gap:            0.9rem;
-  padding:        var(--porthole-rim) var(--porthole-rim) 0;
-}
-.porthole-window { position: relative; }
-.porthole-glass {
-  width:         var(--porthole);
-  height:        var(--porthole);
-  border-radius: 50%;
-}
-/* Before the observer reports, and once scrolled away: dark glass */
-:root:not(.porthole-open) .porthole-glass { background: #041530; }
-
-/* Lens: darkened edge and a glare. */
-.porthole-window > .porthole-frame {
-  position:      absolute;
-  inset:         0;
-  border-radius: 50%;
-  background:
-    radial-gradient(circle at 30% 24%, rgba(255, 255, 255, 0.14) 0%, transparent 34%),
-    radial-gradient(circle at 50% 50%, transparent 56%, rgba(0, 6, 20, 0.55) 100%);
-  box-shadow: inset 0 0 22px 4px rgba(0, 6, 20, 0.7);
-  pointer-events: none;
-}
-/* Rim */
-.porthole-frame::after {
-  content:       "";
-  position:      absolute;
-  inset:         calc(var(--porthole-rim) * -1);
-  border-radius: 50%;
-  border:        var(--porthole-rim) solid #1f3148;
-  box-shadow:
-    0 -1px 0 1px rgba(160, 205, 235, 0.22),
-    inset 0 0 0 1px rgba(0, 0, 0, 0.7),
-    0 10px 26px rgba(0, 0, 0, 0.5);
-  pointer-events: none;
-}
-.porthole-caption {
-  font-family: 'Share Tech Mono', ui-monospace, monospace;
-  font-size:   0.74rem;
-  white-space: nowrap;
-  color:       var(--ink-3);
-}
 
 /* ── Opening paragraph + at a glance ───────────────────────────────── */
 
@@ -735,7 +648,6 @@
   font-family: ui-sans-serif, system-ui, sans-serif;
   font-size:   0.88rem;
   color:       #a8bfd2;
-  user-select: text;
 }
 .blk-lightbox-count { color: #7890a6; white-space: nowrap; }
 .blk-lightbox-btn {
@@ -912,19 +824,8 @@
   }
 }
 
-/* Phone: the porthole sits above the title, caption beside it */
 @media (max-width: 640px) {
-  .entry-head { grid-template-columns: minmax(0, 1fr); margin-bottom: 2rem; }
-  .porthole {
-    --porthole:     104px;
-    --porthole-rim: 8px;
-    order:          -1;
-    flex-direction: row;
-    justify-self:   start;
-    gap:            1.1rem;
-    padding:        var(--porthole-rim) 0 var(--porthole-rim) var(--porthole-rim);
-  }
-  .porthole-caption { white-space: normal; }
+  .entry-head { margin-bottom: 2rem; }
   .entry-fact { grid-template-columns: 5rem minmax(0, 1fr); }
   .entry-lede { font-size: 1.1rem; }
   .blk-stat { margin-right: 1.25rem; padding-right: 1.25rem; }
