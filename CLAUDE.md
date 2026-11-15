@@ -15,12 +15,18 @@ hold the feature-by-feature history, specs, and hard-won gotchas.
   locks freshly-dropped files and crashes fs.watch with EBUSY otherwise)
 - `npm run lint` — MUST stay at zero errors/warnings before every commit
 - `npm run build` — prod build, then `scripts/prerender.mjs` writes a
-  page shell per route + `sitemap.xml` into `dist/` (main bundle ≈ 445 kB
+  page shell per route + `sitemap.xml` into `dist/` (main bundle ≈ 448 kB
   / 144 kB gzip; devicons are imported per-icon from
   `devicons-react/lib/icons/*` — never from the package index, it's CJS
   and ships ~3,000 icons)
 - `npm run preview` — serve `dist/`; the only way to check prerendered
   routes and their meta tags locally
+- `npm run media` — run by hand after adding pictures; never part of
+  the build. `scripts/optimize-media.mjs` (sharp) turns jpg/png under
+  `public/media` into webp, moves originals to the ignored
+  `media-originals/`, rewrites the names in `src/content`, and records
+  sizes in `src/content/media-sizes.json`; then
+  `scripts/social-cards.mjs` writes `public/social/<kind>-<slug>.jpg`
 - `npm run deploy` — build + push `dist/` to the `gh-pages` branch. This is
   the ONLY thing that changes the live site; merging to master does not.
   It publishes whatever is checked out — do NOT run it from the wave 3
@@ -223,7 +229,11 @@ hold the feature-by-feature history, specs, and hard-won gotchas.
 - **Depth gauge stops** (`DepthGauge.jsx`): any section with `id` +
   `data-waypoint="Label"` gets a clickable tick; positions are
   re-measured by a ResizeObserver on body (page length changes when
-  the lazy course column arrives).
+  the lazy course column arrives). Below 768px the gauge is hidden and
+  the same component's `SectionMenu` shows instead: a depth readout,
+  top right, that opens the section list. While it is open a scrim
+  swallows taps on the dive; without it the tap that dismisses the
+  menu also opens the card under the finger.
 - **Tailored links** (`lib/profile.js`): `?for=<tag>` moves projects
   with that tag (projects.js `tags`) to the front of the grid, kept in
   sessionStorage for the visit. Career order never changes.
@@ -256,9 +266,12 @@ hold the feature-by-feature history, specs, and hard-won gotchas.
   `public/media/<kind>/<slug>/`.
 - **Page blocks** (`components/mdx/blocks.jsx`, `Chart.jsx`,
   `EngineControls.jsx`): Draft, Stats, Note, Callout, Figure, Gallery,
-  Clip, YouTube, Diagram, CodeTour, Redacted, RepoCard, Chart,
-  EngineControls (Figure/Gallery/Clip draw a labelled placeholder frame
-  when given no `src`; CodeTour toggles `data-lit` on the build-time
+  Clip, YouTube, Diagram, CodeTour, Compare, Timeline, Download,
+  Redacted, RepoCard, Chart, EngineControls (Figure/Gallery/Clip/Compare
+  draw a labelled placeholder frame when given no `src`, Download a
+  placeholder row with no `href`; Compare's divider is a real
+  `<input type="range">` laid invisibly over the frame, so drag, tap,
+  and arrow keys need no pointer code; CodeTour toggles `data-lit` on the build-time
   `[data-line]` spans rather than re-highlighting; EngineControls drives
   the live dive from the page about this site and MUST restore scroll
   position and time of day on unmount) — each
@@ -267,6 +280,23 @@ hold the feature-by-feature history, specs, and hard-won gotchas.
   template, and a line in the Owner's Manual. Anything that opens over a
   page (lightbox) is portaled to body with `data-esc-layer`, or Esc will
   close the page under it; portaled UI cannot use the page's theme vars.
+- **Media sizes** (`src/content/media-sizes.json`, generated): Figure
+  reads width/height from it and Compare its frame shape, so write-ups
+  never state dimensions. Do not hand-edit; run `npm run media`.
+- **Share pictures** (`public/social/`, generated and COMMITTED): drawn
+  with the local machine's fonts (the hero's Segoe UI Black), which is
+  why they are not made during the build. Default card = the page title
+  over `scripts/assets/social-base.png` (the hero screenshotted at
+  1200x630, noon, text and buttons hidden); an entry with `cover` uses
+  that picture with a title band. `prerender.mjs` swaps og:image and
+  twitter:image only when the card file exists. Retake the base and
+  `public/og-image.png` if the hero's look changes.
+- **Print** (`@media print` at the end of pages.css): a page prints
+  light, with everything on body except `.page-layer` hidden. A new
+  block with a tinted panel needs a look in print (backgrounds are off
+  by default: outline it, or opt in with `print-color-adjust: exact`
+  as code and charts do); a new screen-only control goes in the hidden
+  list there.
 - **Charts** (`Chart.jsx`, plain SVG): one y-axis always; series colors
   are the fixed `--viz-s1…s8` order, validated against `--viz-surface`
   with the dataviz skill's `validate_palette.js` — re-run it if either
@@ -322,7 +352,12 @@ playwright-core — reinstall it. Source files are CRLF on disk but Git
 Bash tools (grep, sed, cat -A) HIDE the CRs: a Node script that matches
 multi-line strings must normalize `\r\n` first or it finds nothing. Never `git stash -u` in this folder:
 OneDrive denies removing empty dirs, so the stash is saved but the working
-tree is left as-is and `stash pop` then refuses. Start test servers on your OWN ports (`npm run dev -- --port 5199
+tree is left as-is and `stash pop` then refuses. The dev server lists `public/` once at startup and its watcher
+ignores that folder, so files added later were answered with the app
+shell; the `freshMedia` plugin in vite.config.js now serves `/media/*`
+from disk (anything else new in `public/` still needs a restart). Bash
+heredocs here mangle backslashes and choke on apostrophes: write patch
+scripts with the Write tool. Start test servers on your OWN ports (`npm run dev -- --port 5199
 --strictPort`), never 5173 — the owner may have their dev server there,
 and one was killed by a cleanup that matched on the command line. Git
 Bash rewrites arguments that start with `/` into Windows paths; pass

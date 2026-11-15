@@ -7,11 +7,11 @@ line as work lands. Edit with the Write/Edit tools only.
 | Phase | What | Status |
 |---|---|---|
 | 0 | Foundations: registry, router, page layer, pause, prerender, MDX | DONE |
-| 1 | Project pages | MOSTLY: cards open pages, write-up template, page blocks, charts, code tours. Left: before/after slider, media script, the write-ups themselves |
+| 1 | Project pages | DONE except the write-ups themselves (the owner's): cards open pages, write-up template, page blocks, charts, code tours, before/after slider, timeline, download row, media script |
 | 2 | Job and hobby pages | PARTLY: every hobby and job has a page and a way in. No write-ups yet (waiting on the owner's photos and stories) |
 | 3 | Course bubble column | DONE (four class pages carry placeholder wording) |
-| 4 | Findability | MOSTLY: skill ping, depth-gauge stops, terminal ls/open, tailored ?for= links. Left: credentials strip (needs the PDFs), a section menu on phones. CUT by the owner: Ship's Manifest, hero availability line |
-| 5 | Showpieces and polish | Engine Room DONE (wording awaits the owner). Porthole built, then REMOVED at the owner's call. Left: per-page social images, print stylesheet |
+| 4 | Findability | MOSTLY: skill ping, depth-gauge stops, section menu on phones, terminal ls/open, tailored ?for= links. Left: credentials strip (needs the PDFs). CUT by the owner: Ship's Manifest, hero availability line |
+| 5 | Showpieces and polish | DONE: Engine Room (wording awaits the owner), per-page share pictures, print stylesheet. Porthole built, then REMOVED at the owner's call. Not built, on purpose: card-to-page morph, 3D model viewer (see Fourth pass) |
 
 ## Context
 
@@ -381,6 +381,42 @@ Owner feedback after seeing the sheet and the placeholder pages.
   a box; it now turns in the gap between columns. The smoke test walks
   each connector and checks no point lies inside a box.
 - Seven project cards now, so the last row of the grid holds one.
+
+## Fourth pass (2026-11-15) — DONE
+
+The rest of the plan that did not need the owner.
+
+- **Compare, Timeline, Download blocks.** Compare's divider is a real
+  range input laid invisibly over the frame; the before picture is
+  clipped at `--pos`. Used as placeholders on the research page (the
+  two detectors, the paper), the lab page (the poster), and Pelagos
+  (a dated list with no dates invented).
+- **Print stylesheet.** End of pages.css. Checked by printing pages to
+  PDF in headless Edge (`page.pdf()`), then reading the PDF.
+- **Section menu on phones.** The gauge's phone form: depth readout,
+  top right, opens the section list. The smoke test caught the
+  dismissing tap opening the card underneath; a scrim fixes it.
+- **`npm run media`.** Shrinks pictures, keeps originals out of the
+  repo and the deploy, rewrites names in write-ups, records sizes.
+  The Pelagos screenshots went from 2.2 MB to 0.75 MB.
+- **Dev server fix.** Files added to `public/media` while the server
+  ran were answered with the app shell (Vite lists `public/` at
+  startup; the watcher ignores it here). `freshMedia` in
+  vite.config.js serves them from disk.
+- **Share pictures.** One per page in `public/social`, the title over
+  the site's own water, or over the entry's `cover` picture. The old
+  `og-image.png` still showed the pre-restyle tagline and was retaken.
+
+**Not built, and why.**
+
+- *Card-to-page morph.* The dive restyle removed every hover lift and
+  tilt at the owner's request; a card that grows into a page is the
+  same family of flourish. The cross-fade stays unless the owner asks.
+- *3D model viewer.* Nothing to show in it until the Immersive
+  Learning Lab assets arrive; three.js is already a lazy chunk, so it
+  is cheap to add then.
+- *Credentials strip.* Needs the paper and poster PDFs. The Download
+  block is ready for them.
 
 ## Things to settle before they bite
 

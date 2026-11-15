@@ -544,8 +544,8 @@ Every job, project, and hobby — and every class you made clickable —
 has its own page with its own web address, for example
 `https://happy-duck.github.io/projects/pelagos/`, that you can put on a
 resume or send to someone. Visitors reach them from the site: clicking a
-project card, the "open file" link on a career card, a glowing class
-bubble, or a hobby line in the Captain's Log.
+project or career card, a class bubble with a ring around it, or a hobby
+line in the Captain's Log.
 
 Out of the box a page shows only what its block in the data file says.
 **Hobby pages in particular are one line long until you write them.**
@@ -581,13 +581,18 @@ the template and change the text between the quotes:
 | `<Diagram nodes={[…]} links={[…]} />` | Boxes joined by arrows. Each box has a `col` and `row` (counting from 0) saying where it sits. |
 | `<Note title="…">…</Note>` | A short aside in the right-hand margin. Put it just before the paragraph it belongs beside. |
 | `<CodeTour steps={[…]}>` … `</CodeTour>` | Wrapped around a code block: walks the reader through it a few lines at a time. Each step is `{ lines: 2, text: '…' }` or `{ lines: [3, 5], text: '…' }`, counting lines from 1. |
+| `<Compare before="…" after="…" alt="…" />` | Two pictures of the same thing with a divider the reader drags between them. Both should be the same shape. `beforeLabel="…"` and `afterLabel="…"` change the words in the corners. |
+| `<Timeline items={[…]} />` | Dated steps, oldest first. Each is `{ when: 'March 2025', title: '…', text: '…' }`; `text` is optional. |
+| `<Download href="…" title="…" note="…" />` | A row that opens a file, such as a paper or a poster. Put the file in the page's media folder. |
 | `<Draft />` | The yellow "this page is placeholder" notice. See below. |
 
 `Figure`, `Gallery`, and `Clip` can stand in for media you don't have
 yet: leave out `src` and write `label="what will go here"`, and they
-draw a crossed-out frame of the right size. Add `wide` to a `Figure` or
-`Clip` to let it run the full width of the page instead of the text
-column, and `lead` to a `Gallery` to show its first picture large.
+draw a crossed-out frame of the right size. `Compare` does the same
+when it has no pictures, and `Download` without an `href` shows as
+"File to come". Add `wide` to a `Figure`, `Clip`, or `Compare` to let
+it run the full width of the page instead of the text column, and
+`lead` to a `Gallery` to show its first picture large.
 
 **Every page currently holds placeholder content** so the layout can be
 judged: filler text that says what belongs in each spot, crossed-out
@@ -614,11 +619,49 @@ of the page; clicking it, pressing Esc, or "Back to the dive" all return
 to where the visitor was.
 
 **Pictures and video** go in the `public` folder, one folder per page:
-`public/media/projects/pelagos/menu.webp` is written in the page as
-`![what the picture shows](/media/projects/pelagos/menu.webp)`. Keep
-images to `.webp` or `.jpg` under about 300 kB each and video clips
-under about 4 MB; put anything longer on YouTube and embed it (the
-template shows how).
+`public/media/projects/pelagos/menu.jpg` is written in the page as
+`/media/projects/pelagos/menu.jpg` (in a `Figure`, a `Gallery`, and so
+on).
+
+**After adding pictures, run this once in the terminal:**
+
+```
+npm run media
+```
+
+It does four things, and is safe to run as often as you like:
+
+1. Shrinks every `.jpg` and `.png` in `public/media` to a `.webp`
+   (a much smaller kind of picture file), no wider than 1920 pixels,
+   and turns phone photos the right way up.
+2. Moves your original out to a folder called `media-originals`, next
+   to `public`. Nothing is deleted. That folder is not uploaded to the
+   site or to GitHub, so keep your own copy of anything precious.
+3. Fixes the file names in your write-ups: if a page says `menu.jpg`,
+   it now says `menu.webp`. You never rename anything by hand.
+4. Remakes the share pictures (below).
+
+It finishes by listing anything heavy. Keep video clips under about
+4 MB; put anything longer on YouTube and embed it (the template shows
+how). Videos and PDFs are not changed by the command.
+
+**The picture a shared link shows.** When a page's address is pasted
+into a message or a post, it shows a picture. `npm run media` makes one
+per page, in `public/social`: the page's title over the site's water.
+To use one of your own pictures instead, add a `cover` line to that
+page's block in its data file (see Pelagos in `projects.js`):
+
+```
+cover: '/media/projects/pelagos/steam-3.webp',
+```
+
+then run `npm run media` again. Run it too after renaming a page or
+adding a new one; the build reminds you if a page has no picture yet.
+
+**Printing.** A page prints (or saves as a PDF) as a plain document:
+dark text on white, no ocean, web addresses written out after links.
+Open the page and use the browser's Print. Handy for bringing one
+project to an interview.
 
 (Create the `projects`, `work`, `courses`, and `hobbies` folders the
 first time — right-click `pages` in the VS Code Explorer → New Folder.) The file is written in
@@ -648,7 +691,9 @@ card content.
   project card whose `skills` list includes it and names them under the
   icons. To change what answers, edit the `skills` lists (6.2, 6.3).
 - **The depth gauge** on the right edge has a tick for each section;
-  clicking one jumps there. New sections need a programmer.
+  clicking one jumps there. On a phone there is no room for it, so the
+  depth shows in the top corner instead, and tapping it lists the
+  sections. New sections need a programmer.
 - **Tailored links.** Add `?for=` and a tag to the site address and the
   projects with that tag come first: `happy-duck.github.io/?for=tools`
   leads with SportsBot, `?for=graphics` with the vision research. Use a
@@ -739,8 +784,10 @@ color grading so photos sit in the scene.
 - **Favicon** (the tiny browser-tab icon): replace `public/favicon.svg`,
   `public/favicon-16.png` (16×16 pixels), and `public/favicon-32.png`
   (32×32 pixels), keeping the names.
-- **Social preview** (the picture shown when the link is shared):
-  replace `public/og-image.png`, sized 1200×630 pixels.
+- **Social preview** (the picture shown when the home page's link is
+  shared): replace `public/og-image.png`, sized 1200×630 pixels. It is
+  a screenshot of the top of the site. Each page has its own, made by
+  `npm run media` (section 6.10).
 - Don't delete `googleb28b642a426b9703.html`, `robots.txt`,
   `manifest.json`, or `404.html` — they're plumbing for Google and
   GitHub Pages. (The sitemap is no longer a file you keep: the build
