@@ -10,6 +10,7 @@
 //   <Clip src="/media/…/clip.mp4" poster="…" caption="…" />
 //   <YouTube id="dQw4w9WgXcQ" title="Launch trailer" />
 //   <Diagram nodes={[…]} links={[…]} caption="…" />
+//   <CodeTour steps={[{ lines: [2, 4], text: '…' }]}> ```js … ``` </CodeTour>
 //   <Note title="Aside">…</Note>               sits in the right margin
 //   <Callout title="Why this mattered">…</Callout>
 //   <Redacted until="January 2027">Screenshots of the simulator</Redacted>
@@ -25,10 +26,12 @@ import { createPortal } from 'react-dom'
 // scripts/prerender.mjs counts these at build time and warns, so filler
 // can't reach the live site unnoticed.
 
-export function Draft() {
+// `note` replaces the default wording, for a page that is drafted for a
+// different reason (written but not yet reviewed, say).
+export function Draft({ note }) {
   return (
     <p className="blk-draft" role="note">
-      Draft layout. The text and media on this page are placeholders.
+      {note || 'Draft layout. The text and media on this page are placeholders.'}
     </p>
   )
 }
@@ -339,10 +342,12 @@ export function Diagram({ nodes = [], links = [], caption, label = 'Diagram' }) 
       const dir = by > ay ? 1 : -1
       pts = [[ax, ay + dir * CELL_H / 2], [bx, by - dir * CELL_H / 2]]
     } else {
-      // Elbow: out sideways, then down or up into the target
+      // Dog-leg: out sideways into the gap between the columns, along the
+      // gap to the target's row, then in through the target's side. The
+      // turn happens in empty space, so the line never crosses a box.
       const dx = bx > ax ? 1 : -1
-      const dy = by > ay ? 1 : -1
-      pts = [[ax + dx * CELL_W / 2, ay], [bx, ay], [bx, by - dy * CELL_H / 2]]
+      const gapX = ax + dx * (CELL_W / 2 + GAP_X / 2)
+      pts = [[ax + dx * CELL_W / 2, ay], [gapX, ay], [gapX, by], [bx - dx * CELL_W / 2, by]]
     }
     const mid = [(pts[0][0] + pts[1][0]) / 2, (pts[0][1] + pts[1][1]) / 2]
     return { key: `${l.from}-${l.to}`, d: pts.map((p, i) => `${i ? 'L' : 'M'}${p[0]},${p[1]}`).join(' '), mid, label: l.label }
@@ -380,6 +385,51 @@ export function Diagram({ nodes = [], links = [], caption, label = 'Diagram' }) 
         ))}
       </svg>
       {caption && <figcaption>{caption}</figcaption>}
+    </figure>
+  )
+}
+
+// ── CodeTour — walk through a code block a few lines at a time ─────────
+// Wrap a fenced code block and give it steps. Each step names the lines
+// it is about (one number, or [first, last], counting from 1) and says
+// something about them; those lines stay lit while the rest dim.
+//
+//   <CodeTour steps={[
+//     { lines: 2, text: 'What this line is for.' },
+//     { lines: [3, 5], text: 'What these three do together.' },
+//   ]}>
+//   ```js
+//   …the code…
+//   ```
+//   </CodeTour>
+//
+// The code is highlighted at build time like any other block; this only
+// marks lines, so it reaches into the rendered block rather than
+// re-rendering it.
+
+export function CodeTour({ steps = [], children }) {
+  const [at, setAt] = useState(0)
+  const codeRef = useRef(null)
+  const step = steps[at]
+
+  useEffect(() => {
+    const lines = codeRef.current?.querySelectorAll('[data-line]') || []
+    const [from, to] = Array.isArray(step?.lines) ? step.lines : [step?.lines, step?.lines]
+    lines.forEach((el, i) => el.toggleAttribute('data-lit', i + 1 >= from && i + 1 <= to))
+  }, [step])
+
+  if (!step) return children
+  return (
+    <figure className="blk-tour blk-wide">
+      <div className="blk-tour-code" ref={codeRef}>{children}</div>
+      <div className="blk-tour-side">
+        <p className="blk-tour-count">Step {at + 1} of {steps.length}</p>
+        <p className="blk-tour-text" aria-live="polite">{step.text}</p>
+        <div className="blk-tour-nav">
+          <button type="button" onClick={() => setAt(i => i - 1)} disabled={at === 0}>Back</button>
+          <button type="button" onClick={() => setAt(i => i + 1)} disabled={at === steps.length - 1}>Next</button>
+        </div>
+      </div>
     </figure>
   )
 }

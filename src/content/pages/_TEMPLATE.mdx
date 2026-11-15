@@ -107,6 +107,24 @@ void Update() {
 }
 ```
 
+The same, walked through a few lines at a time. Each step names the
+lines it is about (counting from 1):
+
+<CodeTour steps={[
+  { lines: 1, text: 'A step names the lines it is about and says something about them.' },
+  { lines: [2, 3], text: 'A step can cover a run of lines. The rest of the block dims.' },
+]}>
+
+```js
+function area(width, height) {
+  const w = Math.max(0, width)
+  const h = Math.max(0, height)
+  return w * h
+}
+```
+
+</CodeTour>
+
 A chart. `type` is `line`, `bar`, or `scatter`:
 
 <Chart

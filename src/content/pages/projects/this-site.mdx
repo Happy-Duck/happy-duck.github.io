@@ -1,0 +1,117 @@
+<Draft note="Written from the code and its notes, not placeholder text. The wording, and how the build is credited, still need your review." />
+
+<Stats items={[
+  { value: '6,000 m', label: 'from the surface to the floor' },
+  { value: '380', label: 'fish in the school, simulated on the GPU' },
+  { value: '11', label: 'species to find in the dive log' },
+]} />
+
+## Try it
+
+The page you are reading is a sheet laid over the dive, and the dive is still running underneath. These controls act on it. Watch the water either side.
+
+<EngineControls />
+
+Everything goes back the way it was when you close the page.
+
+## Scroll is depth
+
+There is one number behind the whole site: how far down the page you are, from 0 at the surface to 1 at the floor. The color of the water, which animals are out, how dark it is, and what the depth gauge reads are all worked out from it.
+
+<Note title="Why not a straight line">
+Each zone gets a share of the page that suits what is in it. The top 200 metres hold the name and the first jobs, so they get a fifth of the scroll.
+</Note>
+
+The gauge does not simply multiply that number by 6,000. Real ocean zones are very uneven (the sunlit zone is 200 metres deep, the midnight zone 3,000), and the page is paced for reading, so the conversion runs zone by zone.
+
+<CodeTour steps={[
+  { lines: 1, text: 'Depth comes in as a fraction of the page, 0 to 1.' },
+  { lines: 3, text: 'Find which zone that fraction falls in. Each zone knows its share of the page and its real range in metres.' },
+  { lines: 4, text: 'How far through that zone the reader is, again as a fraction.' },
+  { lines: 5, text: 'Stretch that across the zone’s real depth. Halfway through the midnight zone reads 2,500 m, wherever that falls on the page.' },
+]}>
+
+```js
+export function metersAt(depth) {
+  const d = Math.max(0, Math.min(1, depth))
+  const zone = getZone(d)
+  const t = (d - zone.min) / (zone.max - zone.min)
+  return zone.meterMin + t * (zone.meterMax - zone.meterMin)
+}
+```
+
+</CodeTour>
+
+| Zone     | Share of the page | Real depth      |
+| -------- | ----------------- | --------------- |
+| Sunlit   | first 20%         | 0 to 200 m      |
+| Twilight | next 30%          | 200 to 1,000 m  |
+| Midnight | next 22%          | 1,000 to 4,000 m |
+| Abyssal  | last 28%          | 4,000 to 6,000 m |
+
+## One clock
+
+Every animal, particle, and bubble is moved by the same loop, once a frame. Early on, the fish swam twice as fast on a 120 Hz monitor as on a 60 Hz one, and slowed down whenever scrolling made the page stutter, because each frame moved them a fixed amount.
+
+The fix is to measure how long the last frame really took and scale every movement by it.
+
+<CodeTour steps={[
+  { lines: 1, text: 'How many milliseconds since the previous frame.' },
+  { lines: 2, text: 'Turn that into "how many 60 Hz frames was that": 1 on a normal display, 0.5 at 120 Hz. It is clamped so a tab left in the background does not come back and teleport everything.' },
+  { lines: 4, text: 'Every moving thing gets the depth and that number, and nothing else.' },
+  { lines: [7, 8], text: 'What a mover does with it, here from the course bubbles: steps are multiplied by it, and drag is raised to its power so it decays at the same rate per second.' },
+]}>
+
+```js
+const frameMs = lastNowRef.current > 0 ? now - lastNowRef.current : 1000 / 60
+const dt = Math.min(2.5, Math.max(0.25, frameMs / (1000 / 60)))
+
+subscribers.current.forEach(fn => fn(depth, dt))
+
+// in a subscriber
+const drag = Math.pow(DRAG, dt)
+vx[i] = (vx[i] + ax * dt) * drag
+```
+
+</CodeTour>
+
+<Diagram
+  caption="One loop reads the scroll position and feeds everything else."
+  nodes={[
+    { id: 'scroll', label: 'Scroll position', col: 0, row: 1 },
+    { id: 'loop', label: 'Depth loop', note: 'once a frame', col: 1, row: 1 },
+    { id: 'css', label: 'Page colors', note: 'CSS variables', col: 2, row: 0 },
+    { id: 'life', label: 'Animals and bubbles', note: 'depth and frame time', col: 2, row: 1 },
+    { id: 'gpu', label: 'Shaders', note: 'light, snow, fish school', col: 2, row: 2 },
+  ]}
+  links={[
+    { from: 'scroll', to: 'loop' },
+    { from: 'loop', to: 'css' },
+    { from: 'loop', to: 'life' },
+    { from: 'loop', to: 'gpu' },
+  ]}
+/>
+
+## The water
+
+Three parts of the scene are drawn on the graphics card.
+
+- **Light from the surface.** Slanted shafts in the top few hundred metres, written as a WebGL2 shader at half resolution. It runs in a worker, so drawing it never holds up scrolling.
+- **The fish school.** About 380 anchovies between roughly 40 and 400 metres, steered by a WebGPU compute shader and drawn from a real photo. Without WebGPU the school is simply absent and the other animals carry the scene.
+- **Marine snow.** The drifting specks in deep water, with their motion worked out in the vertex shader. They brighten inside the beam of the light that follows the cursor.
+
+<Callout title="Something that was built and thrown away">
+The first version of the surface light was a web of bright caustic lines. That is what light looks like on the sea bed seen from above. This site is a side view of the water, so it was replaced with shafts.
+</Callout>
+
+## Pages over the dive
+
+A page like this one does not replace the dive. It is laid on top, and the dive stays where it was. Closing the page puts you back at the same depth, with nothing reloaded. On a screen too narrow to show water beside the page, the dive is paused until you come back.
+
+## What went wrong along the way
+
+- **Fish at double speed.** The frame-rate problem above. It only showed on a fast monitor, and only when the page was not stuttering.
+- **A white rectangle where the light should be.** Releasing the graphics context on cleanup left a dead one behind during development, which painted solid white. The context is now kept.
+- **Ripples, twice.** A ripple effect on the surface was built two different ways and removed both times. The first was the wrong physics for a side view. The second was right and still not worth keeping.
+
+<RepoCard repo="Happy-Duck/happy-duck.github.io" />

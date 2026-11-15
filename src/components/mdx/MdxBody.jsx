@@ -28,6 +28,8 @@ const block = (name) => lazy(() => import('./blocks').then(m => ({ default: m[na
 const MDX_COMPONENTS = {
   a: MdxLink,
   Chart:    lazy(() => import('./Chart')),
+  EngineControls: lazy(() => import('./EngineControls')),
+  CodeTour: block('CodeTour'),
   Draft:    block('Draft'),
   Stats:    block('Stats'),
   Figure:   block('Figure'),

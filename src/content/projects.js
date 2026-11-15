@@ -126,4 +126,23 @@ export const PROJECTS = [
       ],
     },
   },
+  {
+    slug:        'this-site',
+    title:       'This website',
+    summary:     'A portfolio built as a dive from the surface to 6,000 m, with the water, light, and animals drawn live in the browser.',
+    description: 'The site you are on. Scrolling is a dive from the surface to 6,000 metres: the water darkens, the light changes, and different animals live at each depth. The light and the fish school are drawn on the graphics card, and every moving thing runs off one clock.',
+    stack:       ['React', 'Vite', 'WebGL2', 'WebGPU', 'three.js'],
+    link:        'https://github.com/Happy-Duck/happy-duck.github.io',
+    tags:        ['graphics'],
+    skills:      [],
+    details: {
+      // PLACEHOLDER role wording: say how you want to credit the build
+      role: 'Design and development',
+      highlights: [
+        'One animation loop drives everything, scaled to real elapsed time',
+        'About 380 fish simulated on the GPU with WebGPU',
+        'Light shafts rendered in WebGL2, off the main thread',
+      ],
+    },
+  },
 ]
