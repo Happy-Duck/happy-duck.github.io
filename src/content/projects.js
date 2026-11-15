@@ -27,7 +27,7 @@ export const PROJECTS = [
     tags:        ['games'],
     skills:      ['unity', 'csharp'],
     details: {
-      role: 'Solo developer — design, code, and publishing',
+      role: 'Solo developer: design, code, and publishing',
       highlights: [
         'Self-published on Steam with 30,000+ downloads',
         'Adopted by local schools as an environmental-science teaching tool',
@@ -65,7 +65,7 @@ export const PROJECTS = [
     tags:        ['games'],
     skills:      [],
     details: {
-      role: 'Developer — UIUC ACM GameBuilders club project',
+      role: 'Developer, UIUC ACM GameBuilders club project',
       highlights: [
         'Puzzle Metroidvania built around wind mechanics and momentum-based traversal',
         'Playable on itch.io',
@@ -101,7 +101,7 @@ export const PROJECTS = [
     tags:        ['games'],
     skills:      ['unity', 'csharp'],
     details: {
-      role: '48-hour jam entry — Game Builders Game Jam',
+      role: '48-hour jam entry, Game Builders Game Jam',
       highlights: [
         'Physics "tosser" mixing 2D art, 3D physics, and 1D gameplay',
         'Concept to shipped build in one weekend',

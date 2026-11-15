@@ -45,7 +45,6 @@ export function Shipwreck() {
         <span className="treasure-spark treasure-spark--1" aria-hidden="true" />
         <span className="treasure-spark treasure-spark--2" aria-hidden="true" />
         <span className="treasure-spark treasure-spark--3" aria-hidden="true" />
-        <span className="chest-tip">the real treasure</span>
         {bubbles.map(b => (
           <span
             key={b.id}

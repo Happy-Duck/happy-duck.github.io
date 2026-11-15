@@ -198,7 +198,7 @@ function LivePresence() {
 
   return (
     <div className="log-presence">
-      <span className="log-presence-label">live transmission</span>
+      <span className="log-presence-label">Live transmission</span>
       <div className="log-presence-content">
         {thumb && (
           <img src={thumb} alt="" className="log-presence-thumb" loading="lazy" />
@@ -221,7 +221,7 @@ function ShippingManifest() {
 
   return (
     <div className="log-manifest">
-      <span className="log-presence-label">engine room: recent transmissions</span>
+      <span className="log-presence-label">Engine room: recent transmissions</span>
       <ul className="manifest-list">
         {items.map(it => (
           <li key={it.id} className="manifest-item">
@@ -286,6 +286,8 @@ function TypewriterLog() {
 export function About() {
   return (
     <section
+      id="log"
+      data-waypoint="Captain's Log"
       className="relative px-6 pb-28 pt-4 w-full max-w-6xl mx-auto"
       style={{ zIndex: 10 }}
     >
@@ -303,8 +305,8 @@ export function About() {
 
         {/* Metadata block */}
         <div className="log-meta">
-          <span className="log-meta-line">UIUC — CS '28 — 3.98 GPA</span>
-          <span className="log-meta-line">40.1141°N 88.2249°W — {LOCATION}</span>
+          <span className="log-meta-line">UIUC, CS '28, 3.98 GPA</span>
+          <span className="log-meta-line">{LOCATION}, 40.1141°N 88.2249°W</span>
         </div>
 
         <div className="log-divider" />

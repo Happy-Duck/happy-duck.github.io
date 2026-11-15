@@ -1,13 +1,14 @@
-import { useRef } from 'react'
 import { motion } from 'framer-motion'
 // Project data lives in src/content/projects.js
 import { PROJECTS, entryAnchor, entryPath } from '../content/index.js'
 import { cardLinkProps } from '../lib/cardLink'
+import { byProfile } from '../lib/profile'
 import { EntryLinkButton } from './EntryLinkButton'
 
 // Projects marked `grid: false` have a page (and show up under their
-// class) but no card here
-const CARDS = PROJECTS.filter(p => p.grid !== false)
+// class) but no card here. A ?for= link puts matching projects first
+// (lib/profile.js).
+const CARDS = byProfile(PROJECTS.filter(p => p.grid !== false))
 
 // ── Animation variants ─────────────────────────────────────────────────
 
@@ -30,31 +31,11 @@ const headerItem = {
   show:   { opacity: 1, y: 0, transition: { duration: 0.6, ease: [0.22, 1, 0.36, 1] } },
 }
 
-// ── Parallax card shell ────────────────────────────────────────────────
+// ── Card shell ─────────────────────────────────────────────────────────
 // The whole card opens the project's page. It is a div with role="link"
 // rather than an <a> because the store button inside it is itself a link.
 
-function ParallaxCard({ children, delay = 0, href, label, anchor }) {
-  const innerRef = useRef(null)
-
-  const onMouseMove = (e) => {
-    const el   = innerRef.current
-    if (!el) return
-    const rect = el.getBoundingClientRect()
-    const dx   = (e.clientX - rect.left  - rect.width  / 2) / (rect.width  / 2)
-    const dy   = (e.clientY - rect.top   - rect.height / 2) / (rect.height / 2)
-    const maxR = 4.5
-    el.style.transform  = `perspective(900px) rotateX(${-dy * maxR}deg) rotateY(${dx * maxR}deg) translateY(-7px)`
-    el.style.transition = 'transform 0.07s linear, box-shadow 0.07s linear'
-  }
-
-  const onMouseLeave = () => {
-    const el = innerRef.current
-    if (!el) return
-    el.style.transform  = ''
-    el.style.transition = 'transform 0.55s cubic-bezier(0.22,1,0.36,1), box-shadow 0.55s ease, border-color 0.55s ease'
-  }
-
+function CardShell({ children, delay = 0, href, label, anchor, skills }) {
   return (
     <motion.div
       variants={fadeUp}
@@ -64,12 +45,10 @@ function ParallaxCard({ children, delay = 0, href, label, anchor }) {
       viewport={{ once: true, margin: '-60px' }}
     >
       <div
-        ref={innerRef}
         className="project-card project-card--clickable h-full"
         data-entry-anchor={anchor}
+        data-skills={skills}
         {...cardLinkProps(href, `${label}: open the project page`)}
-        onMouseMove={onMouseMove}
-        onMouseLeave={onMouseLeave}
       >
         {children}
       </div>
@@ -81,11 +60,12 @@ function ParallaxCard({ children, delay = 0, href, label, anchor }) {
 
 function ProjectCard({ project, delay }) {
   return (
-    <ParallaxCard
+    <CardShell
       delay={delay}
       href={entryPath('projects', project.slug)}
       label={project.title}
       anchor={entryAnchor('projects', project.slug)}
+      skills={project.skills.join(' ')}
     >
       <div className="flex flex-col gap-3 h-full">
 
@@ -102,16 +82,10 @@ function ProjectCard({ project, delay }) {
           {project.description}
         </p>
 
-        {/* Stack pills */}
-        <div className="flex flex-wrap gap-1.5 mt-auto pt-1">
-          {project.stack.map(t => (
-            <span key={t} className="card-pill px-2 py-0.5 rounded-full text-[clamp(0.625rem,0.55rem+0.2vw,0.75rem)] font-mono">
-              {t}
-            </span>
-          ))}
-        </div>
+        {/* Tools: one plain line */}
+        <p className="card-stack">{project.stack.join(', ')}</p>
       </div>
-    </ParallaxCard>
+    </CardShell>
   )
 }
 
@@ -120,6 +94,8 @@ function ProjectCard({ project, delay }) {
 export function Projects() {
   return (
     <section
+      id="projects"
+      data-waypoint="Projects"
       className="relative px-6 pb-28 pt-4 w-full max-w-6xl mx-auto"
       style={{ zIndex: 10 }}
       data-entry-anchor="projects"

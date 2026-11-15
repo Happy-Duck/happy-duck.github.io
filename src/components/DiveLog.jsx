@@ -24,7 +24,7 @@ function Entry({ species, found, bonus = false }) {
         <span className="divelog-depth">{found ? species.depth : '·····'}</span>
       </div>
       <span className="divelog-note">
-        {found ? species.note : `Undiscovered — ${species.zone}`}
+        {found ? species.note : `Undiscovered. ${species.zone}`}
       </span>
     </li>
   )
@@ -78,7 +78,7 @@ export function DiveLog() {
       >
         <BookIcon />
         <span className="divelog-count">{count}/{SPECIES.length}</span>
-        <span className="divelog-tip">dive log — point at a creature to identify it</span>
+        <span className="divelog-tip">Dive log: point at a creature to identify it</span>
       </button>
 
       <AnimatePresence>
@@ -107,7 +107,7 @@ export function DiveLog() {
 
             <div className="divelog-sub">
               {complete
-                ? <span className="divelog-stamp">EXPEDITION COMPLETE</span>
+                ? <span className="divelog-stamp">Expedition complete</span>
                 : <>{count}/{SPECIES.length} species identified{whaleSeen ? ' (+1)' : ''}</>}
             </div>
 
@@ -132,7 +132,7 @@ export function DiveLog() {
             exit={{ opacity: 0, y: 8 }}
             transition={{ duration: 0.3, ease: [0.22, 1, 0.36, 1] }}
           >
-            <span className="divelog-toast-label">new log entry //</span>
+            <span className="divelog-toast-label">New log entry</span>
             <span className="divelog-toast-name">{toast.name}</span>
           </motion.div>
         )}

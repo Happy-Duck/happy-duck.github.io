@@ -28,6 +28,8 @@ const headerItem = {
 export function Education() {
   return (
     <section
+      id="education"
+      data-waypoint="Education"
       className="relative px-6 pb-28 pt-4 w-full max-w-6xl mx-auto"
       style={{ zIndex: 10 }}
     >
@@ -46,17 +48,17 @@ export function Education() {
       </motion.div>
 
       <motion.div
-        className="exp-card max-w-2xl mb-8"
+        className="exp-card mb-8"
         initial={{ opacity: 0, y: 36 }}
         whileInView={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.72, ease: [0.22, 1, 0.36, 1] }}
         viewport={{ once: true, margin: '-60px' }}
       >
-        <span className="exp-period font-mono text-[clamp(0.625rem,0.55rem+0.2vw,0.75rem)] tracking-[0.2em] uppercase">
+        <span className="exp-period text-sm">
           Expected May 2028
         </span>
         <h3 className="exp-role font-bold text-base sm:text-lg leading-snug mt-2">
-          B.S. Computer Science — 3.98 GPA
+          B.S. Computer Science, 3.98 GPA
         </h3>
         <p className="exp-company font-semibold text-sm mt-0.5 mb-3">
           University of Illinois Urbana-Champaign · Minor in Game Studies and Design

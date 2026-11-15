@@ -53,7 +53,7 @@ export function FloorStamp() {
         >
           <span className="floor-stamp-top">ABYSSAL FLOOR REACHED</span>
           <span className="floor-stamp-depth">6,000 m</span>
-          <span className="floor-stamp-sub">R/V HAPPY DUCK — expedition logged</span>
+          <span className="floor-stamp-sub">R/V HAPPY DUCK · expedition logged</span>
         </motion.div>
       )}
     </AnimatePresence>

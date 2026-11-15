@@ -69,13 +69,14 @@ function EntryCard({ entry, fromLeft = false }) {
     <motion.div
       className="exp-card exp-card--clickable"
       data-entry-anchor={entryAnchor('work', entry.slug)}
+      data-skills={entry.skills.join(' ')}
       {...cardLinkProps(entryPath('work', entry.slug), `${entry.role}, ${entry.company}: open the page`)}
       initial={{ opacity: 0, x: fromLeft ? -52 : 52 }}
       whileInView={{ opacity: 1, x: 0 }}
       transition={{ duration: 0.72, ease: [0.22, 1, 0.36, 1] }}
       viewport={{ once: true, margin: '-80px' }}
     >
-      <span className="exp-period font-mono text-[clamp(0.625rem,0.55rem+0.2vw,0.75rem)] tracking-[0.2em] uppercase">
+      <span className="exp-period text-sm">
         {entry.period}
       </span>
       <h3 className="exp-role font-bold text-base sm:text-lg leading-snug mt-2">
@@ -87,13 +88,7 @@ function EntryCard({ entry, fromLeft = false }) {
       <p className="exp-desc text-sm leading-relaxed mb-3">
         {entry.description}
       </p>
-      <div className="flex flex-wrap gap-1.5">
-        {entry.stack.map(t => (
-          <span key={t} className="card-pill px-2 py-0.5 rounded-full text-[clamp(0.625rem,0.55rem+0.2vw,0.75rem)] font-mono">
-            {t}
-          </span>
-        ))}
-      </div>
+      <p className="card-stack">{entry.stack.join(', ')}</p>
     </motion.div>
   )
 }
@@ -103,6 +98,8 @@ function EntryCard({ entry, fromLeft = false }) {
 export function Experience() {
   return (
     <section
+      id="career"
+      data-waypoint="Career"
       className="relative px-6 pb-28 pt-4 w-full max-w-6xl mx-auto"
       style={{ zIndex: 10 }}
     >

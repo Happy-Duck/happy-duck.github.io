@@ -5,9 +5,11 @@ import { SPECIES, BONUS_SPECIES } from '../constants/species'
 import { getDiscovered } from '../lib/diveLog'
 import { todBucket } from '../constants/timeOfDay'
 import { depthAtMeters } from '../constants/depthZones'
+import { KINDS, allEntries, entryShortName } from '../content/index.js'
+import { navigate } from '../lib/router'
 
 const BANNER = [
-  'R.O.V. CONSOLE v2.6 — R/V HAPPY DUCK',
+  'R.O.V. CONSOLE v2.6, R/V HAPPY DUCK',
   'link established. type \'help\' for commands.',
 ]
 
@@ -80,10 +82,37 @@ function runCommand(raw, ctx) {
     ]
   }
 
+  // ls [kind] — what there is to read
+  if (cmd === 'ls' || cmd.startsWith('ls ')) {
+    const arg = cmd.slice(2).trim()
+    if (!arg) {
+      return [
+        ...Object.values(KINDS).map(k => `  ${k.segment.padEnd(10)} ${k.entries.length} pages`),
+        "try: ls projects   then: open <name>",
+      ]
+    }
+    const kind = Object.keys(KINDS).find(k => KINDS[k].segment === arg)
+    if (!kind) return [`no such directory: ${arg}. try 'ls'`]
+    return KINDS[kind].entries.map(e => `  ${e.slug.padEnd(24)} ${entryShortName(kind, e)}`)
+  }
+
+  // open <name> — open a page by its slug (or kind/slug)
+  if (cmd === 'open' || cmd.startsWith('open ')) {
+    const arg = cmd.slice(4).trim().replace(/^\/+|\/+$/g, '')
+    if (!arg) return ['usage: open <name>   (see: ls projects)']
+    const hit = allEntries().find(p => p.entry.slug === arg || `${KINDS[p.kind].segment}/${p.entry.slug}` === arg)
+    if (!hit) return [`no page named ${arg}. try 'ls projects'`]
+    navigate(hit.path)
+    setTimeout(ctx.close, 200)
+    return [`opening ${hit.path}`]
+  }
+
   switch (cmd) {
     case 'help':
       return [
         'available commands:',
+        '  ls         list the pages (ls projects, ls work, ...)',
+        '  open       open a page by name (open pelagos)',
         '  log        dive log summary',
         '  surface    return to the surface',
         '  bottom     descend to the ocean floor',
@@ -105,7 +134,7 @@ function runCommand(raw, ctx) {
       const names = SPECIES.filter(s => found[s.id]).map(s => s.name)
       const lines = [
         `species identified: ${names.length}/${SPECIES.length}`,
-        ...(names.length ? [`  ${names.join(', ')}`] : ['  (none yet — go look around)']),
+        ...(names.length ? [`  ${names.join(', ')}`] : ['  (none yet. go look around)']),
       ]
       if (found[BONUS_SPECIES.id]) lines.push('  + one entry the log refuses to classify.')
       let dives = 0
@@ -149,7 +178,7 @@ function runCommand(raw, ctx) {
       const h = now.getHours()
       const watch = h < 5 ? 'middle watch' : h < 8 ? 'morning watch' : h < 17 ? 'forenoon watch' : h < 20 ? 'dog watch' : 'first watch'
       return [
-        `ship's clock: ${now.toLocaleTimeString()} — ${watch}`,
+        `ship's clock: ${now.toLocaleTimeString()}, ${watch}`,
         `surface conditions: ${todBucket(h)}`,
       ]
     }
@@ -201,7 +230,7 @@ function runCommand(raw, ctx) {
       return ['this IS the command console.']
 
     default:
-      return [`command not found: ${cmd} — try 'help'`]
+      return [`command not found: ${cmd}. try 'help'`]
   }
 }
 
@@ -308,7 +337,7 @@ export function Terminal() {
         aria-expanded={open}
       >
         <span className="term-fab-glyph" aria-hidden="true">&gt;_</span>
-        <span className="term-fab-tip">sub console — psst: typing 'cmd' works too</span>
+        <span className="term-fab-tip">Sub console. Typing 'cmd' works too</span>
       </button>
 
       <AnimatePresence>

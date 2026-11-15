@@ -56,7 +56,7 @@ function ScrollBubble() {
           }}
         />
       </div>
-      <span className="hero-scroll-label text-[clamp(0.5rem,0.45rem+0.12vw,0.625rem)] font-mono tracking-[0.28em] uppercase select-none">
+      <span className="hero-scroll-label text-xs select-none">
         scroll
       </span>
     </div>
@@ -94,8 +94,8 @@ export function Hero() {
         {/* Roles */}
         <motion.p
           variants={fadeUp}
-          className="hero-subtitle font-bold tracking-[0.18em] uppercase select-none
-                     text-[clamp(0.65rem,1.8vw,0.9rem)]"
+          className="hero-subtitle font-medium select-none
+                     text-[clamp(0.9rem,2vw,1.15rem)]"
         >
           CS&nbsp;Student&nbsp;@&nbsp;UIUC&ensp;&middot;&ensp;XR&nbsp;Engineer&ensp;&middot;&ensp;Game&nbsp;Developer
         </motion.p>

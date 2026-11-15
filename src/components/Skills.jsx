@@ -11,7 +11,9 @@ import DjangoPlain           from 'devicons-react/lib/icons/DjangoPlain'
 import AzuresqldatabasePlain from 'devicons-react/lib/icons/AzuresqldatabasePlain'
 import GitOriginal           from 'devicons-react/lib/icons/GitOriginal'
 import PytorchOriginal       from 'devicons-react/lib/icons/PytorchOriginal'
-import { SKILL_GROUPS as GROUPS } from '../content/index.js'
+import { useEffect, useState } from 'react'
+import { SKILL_GROUPS as GROUPS, findSkill, pagesForSkill, entryShortName } from '../content/index.js'
+import { Link } from './Link'
 
 // Wrapper to force fill color on icons that don't accept a color prop
 function ForcedColorIcon({ Icon, size }) {
@@ -63,24 +65,30 @@ const gemVariant = {
 }
 
 // ── Skill item ─────────────────────────────────────────────────────────
+// Each skill is a button. Pressing it sends a sonar ping out from the
+// icon and "asks the water" who used it: every career and project card
+// carrying that skill (data-skills) is outlined, and the answers are
+// listed under the icons as links. Pressing it again clears it.
 
-function SkillItem({ item }) {
+function SkillItem({ item, active, onPing }) {
   return (
     <motion.div className="skill-item-wrap" variants={gemVariant}>
-      <div className="skill-gem-outer">
-        <motion.div
-          className="skill-icon-box"
-          whileHover={{ y: -10, scale: 1.1 }}
-          transition={{ type: 'spring', stiffness: 300, damping: 20 }}
-        >
+      <button
+        type="button"
+        className={`skill-gem-outer skill-btn${active ? ' skill-btn--on' : ''}`}
+        aria-pressed={active}
+        aria-label={`${item.name}: show where it was used`}
+        onClick={(e) => onPing(item.id, e.currentTarget)}
+      >
+        <span className="skill-icon-box">
           {ICONS[item.id]?.('48px')}
-        </motion.div>
+        </span>
 
-        <div className="skill-tooltip" role="tooltip">
+        <span className="skill-tooltip" role="tooltip">
           {item.tooltip}
-          <div className="skill-tooltip-arrow" />
-        </div>
-      </div>
+          <span className="skill-tooltip-arrow" />
+        </span>
+      </button>
 
       <span className="skill-label">{item.name}</span>
     </motion.div>
@@ -89,11 +97,11 @@ function SkillItem({ item }) {
 
 // ── Skill group ────────────────────────────────────────────────────────
 
-function SkillGroup({ group }) {
+function SkillGroup({ group, active, onPing }) {
   return (
     <div>
       <motion.p
-        className="skill-group-label font-mono text-xs tracking-[0.22em] uppercase mb-5"
+        className="skill-group-label text-sm font-semibold mb-5"
         initial={{ opacity: 0, x: -10 }}
         whileInView={{ opacity: 1, x: 0 }}
         transition={{ duration: 0.5, ease: 'easeOut' }}
@@ -110,7 +118,7 @@ function SkillGroup({ group }) {
         viewport={{ once: true, margin: '-60px' }}
       >
         {group.items.map(item => (
-          <SkillItem key={item.id} item={item} />
+          <SkillItem key={item.id} item={item} active={active === item.id} onPing={onPing} />
         ))}
       </motion.div>
     </div>
@@ -120,8 +128,33 @@ function SkillGroup({ group }) {
 // ── Section ────────────────────────────────────────────────────────────
 
 export function Skills() {
+  const [active, setActive] = useState(null)
+
+  // Outline the cards that carry the active skill. They live in other
+  // sections, so this goes through the DOM rather than through props.
+  useEffect(() => {
+    const cards = [...document.querySelectorAll('[data-skills]')]
+    for (const el of cards) {
+      el.classList.toggle('card--answer', Boolean(active) && el.dataset.skills.split(' ').includes(active))
+    }
+    return () => { for (const el of cards) el.classList.remove('card--answer') }
+  }, [active])
+
+  const onPing = (id, button) => {
+    const r = button.getBoundingClientRect()
+    window.dispatchEvent(new CustomEvent('ocean:ping', {
+      detail: { x: r.left + r.width / 2, y: r.top + r.height / 2 },
+    }))
+    setActive(a => (a === id ? null : id))
+  }
+
+  const skill = active ? findSkill(active) : null
+  const answers = active ? pagesForSkill(active) : []
+
   return (
     <section
+      id="skills"
+      data-waypoint="Skills"
       className="relative px-6 pb-28 pt-4 w-full max-w-6xl mx-auto"
       style={{ zIndex: 10 }}
     >
@@ -142,9 +175,30 @@ export function Skills() {
       {/* Groups */}
       <div className="flex flex-col gap-12">
         {GROUPS.map(group => (
-          <SkillGroup key={group.label} group={group} />
+          <SkillGroup key={group.label} group={group} active={active} onPing={onPing} />
         ))}
       </div>
+
+      {/* What came back from the ping. Always in the page (aria-live), so
+          the answer is announced when it changes. */}
+      <p className="skill-answers" aria-live="polite" data-no-ping>
+        {skill && (
+          answers.length > 0 ? (
+            <>
+              <span className="skill-answers-lead">{skill.name} was used in </span>
+              {answers.map((p, i) => (
+                <span key={p.path}>
+                  {i > 0 && (i === answers.length - 1 ? ' and ' : ', ')}
+                  <Link href={p.path}>{entryShortName(p.kind, p.entry)}</Link>
+                </span>
+              ))}
+              .
+            </>
+          ) : (
+            <span className="skill-answers-lead">Nothing on this site lists {skill.name} yet.</span>
+          )
+        )}
+      </p>
     </section>
   )
 }

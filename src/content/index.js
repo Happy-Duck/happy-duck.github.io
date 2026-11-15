@@ -20,7 +20,7 @@ export {
 export const SITE_URL = 'https://happy-duck.github.io'
 
 // The dive's own tab title — keep in sync with <title> in index.html
-export const SITE_TITLE = 'Rishi Garhyan — XR Engineer & Game Developer'
+export const SITE_TITLE = 'Rishi Garhyan | XR Engineer & Game Developer'
 
 // kind → URL segment, display label, and the list it draws from. Adding a
 // kind here is all routing, prerender, and the sitemap need.
@@ -123,19 +123,4 @@ export function coursesForProject(project) {
   return (project.courses || [])
     .map(slug => COURSES.find(c => c.slug === slug))
     .filter(Boolean)
-}
-
-// Other entries sharing at least one skill or tag, most overlap first
-export function related(kind, slug, limit = 3) {
-  const self = findEntry(kind, slug)
-  if (!self) return []
-  const overlap = (other) =>
-    (other.skills || []).filter(s => self.skills?.includes(s)).length +
-    (other.tags   || []).filter(t => self.tags?.includes(t)).length
-  return allEntries()
-    .filter(p => !(p.kind === kind && p.entry.slug === slug))
-    .map(p => ({ ...p, score: overlap(p.entry) }))
-    .filter(p => p.score > 0)
-    .sort((a, b) => b.score - a.score)
-    .slice(0, limit)
 }
