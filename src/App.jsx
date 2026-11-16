@@ -142,13 +142,14 @@ export default function App() {
         {/* GPU marine snow — lit volumetrically by the ROV beam */}
         <DeepParticles />
 
+        {/* Sonar ping rings — click open water. In here so a ping sent
+            from a page (the engine controls) shows in the water beside it */}
+        <SonarPing />
+
         </div>
 
         {/* ROV headlight — darkness + cursor light cone in deep zones */}
         <RovLight />
-
-        {/* Sonar ping rings — click open water */}
-        <SonarPing />
 
         {/* Bioluminescent cursor trail — stirred plankton at depth */}
         <BioTrail />

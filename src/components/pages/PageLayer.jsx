@@ -89,8 +89,12 @@ export function PageLayer({ route, path }) {
   // Clicking the water either side of the sheet closes the page. Both the
   // press and the release have to land out there, so a text selection
   // dragged past the edge doesn't count, and neither does the scrollbar
-  // (which sits beyond the scroller's clientWidth).
+  // (which sits beyond the scroller's clientWidth). The target must also
+  // be inside the scroller in the DOM: anything a page portals to <body>
+  // (the image lightbox) is still its child as far as React's events go,
+  // so its clicks arrive here too, and they are not clicks on the water.
   const isOutside = (e) =>
+    e.currentTarget.contains(e.target) &&
     !e.target.closest('.page-sheet') && e.clientX < e.currentTarget.clientWidth
   const onMouseDown = (e) => { downOutside.current = e.button === 0 && isOutside(e) }
   const onClick = (e) => {

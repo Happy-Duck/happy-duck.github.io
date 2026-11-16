@@ -931,40 +931,8 @@ html::-webkit-scrollbar { display: none; }
   position: relative;
 }
 
-/* Each skill is a button: press it to see where it was used */
-.skill-btn {
-  display:       block;
-  padding:       6px;
-  border:        1px solid transparent;
-  border-radius: 6px;
-  background:    none;
-  font:          inherit;
-  cursor:        pointer;
-  transition:    border-color 0.2s ease;
-}
-.skill-btn:hover { border-color: var(--card-border-hover); }
-.skill-btn--on  { border-color: var(--card-link-hover); }
-.skill-btn--on .skill-icon-box { color: var(--card-link-hover); }
-
-/* The answer to a skill ping, under the icons */
-.skill-answers {
-  min-height:  1.6em;
-  margin:      2.25rem 0 0;
-  font-size:   0.95rem;
-  line-height: 1.6;
-  color:       var(--skill-label);
-}
-.skill-answers a {
-  color:                 var(--card-link-hover);
-  text-decoration:       underline;
-  text-underline-offset: 3px;
-}
-
-/* A card that answered the ping */
-.card--answer {
-  outline:        2px solid var(--card-link-hover);
-  outline-offset: 3px;
-}
+/* Focusable only so the tooltip can be reached from the keyboard */
+.skill-gem-outer { display: block; border-radius: 6px; }
 
 /* Force fill color on icons that have hardcoded brand colors */
 .forced-icon-color svg,
@@ -1023,7 +991,8 @@ html::-webkit-scrollbar { display: none; }
     color      var(--theme-dur) var(--theme-ease);
 }
 
-.skill-gem-outer:hover .skill-tooltip {
+.skill-gem-outer:hover .skill-tooltip,
+.skill-gem-outer:focus-visible .skill-tooltip {
   opacity:   1;
   transform: translateX(-50%) translateY(0);
 }
@@ -3118,7 +3087,6 @@ html::-webkit-scrollbar { display: none; }
 
 /* ── Brief view: a short tank beside what is in it ─────────────────── */
 .course-controls-end { display: flex; flex-wrap: wrap; gap: 0.45rem; }
-.course-foot { display: flex; justify-content: flex-end; margin-top: 0.9rem; }
 
 .course-wrap--brief .course-stage {
   display:               grid;

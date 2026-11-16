@@ -35,7 +35,7 @@ const headerItem = {
 // The whole card opens the project's page. It is a div with role="link"
 // rather than an <a> because the store button inside it is itself a link.
 
-function CardShell({ children, delay = 0, href, label, anchor, skills }) {
+function CardShell({ children, delay = 0, href, label, anchor }) {
   return (
     <motion.div
       variants={fadeUp}
@@ -47,7 +47,6 @@ function CardShell({ children, delay = 0, href, label, anchor, skills }) {
       <div
         className="project-card project-card--clickable h-full"
         data-entry-anchor={anchor}
-        data-skills={skills}
         {...cardLinkProps(href, `${label}: open the project page`)}
       >
         {children}
@@ -65,7 +64,6 @@ function ProjectCard({ project, delay }) {
       href={entryPath('projects', project.slug)}
       label={project.title}
       anchor={entryAnchor('projects', project.slug)}
-      skills={project.skills.join(' ')}
     >
       <div className="flex flex-col gap-3 h-full">
 

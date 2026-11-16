@@ -69,7 +69,6 @@ function EntryCard({ entry, fromLeft = false }) {
     <motion.div
       className="exp-card exp-card--clickable"
       data-entry-anchor={entryAnchor('work', entry.slug)}
-      data-skills={entry.skills.join(' ')}
       {...cardLinkProps(entryPath('work', entry.slug), `${entry.role}, ${entry.company}: open the page`)}
       initial={{ opacity: 0, x: fromLeft ? -52 : 52 }}
       whileInView={{ opacity: 1, x: 0 }}

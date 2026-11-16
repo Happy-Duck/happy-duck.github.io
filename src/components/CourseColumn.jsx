@@ -25,7 +25,7 @@
 import { useEffect, useRef, useState } from 'react'
 import { useOceanDepthContext } from '../context/OceanDepthContext'
 import { useMouse } from '../context/MouseContext'
-import { pingImpulse } from '../lib/sonar'
+import { pingImpulse, getPing } from '../lib/sonar'
 import { createBubbleSim } from '../lib/bubbleSim'
 import { Link } from './Link'
 import {
@@ -417,8 +417,8 @@ export function CourseColumn() {
 
     const env = { mouse: null, ping: null }
     const local = { x: 0, y: 0 }
-    let rect = { left: 0, top: 0 }
-    env.ping = (x, y) => pingImpulse(x + rect.left, y + rect.top, 360)
+    let rect = { left: 0, top: 0, right: 0, bottom: 0 }
+    const pingHere = (x, y) => pingImpulse(x + rect.left, y + rect.top, 360)
 
     const unsubscribe = reduced ? null : subscribe((_depth, dt) => {
       if (!inView) return
@@ -426,8 +426,13 @@ export function CourseColumn() {
       const m = mouseRef.current
       local.x = m.x - rect.left
       local.y = m.y - rect.top
-      const inside = local.x > -60 && local.y > -60 &&
-        local.x < rect.width + 60 && local.y < rect.height + 60
+      // The tank is its own body of water: only a pointer or a ping that
+      // is inside the glass moves what is in it
+      const inside = local.x > 0 && local.y > 0 &&
+        local.x < rect.width && local.y < rect.height
+      const p = getPing()
+      env.ping = p.x > rect.left && p.x < rect.right && p.y > rect.top && p.y < rect.bottom
+        ? pingHere : null
       // A hovered bubble is being read — don't shove it out from under
       // the cursor
       env.mouse = inside && liveRef.current.hover < 0 ? local : null
@@ -605,14 +610,6 @@ export function CourseColumn() {
       </div>
       )}
 
-      {/* The column is tall: a second way back, where the reader ends up */}
-      {expanded && (
-        <div className="course-foot" data-no-ping>
-          <button type="button" className="course-view-toggle course-expand" aria-expanded="true" onClick={collapse}>
-            Show fewer classes
-          </button>
-        </div>
-      )}
     </div>
   )
 }

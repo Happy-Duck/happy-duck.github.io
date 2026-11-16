@@ -11,9 +11,7 @@ import DjangoPlain           from 'devicons-react/lib/icons/DjangoPlain'
 import AzuresqldatabasePlain from 'devicons-react/lib/icons/AzuresqldatabasePlain'
 import GitOriginal           from 'devicons-react/lib/icons/GitOriginal'
 import PytorchOriginal       from 'devicons-react/lib/icons/PytorchOriginal'
-import { useEffect, useState } from 'react'
-import { SKILL_GROUPS as GROUPS, findSkill, pagesForSkill, entryShortName } from '../content/index.js'
-import { Link } from './Link'
+import { SKILL_GROUPS as GROUPS } from '../content/index.js'
 
 // Wrapper to force fill color on icons that don't accept a color prop
 function ForcedColorIcon({ Icon, size }) {
@@ -65,21 +63,15 @@ const gemVariant = {
 }
 
 // ── Skill item ─────────────────────────────────────────────────────────
-// Each skill is a button. Pressing it sends a sonar ping out from the
-// icon and "asks the water" who used it: every career and project card
-// carrying that skill (data-skills) is outlined, and the answers are
-// listed under the icons as links. Pressing it again clears it.
+// An icon, its name, and a tooltip on hover or keyboard focus. Not a
+// control: pressing one used to send a sonar ping, outline the cards
+// that used the skill, and list them in a line underneath. The owner had
+// that turned off (2026-11-15); don't bring it back.
 
-function SkillItem({ item, active, onPing }) {
+function SkillItem({ item }) {
   return (
     <motion.div className="skill-item-wrap" variants={gemVariant}>
-      <button
-        type="button"
-        className={`skill-gem-outer skill-btn${active ? ' skill-btn--on' : ''}`}
-        aria-pressed={active}
-        aria-label={`${item.name}: show where it was used`}
-        onClick={(e) => onPing(item.id, e.currentTarget)}
-      >
+      <span className="skill-gem-outer" tabIndex={0} data-no-ping>
         <span className="skill-icon-box">
           {ICONS[item.id]?.('48px')}
         </span>
@@ -88,7 +80,7 @@ function SkillItem({ item, active, onPing }) {
           {item.tooltip}
           <span className="skill-tooltip-arrow" />
         </span>
-      </button>
+      </span>
 
       <span className="skill-label">{item.name}</span>
     </motion.div>
@@ -97,7 +89,7 @@ function SkillItem({ item, active, onPing }) {
 
 // ── Skill group ────────────────────────────────────────────────────────
 
-function SkillGroup({ group, active, onPing }) {
+function SkillGroup({ group }) {
   return (
     <div>
       <motion.p
@@ -118,7 +110,7 @@ function SkillGroup({ group, active, onPing }) {
         viewport={{ once: true, margin: '-60px' }}
       >
         {group.items.map(item => (
-          <SkillItem key={item.id} item={item} active={active === item.id} onPing={onPing} />
+          <SkillItem key={item.id} item={item} />
         ))}
       </motion.div>
     </div>
@@ -128,29 +120,6 @@ function SkillGroup({ group, active, onPing }) {
 // ── Section ────────────────────────────────────────────────────────────
 
 export function Skills() {
-  const [active, setActive] = useState(null)
-
-  // Outline the cards that carry the active skill. They live in other
-  // sections, so this goes through the DOM rather than through props.
-  useEffect(() => {
-    const cards = [...document.querySelectorAll('[data-skills]')]
-    for (const el of cards) {
-      el.classList.toggle('card--answer', Boolean(active) && el.dataset.skills.split(' ').includes(active))
-    }
-    return () => { for (const el of cards) el.classList.remove('card--answer') }
-  }, [active])
-
-  const onPing = (id, button) => {
-    const r = button.getBoundingClientRect()
-    window.dispatchEvent(new CustomEvent('ocean:ping', {
-      detail: { x: r.left + r.width / 2, y: r.top + r.height / 2 },
-    }))
-    setActive(a => (a === id ? null : id))
-  }
-
-  const skill = active ? findSkill(active) : null
-  const answers = active ? pagesForSkill(active) : []
-
   return (
     <section
       id="skills"
@@ -175,30 +144,10 @@ export function Skills() {
       {/* Groups */}
       <div className="flex flex-col gap-12">
         {GROUPS.map(group => (
-          <SkillGroup key={group.label} group={group} active={active} onPing={onPing} />
+          <SkillGroup key={group.label} group={group} />
         ))}
       </div>
 
-      {/* What came back from the ping. Always in the page (aria-live), so
-          the answer is announced when it changes. */}
-      <p className="skill-answers" aria-live="polite" data-no-ping>
-        {skill && (
-          answers.length > 0 ? (
-            <>
-              <span className="skill-answers-lead">{skill.name} was used in </span>
-              {answers.map((p, i) => (
-                <span key={p.path}>
-                  {i > 0 && (i === answers.length - 1 ? ' and ' : ', ')}
-                  <Link href={p.path}>{entryShortName(p.kind, p.entry)}</Link>
-                </span>
-              ))}
-              .
-            </>
-          ) : (
-            <span className="skill-answers-lead">Nothing on this site lists {skill.name} yet.</span>
-          )
-        )}
-      </p>
     </section>
   )
 }

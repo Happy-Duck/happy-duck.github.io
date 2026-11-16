@@ -434,12 +434,13 @@ export function CodeTour({ steps = [], children }) {
     <figure className="blk-tour blk-wide">
       <div className="blk-tour-code" ref={codeRef}>{children}</div>
       <div className="blk-tour-side">
-        <p className="blk-tour-count">Step {at + 1} of {steps.length}</p>
-        <p className="blk-tour-text" aria-live="polite">{step.text}</p>
+        {/* Buttons above the text, so they stay put whatever its length */}
         <div className="blk-tour-nav">
           <button type="button" onClick={() => setAt(i => i - 1)} disabled={at === 0}>Back</button>
           <button type="button" onClick={() => setAt(i => i + 1)} disabled={at === steps.length - 1}>Next</button>
+          <span className="blk-tour-count">Step {at + 1} of {steps.length}</span>
         </div>
+        <p className="blk-tour-text" aria-live="polite">{step.text}</p>
       </div>
     </figure>
   )
