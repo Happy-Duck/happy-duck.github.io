@@ -3088,6 +3088,24 @@ html::-webkit-scrollbar { display: none; }
 /* ── Brief view: a short tank beside what is in it ─────────────────── */
 .course-controls-end { display: flex; flex-wrap: wrap; gap: 0.45rem; }
 
+/* What appears around the tank when it opens (the legend above, the
+   scrubber below) and beside it when it closes (the list) eases in while
+   the glass changes size, instead of popping */
+@keyframes course-unfold {
+  from { max-height: 0; opacity: 0; margin-top: 0; margin-bottom: 0; }
+  to   { max-height: 220px; opacity: 1; }
+}
+@keyframes course-fade-in {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+.course-controls,
+.course-scrub { overflow: hidden; animation: course-unfold 0.7s cubic-bezier(0.22, 1, 0.36, 1) both; }
+.course-brief  { animation: course-fade-in 0.5s ease 0.25s both; }
+@media (prefers-reduced-motion: reduce) {
+  .course-controls, .course-scrub, .course-brief { animation: none; }
+}
+
 .course-wrap--brief .course-stage {
   display:               grid;
   grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);

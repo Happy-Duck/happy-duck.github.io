@@ -22,7 +22,13 @@
 // semester scrubber; "Show fewer" puts it back. The owner found the full
 // column big and in the way as the default. The tank element is the
 // same one in both sizes, so the sim and the GL context carry over.
+//
+// The change of size is animated (resizeTank): the glass grows from its
+// brief size to its full one while the rest of the classes rise in from
+// the floor a few at a time, the same way the scrubber adds them. The
+// sim follows the glass frame by frame through the ResizeObserver.
 import { useEffect, useRef, useState } from 'react'
+import { flushSync } from 'react-dom'
 import { useOceanDepthContext } from '../context/OceanDepthContext'
 import { useMouse } from '../context/MouseContext'
 import { pingImpulse, getPing } from '../lib/sonar'
@@ -45,6 +51,15 @@ const BUBBLES = COURSES.slice(0, MAX_BALLS).map(c => ({
 }))
 const NOW_IDX = TERMS.findIndex(t => t.id === CURRENT_TERM)
 const PAGED = BUBBLES.filter(b => b.hasPage)
+// The order the other classes enter in when the tank opens: as taken
+const ENTRY_RANK = (() => {
+  const rank = new Array(BUBBLES.length).fill(0)
+  BUBBLES.map((b, i) => i).filter(i => !BUBBLES[i].hasPage)
+    .sort((a, b) => BUBBLES[a].termIdx - BUBBLES[b].termIdx)
+    .forEach((i, k) => { rank[i] = k })
+  return rank
+})()
+const ENTRY_STEPS = 70 // 60 fps frames for all of them to enter (~1.2 s)
 
 // How strongly a bubble is drawn, by status
 const STATUS_STRENGTH = { done: 1, now: 0.72, next: 0.4 }
@@ -273,16 +288,34 @@ export function CourseColumn() {
     apiRef.current?.refresh()
   }, [filter, through, expanded])
 
-  // Collapsing from far down the column would leave the visitor looking
-  // at whatever slid up into its place, so bring the section back
-  const collapse = () => {
-    setHover(-1)
-    setView('bubbles')
-    setExpanded(false)
+  // Change the tank's size with the glass growing or shrinking between
+  // the two, instead of jumping: measure it, commit the new layout,
+  // measure again, and animate from the first size to the second.
+  const resizeTank = (toExpanded) => {
+    const wrap = wrapRef.current
+    const animate = wrap && wrap.animate &&
+      !window.matchMedia('(prefers-reduced-motion: reduce)').matches
+    const from = animate ? wrap.getBoundingClientRect() : null
+    flushSync(() => {
+      setHover(-1)
+      setView('bubbles')
+      setExpanded(toExpanded)
+    })
+    // Collapsing from far down the column would leave the visitor looking
+    // at whatever slid up into its place, so bring the section back
     const section = wrapRef.current?.closest('section')
-    if (section && section.getBoundingClientRect().top < 0) {
+    if (!toExpanded && section && section.getBoundingClientRect().top < 0) {
       section.scrollIntoView({ block: 'start', behavior: 'instant' })
     }
+    if (!animate || wrapRef.current !== wrap) return
+    const to = wrap.getBoundingClientRect()
+    wrap.animate(
+      [
+        { width: `${from.width}px`, height: `${from.height}px` },
+        { width: `${to.width}px`, height: `${to.height}px` },
+      ],
+      { duration: 700, easing: 'cubic-bezier(0.22, 1, 0.36, 1)' },
+    )
   }
 
   useEffect(() => {
@@ -306,19 +339,25 @@ export function CourseColumn() {
     const renderer = createRenderer(canvas)
     wrap.classList.toggle('course-column--css', !renderer)
 
+    // How many of the classes without a page have been let in. Infinity
+    // except while the tank is opening, when it counts up from 0 so they
+    // enter a few at a time (see the tick below).
+    let entered = Infinity
+    let wasBrief = liveRef.current.brief
+
     const isActive = (i) => (liveRef.current.brief
       ? BUBBLES[i].hasPage
-      : BUBBLES[i].termIdx <= liveRef.current.through)
+      : BUBBLES[i].termIdx <= liveRef.current.through &&
+        (BUBBLES[i].hasPage || ENTRY_RANK[i] < entered))
 
-    // Which size the last layout was for. A change of size is a new
-    // arrangement (the tank is a different shape), so it re-scatters.
-    let laidOutBrief = null
-
+    // first: place everything from scratch (mount). Otherwise the glass
+    // changed size under a running sim: move the walls and retarget the
+    // radii, and let the sim carry the bubbles to where they now belong.
+    // With no sim running (reduced motion) every resize places from scratch.
     const layout = (first) => {
       const w = wrap.clientWidth
       const h = wrap.clientHeight
-      if (laidOutBrief !== null && laidOutBrief !== liveRef.current.brief) first = true
-      laidOutBrief = liveRef.current.brief
+      const place = first || reduced
       sim.resize(w, h)
       renderer?.resize(w, h)
       const base = baseRadius(w)
@@ -329,8 +368,10 @@ export function CourseColumn() {
           node.style.width = `${baseR[i] * 2}px`
           node.style.height = `${baseR[i] * 2}px`
         }
-        sim.setRadius(i, isActive(i) ? baseR[i] : 0, true)
+        if (place) sim.setRadius(i, isActive(i) ? baseR[i] : 0, true)
+        else if (sim.rt[i] > 0) sim.setRadius(i, baseR[i])
       }
+      if (!place) return
       if (first) sim.scatter()
       // The brief tank holds a handful of bubbles: start them spread
       // across it instead of wherever the dice put them
@@ -402,6 +443,7 @@ export function CourseColumn() {
       placeTip,
       refresh() {
         if (!reduced) return
+        entered = Infinity
         for (let i = 0; i < n; i++) sim.setRadius(i, isActive(i) ? baseR[i] : 0, true)
         sim.settle(90)
         paint(1)
@@ -433,6 +475,11 @@ export function CourseColumn() {
       const p = getPing()
       env.ping = p.x > rect.left && p.x < rect.right && p.y > rect.top && p.y < rect.bottom
         ? pingHere : null
+      // Opening: start the count of classes let in, then run it up
+      const brief = liveRef.current.brief
+      if (wasBrief && !brief) entered = 0
+      wasBrief = brief
+      if (entered < n) entered += dt * (n / ENTRY_STEPS)
       // A hovered bubble is being read — don't shove it out from under
       // the cursor
       env.mouse = inside && liveRef.current.hover < 0 ? local : null
@@ -484,7 +531,7 @@ export function CourseColumn() {
           >
             {view === 'bubbles' ? 'List view' : 'Bubble view'}
           </button>
-          <button type="button" className="course-view-toggle course-expand" aria-expanded="true" onClick={collapse}>
+          <button type="button" className="course-view-toggle course-expand" aria-expanded="true" onClick={() => resizeTank(false)}>
             Show fewer
           </button>
         </div>
@@ -577,7 +624,7 @@ export function CourseColumn() {
               </li>
             ))}
           </ul>
-          <button type="button" className="course-view-toggle course-expand" aria-expanded="false" onClick={() => setExpanded(true)}>
+          <button type="button" className="course-view-toggle course-expand" aria-expanded="false" onClick={() => resizeTank(true)}>
             Show all {BUBBLES.length} classes
           </button>
         </div>
