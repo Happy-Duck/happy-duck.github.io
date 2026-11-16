@@ -5,6 +5,8 @@
 //
 //   slug     the page address: /projects/<slug>/ — unique, lowercase, no spaces
 //   summary  one sentence for search results and link previews
+//   blurb    optional: what the CARD says when the description runs past
+//            three lines. The page still opens with the description
 //   link     corner button target; '#' hides the button
 //   tags     which mission profiles feature this (games, xr, graphics, tools, research)
 //   skills   ids from skills.js — drives the cross-links
@@ -44,6 +46,7 @@ export const PROJECTS = [
     slug:        'party-school',
     title:       'Party School',
     summary:     'A multiplayer sandbox party game in Unreal Engine 5, built in a five-person team on a streamed real-world city map.',
+    blurb:       'Multiplayer sandbox party game built in a five-person team. Built the shared multiplayer core, streamed a real-world city-scale map from the Google Map Tiles API, and implemented the racing minigame.',
     description: "Multiplayer sandbox party game with minigame activities built in a five-person team. Built the shared core project base supporting multiplayer integration, reviewed teammates' code, and streamed a real-world city-scale map into the engine from the Google Map Tiles API via the BLOSM plugin; also implementing the racing minigame using Unreal's Chaos Vehicle system.",
     stack:       ['Unreal Engine 5', 'Blueprints', 'Chaos Vehicles', 'BLOSM'],
     link:        '#',
@@ -134,6 +137,7 @@ export const PROJECTS = [
     slug:        'this-site',
     title:       'This website',
     summary:     'A portfolio built as a dive from the surface to 6,000 m, with the water, light, and animals drawn live in the browser.',
+    blurb:       'The site you are on. Scrolling is a dive from the surface to 6,000 metres. The light and the fish school are drawn on the graphics card, and every moving thing runs off one clock.',
     description: 'The site you are on. Scrolling is a dive from the surface to 6,000 metres: the water darkens, the light changes, and different animals live at each depth. The light and the fish school are drawn on the graphics card, and every moving thing runs off one clock.',
     stack:       ['React', 'Vite', 'WebGL2', 'WebGPU', 'three.js'],
     link:        'https://github.com/Happy-Duck/happy-duck.github.io',

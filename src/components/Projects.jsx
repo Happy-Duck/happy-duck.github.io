@@ -79,7 +79,7 @@ function ProjectCard({ project, delay }) {
 
         {/* Description */}
         <p className="card-body text-sm leading-relaxed">
-          {project.description}
+          {project.blurb || project.description}
         </p>
 
         {/* Tools: one plain line */}

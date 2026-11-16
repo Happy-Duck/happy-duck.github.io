@@ -86,7 +86,7 @@ function EntryCard({ entry, fromLeft = false }) {
         {entry.company}
       </p>
       <p className="exp-desc text-sm leading-relaxed mb-3">
-        {entry.description}
+        {entry.blurb || entry.description}
       </p>
       <p className="card-stack">{entry.stack.join(', ')}</p>
     </motion.div>

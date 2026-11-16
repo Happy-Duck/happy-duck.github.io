@@ -96,6 +96,8 @@ html::-webkit-scrollbar { display: none; }
   --card-bg:             rgba(3,13,34,0.93);
   --card-border:         rgba(0,212,255,0.13);
   --card-border-hover:   rgba(0,212,255,0.65);
+  --card-bg-hover:       rgba(10,34,72,0.97);
+  --card-title-hover:    #ffffff;
   --card-shadow:         0 4px 28px rgba(0,0,0,0.55);
   --card-shadow-hover:   0 4px 28px rgba(0,0,0,0.55);
   --card-title:          rgba(168,216,240,0.96);
@@ -212,7 +214,9 @@ html::-webkit-scrollbar { display: none; }
   --section-rule:        rgba(0,100,160,0.20);
   --card-bg:             rgba(250,244,226,0.94);
   --card-border:         rgba(0,120,180,0.18);
-  --card-border-hover:   rgba(255,110,60,0.70);
+  --card-border-hover:   rgba(214,78,32,0.95);
+  --card-bg-hover:       rgba(255,254,248,0.99);
+  --card-title-hover:    rgba(5,28,50,1);
   --card-shadow:         0 4px 28px rgba(0,60,100,0.18);
   --card-shadow-hover:   0 4px 28px rgba(0,60,100,0.18);
   --card-title:          rgba(5,28,50,0.96);
@@ -635,11 +639,7 @@ html::-webkit-scrollbar { display: none; }
   transition:      color 0.2s ease, transform 0.15s ease, filter 0.2s ease;
   border-radius:   8px;
 }
-.card-link-btn:hover {
-  color:     var(--card-link-hover);
-  filter:    brightness(1.1);
-  transform: scale(1.05);
-}
+.card-link-btn:hover { color: var(--card-link-hover); }
 
 .card-link-label {
   font-size:       clamp(0.6rem, 0.55rem + 0.12vw, 0.7rem);
@@ -677,18 +677,37 @@ html::-webkit-scrollbar { display: none; }
   transition: color var(--theme-dur) var(--theme-ease);
 }
 
-/* Hover state — JS overrides transform inline, CSS controls shadow + border */
-.project-card:hover {
-  box-shadow:   var(--card-shadow-hover);
-  border-color: var(--card-border-hover);
-}
 
 
 /* ═══════════════════════════════════════════════════════════════════
    PROJECT / CAREER CARD → PAGE
    ═══════════════════════════════════════════════════════════════════ */
 
-.project-card--clickable { cursor: pointer; }
+/* A card that opens a page has to say so when pointed at. Nothing lifts
+   or grows; three things change together, so it reads on the beige
+   cards as clearly as on the dark ones:
+     - the panel changes tone (beige goes to paper white, navy lightens)
+     - the border doubles in weight and takes the accent color
+     - the title is underlined, the way a link is
+   The same state shows on keyboard focus. */
+.project-card--clickable,
+.exp-card--clickable { cursor: pointer; }
+
+:is(.project-card--clickable, .exp-card--clickable):is(:hover, :focus-visible) {
+  background:          var(--card-bg-hover);
+  border-color:        var(--card-border-hover);
+  box-shadow:          0 0 0 1px var(--card-border-hover), var(--card-shadow);
+  transition-duration: 0.12s;
+}
+:is(.project-card--clickable, .exp-card--clickable):focus-visible { outline: none; }
+
+:is(.project-card--clickable, .exp-card--clickable):is(:hover, :focus-visible) :is(.card-title, .exp-role) {
+  color:                     var(--card-title-hover);
+  text-decoration:           underline;
+  text-decoration-color:     var(--card-border-hover);
+  text-decoration-thickness: 2px;
+  text-underline-offset:     5px;
+}
 
 
 /* ═══════════════════════════════════════════════════════════════════
@@ -864,13 +883,6 @@ html::-webkit-scrollbar { display: none; }
   border-color: var(--exp-card-border-h);
 }
 
-/* The whole career card opens its page, like a project card */
-.exp-card--clickable { cursor: pointer; }
-.exp-card--clickable:hover,
-.exp-card--clickable:focus-visible {
-  border-color: var(--card-border-hover);
-  box-shadow:   var(--card-shadow-hover);
-}
 
 .theme-transitioning .exp-card {
 }
