@@ -15,6 +15,13 @@
 // no React state in the hot path). It only runs while the column is on
 // screen. Under prefers-reduced-motion the column is laid out once and
 // held still. The list view is the accessible, no-motion equivalent.
+//
+// Two sizes. It opens BRIEF: a short tank holding only the classes that
+// have a page, beside their names and a button. "Show all classes"
+// grows it into the full column with the legend, list view, and
+// semester scrubber; "Show fewer" puts it back. The owner found the full
+// column big and in the way as the default. The tank element is the
+// same one in both sizes, so the sim and the GL context carry over.
 import { useEffect, useRef, useState } from 'react'
 import { useOceanDepthContext } from '../context/OceanDepthContext'
 import { useMouse } from '../context/MouseContext'
@@ -37,6 +44,7 @@ const BUBBLES = COURSES.slice(0, MAX_BALLS).map(c => ({
   number:    c.code.split(' ').slice(1).join(' '),
 }))
 const NOW_IDX = TERMS.findIndex(t => t.id === CURRENT_TERM)
+const PAGED = BUBBLES.filter(b => b.hasPage)
 
 // How strongly a bubble is drawn, by status
 const STATUS_STRENGTH = { done: 1, now: 0.72, next: 0.4 }
@@ -242,6 +250,7 @@ export function CourseColumn() {
   const { subscribe } = useOceanDepthContext()
   const mouseRef = useMouse()
 
+  const [expanded, setExpanded] = useState(false)   // false = the brief tank
   const [view, setView]       = useState('bubbles') // 'bubbles' | 'list'
   const [filter, setFilter]   = useState(null)      // category id | null
   const [through, setThrough] = useState(TERMS.length - 1)
@@ -252,15 +261,29 @@ export function CourseColumn() {
   const tipRef    = useRef(null)
   const nodeRefs  = useRef([])
   // Controls, mirrored for the tick loop (written in the effect below)
-  const liveRef   = useRef({ filter: null, through: TERMS.length - 1, hover: -1 })
+  const liveRef   = useRef({ filter: null, through: TERMS.length - 1, hover: -1, brief: true })
   const apiRef    = useRef(null)
 
   useEffect(() => {
-    liveRef.current.filter = filter
+    // The brief tank ignores the filter and the scrubber (both hidden)
+    liveRef.current.brief = !expanded
+    liveRef.current.filter = expanded ? filter : null
     liveRef.current.through = through
     // Reduced motion never ticks — redraw by hand when a control changes
     apiRef.current?.refresh()
-  }, [filter, through])
+  }, [filter, through, expanded])
+
+  // Collapsing from far down the column would leave the visitor looking
+  // at whatever slid up into its place, so bring the section back
+  const collapse = () => {
+    setHover(-1)
+    setView('bubbles')
+    setExpanded(false)
+    const section = wrapRef.current?.closest('section')
+    if (section && section.getBoundingClientRect().top < 0) {
+      section.scrollIntoView({ block: 'start', behavior: 'instant' })
+    }
+  }
 
   useEffect(() => {
     liveRef.current.hover = hover
@@ -283,11 +306,19 @@ export function CourseColumn() {
     const renderer = createRenderer(canvas)
     wrap.classList.toggle('course-column--css', !renderer)
 
-    const isActive = (i) => BUBBLES[i].termIdx <= liveRef.current.through
+    const isActive = (i) => (liveRef.current.brief
+      ? BUBBLES[i].hasPage
+      : BUBBLES[i].termIdx <= liveRef.current.through)
+
+    // Which size the last layout was for. A change of size is a new
+    // arrangement (the tank is a different shape), so it re-scatters.
+    let laidOutBrief = null
 
     const layout = (first) => {
       const w = wrap.clientWidth
       const h = wrap.clientHeight
+      if (laidOutBrief !== null && laidOutBrief !== liveRef.current.brief) first = true
+      laidOutBrief = liveRef.current.brief
       sim.resize(w, h)
       renderer?.resize(w, h)
       const base = baseRadius(w)
@@ -301,6 +332,17 @@ export function CourseColumn() {
         sim.setRadius(i, isActive(i) ? baseR[i] : 0, true)
       }
       if (first) sim.scatter()
+      // The brief tank holds a handful of bubbles: start them spread
+      // across it instead of wherever the dice put them
+      if (first && liveRef.current.brief) {
+        let k = 0
+        for (let i = 0; i < n; i++) {
+          if (!BUBBLES[i].hasPage) continue
+          sim.x[i] = w * (k + 0.5) / PAGED.length
+          sim.y[i] = h * (k % 2 ? 0.62 : 0.38)
+          k++
+        }
+      }
       sim.settle(first ? 320 : 90)
     }
 
@@ -408,8 +450,9 @@ export function CourseColumn() {
   const scrubNote = through < NOW_IDX ? 'looking back' : through === NOW_IDX ? 'this semester' : 'including what is planned'
 
   return (
-    <div className="course-wrap">
+    <div className={`course-wrap${expanded ? '' : ' course-wrap--brief'}`}>
       {/* Controls */}
+      {expanded && (
       <div className="course-controls" data-no-ping>
         <div className="course-legend" role="group" aria-label="Filter classes by category">
           {COURSE_CATEGORIES.map(k => (
@@ -427,20 +470,27 @@ export function CourseColumn() {
           ))}
         </div>
 
-        <button
-          type="button"
-          className="course-view-toggle"
-          aria-pressed={view === 'list'}
-          onClick={() => { setHover(-1); setView(v => (v === 'bubbles' ? 'list' : 'bubbles')) }}
-        >
-          {view === 'bubbles' ? 'List view' : 'Bubble view'}
-        </button>
+        <div className="course-controls-end">
+          <button
+            type="button"
+            className="course-view-toggle"
+            aria-pressed={view === 'list'}
+            onClick={() => { setHover(-1); setView(v => (v === 'bubbles' ? 'list' : 'bubbles')) }}
+          >
+            {view === 'bubbles' ? 'List view' : 'Bubble view'}
+          </button>
+          <button type="button" className="course-view-toggle course-expand" aria-expanded="true" onClick={collapse}>
+            Show fewer
+          </button>
+        </div>
       </div>
+      )}
 
+      <div className="course-stage">
       {view === 'bubbles' ? (
         <div
           ref={wrapRef}
-          className="course-column"
+          className={`course-column${expanded ? '' : ' course-column--brief'}`}
           onMouseLeave={() => setHover(-1)}
         >
           <canvas ref={canvasRef} className="course-canvas" aria-hidden="true" />
@@ -491,7 +541,7 @@ export function CourseColumn() {
 
           <div
             ref={tipRef}
-            className={`ccard${shown ? ' ccard--on' : ''}`}
+            className={`ccard${shown && expanded ? ' ccard--on' : ''}`}
             style={shown ? { '--bubble-color': shown.color } : undefined}
             role="status"
           >
@@ -502,7 +552,35 @@ export function CourseColumn() {
         <CourseList through={through} filter={filter} />
       )}
 
+      {/* Brief view: what is in the tank, and the way to the rest */}
+      {!expanded && (
+        <div className="course-brief" data-no-ping>
+          <p className="course-brief-text">
+            {BUBBLES.length} classes, taken and planned. These {PAGED.length} came with projects.
+          </p>
+          <ul className="course-brief-list">
+            {PAGED.map(b => (
+              <li key={b.slug}>
+                <Link
+                  href={entryPath('courses', b.slug)}
+                  className={`row-link${shown === b ? ' row-link--hot' : ''}`}
+                >
+                  <span className="course-brief-code" style={{ '--bubble-color': b.color }}>{b.code}</span>
+                  <span className="row-link-text">{b.title}</span>
+                  <svg className="row-link-chev" viewBox="0 0 7 12" aria-hidden="true"><path d="M1 1 L6 6 L1 11" /></svg>
+                </Link>
+              </li>
+            ))}
+          </ul>
+          <button type="button" className="course-view-toggle course-expand" aria-expanded="false" onClick={() => setExpanded(true)}>
+            Show all {BUBBLES.length} classes
+          </button>
+        </div>
+      )}
+      </div>
+
       {/* Semester scrubber */}
+      {expanded && (
       <div className="course-scrub" data-no-ping>
         <label className="course-scrub-label" htmlFor="course-scrub">
           Through <strong>{throughLabel}</strong>
@@ -525,6 +603,16 @@ export function CourseColumn() {
           <span className="course-status-key-item course-status-key-item--next">planned</span>
         </div>
       </div>
+      )}
+
+      {/* The column is tall: a second way back, where the reader ends up */}
+      {expanded && (
+        <div className="course-foot" data-no-ping>
+          <button type="button" className="course-view-toggle course-expand" aria-expanded="true" onClick={collapse}>
+            Show fewer classes
+          </button>
+        </div>
+      )}
     </div>
   )
 }

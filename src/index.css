@@ -3098,7 +3098,100 @@ html::-webkit-scrollbar { display: none; }
 
 
 /* Holds the height of the column while its chunk loads (Education.jsx) */
-.course-placeholder { height: calc(clamp(520px, 72vh, 640px) + 90px); }
+/* Holds the page's length while the column's chunk loads: the height of
+   the BRIEF view, which is what it opens as */
+.course-placeholder { height: 281px; }
 @media (max-width: 760px) {
-  .course-placeholder { height: calc(clamp(520px, 72vh, 640px) + 215px); }
+  .course-placeholder { height: 495px; }
 }
+
+/* ── Brief view: a short tank beside what is in it ─────────────────── */
+.course-controls-end { display: flex; flex-wrap: wrap; gap: 0.45rem; }
+.course-foot { display: flex; justify-content: flex-end; margin-top: 0.9rem; }
+
+.course-wrap--brief .course-stage {
+  display:               grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  gap:                   1.25rem 2.5rem;
+  align-items:           center;
+}
+/* No hover card in a tank this short: the names are listed beside it,
+   and pointing at a bubble marks its row there */
+.course-wrap--brief .course-stage { align-items: stretch; }
+.course-column--brief { height: auto; min-height: 232px; }
+
+.course-brief {
+  display:        flex;
+  flex-direction: column;
+  align-items:    flex-start;
+  padding:        1rem 1.2rem 1.1rem;
+  border:         1px solid var(--course-line);
+  border-radius:  6px;
+  background:     rgba(1, 7, 22, 0.86);
+  font-family:    ui-sans-serif, system-ui, sans-serif;
+}
+.course-brief-list { align-self: stretch; }
+.course-brief-text {
+  margin:      0 0 0.6rem;
+  font-size:   0.92rem;
+  line-height: 1.5;
+  color:       var(--course-muted);
+}
+.course-brief-list {
+  margin:     0 0 0.9rem;
+  padding:    0;
+  list-style: none;
+  border-top: 1px solid var(--course-line);
+}
+.course-brief-list li { border-bottom: 1px solid var(--course-line); }
+.course-brief-code {
+  flex:        none;
+  width:       4.9rem;
+  font-family: 'Share Tech Mono', ui-monospace, monospace;
+  font-size:   0.8rem;
+  color:       var(--bubble-color);
+}
+.course-brief .row-link { color: var(--course-ink); font-size: 0.92rem; }
+
+@media (max-width: 760px) {
+  .course-wrap--brief .course-stage { grid-template-columns: minmax(0, 1fr); }
+  .course-column--brief { min-height: 176px; }
+}
+
+/* ── Row link — a line that opens a page ───────────────────────────── */
+/* Used where a list of things each lead somewhere (the classes in the
+   brief view, the hobbies in the Captain's Log). No underline: the whole
+   row is the target, it carries a chevron so it reads as a way in before
+   it is touched, and it takes a tint when pointed at. */
+.row-link {
+  display:         flex;
+  align-items:     center;
+  gap:             0.75rem;
+  min-height:      40px;
+  padding:         0.3rem 0.6rem;
+  margin:          0 -0.6rem;
+  border-radius:   4px;
+  color:           inherit;
+  text-decoration: none;
+  cursor:          pointer;
+  transition:      background-color 0.12s ease;
+}
+.row-link-text { flex: 1; min-width: 0; }
+.row-link-chev {
+  flex:            none;
+  width:           7px;
+  height:          12px;
+  fill:            none;
+  stroke:          currentColor;
+  stroke-width:    1.6;
+  stroke-linecap:  round;
+  stroke-linejoin: round;
+  opacity:         0.45;
+  transition:      opacity 0.12s ease;
+}
+.row-link:hover,
+.row-link:focus-visible,
+.row-link--hot { background-color: rgba(120, 200, 245, 0.13); }
+.row-link:hover .row-link-chev,
+.row-link:focus-visible .row-link-chev,
+.row-link--hot .row-link-chev { opacity: 1; }
