@@ -12,6 +12,7 @@ import {
 import { bodyLoader } from '../../content/bodies.js'
 import { MdxBody } from '../mdx/MdxBody'
 import { Link } from '../Link'
+import { Porthole } from './Porthole'
 
 function headerFor(kind, entry) {
   if (kind === 'work')    return { title: entry.role, sub: entry.company }
@@ -104,7 +105,7 @@ export function EntryPage({ kind, entry }) {
 
   return (
     <article className="entry">
-      <header className="entry-head">
+      <header className="entry-head entry-head--porthole">
         <div className="entry-head-text">
           <h1 className="entry-title" tabIndex={-1}>{title}</h1>
           {sub && <p className="entry-sub">{sub}</p>}
@@ -119,6 +120,7 @@ export function EntryPage({ kind, entry }) {
             </dl>
           )}
         </div>
+        <Porthole />
       </header>
 
       <div className="entry-open">
