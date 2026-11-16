@@ -15,7 +15,7 @@ hold the feature-by-feature history, specs, and hard-won gotchas.
   locks freshly-dropped files and crashes fs.watch with EBUSY otherwise)
 - `npm run lint` — MUST stay at zero errors/warnings before every commit
 - `npm run build` — prod build, then `scripts/prerender.mjs` writes a
-  page shell per route + `sitemap.xml` into `dist/` (main bundle ≈ 448 kB
+  page shell per route + `sitemap.xml` into `dist/` (main bundle ≈ 450 kB
   / 144 kB gzip; devicons are imported per-icon from
   `devicons-react/lib/icons/*` — never from the package index, it's CJS
   and ships ~3,000 icons)
@@ -176,7 +176,17 @@ hold the feature-by-feature history, specs, and hard-won gotchas.
   `KINDS`; routing, prerender, and sitemap follow.
 - **Ways in**: project AND career cards are whole-card links (the modal
   is gone) — spread `cardLinkProps(href, label)` from `lib/cardLink.js`,
-  don't add an "open" label or arrow; Captain's Log hobby lines carry a `<Link>`;
+  don't add an "open" label or arrow. A card says it opens ON HOVER AND
+  FOCUS by three things changing together (panel tone via
+  `--card-bg-hover`, a doubled accent border, the title underlined);
+  the owner could not tell cards were clickable when only the border
+  changed, least of all on the beige theme. Cards show `blurb` (three
+  lines max at full desktop width; the owner's rule) and fall back to
+  `description`, which is what opens the page. Captain's Log hobby
+  lines and the brief class list are ROWS (`.row-link` /
+  `.log-entry--link`): whole row is the target, chevron icon at the end,
+  tint on hover, NO underline (the owner had the underlines removed);
+  the log holds its rotation while pointed at;
   class bubbles with a page are `<Link>`s; skill-ping answers and
   terminal `open` navigate too. Each card carries
   `data-entry-anchor="<kind>-<slug>"`, and each section a bare
@@ -201,9 +211,11 @@ hold the feature-by-feature history, specs, and hard-won gotchas.
   (`.dive-ocean`, `.ocean-backdrop`) still visible, dimmed, in the
   gutters. Clicking a gutter closes the page (press AND release outside
   the sheet; scrollbar excluded). The dimming is `.page-layer`'s own
-  background, so it covers the whole window — a dim cast by the sheet
-  (shadow, border) left creatures undimmed at the sheet edges and behind
-  the scrollbar. The document never scrolls, so closing a page restores
+  background — a dim cast by the sheet (shadow, border) left creatures
+  undimmed at the sheet edges and behind the scrollbar. It is a
+  gradient: dim either side of the sheet, reaching 16px in under each
+  sheet edge, clear under the sheet's column so the porthole looks out
+  on undimmed water. Keep that overlap wider than half a scrollbar. The document never scrolls, so closing a page restores
   the exact depth. Terminal lives OUTSIDE `.dive` so it works over a
   page. Page text is NOT selectable, same as the dive.
 - **Page styles** are all in `src/styles/pages.css` (imported by
@@ -216,7 +228,7 @@ hold the feature-by-feature history, specs, and hard-won gotchas.
   code and the depth readout only.
 - **The dive follows the same rules** (restyled 2026-11-15): cards are
   solid panels — NO `backdrop-filter` anywhere, 6px corners, no glow,
-  lift, or tilt on hover (the border changes); tools are one plain line
+  lift, or tilt on hover (see Ways in for what a card does instead); tools are one plain line
   (`.card-stack`), not pills; no `text-transform: uppercase` or wide
   `letter-spacing` (the floor stamp is the one exception — it is a
   rubber stamp); contact buttons are plain round icon buttons with no
@@ -238,20 +250,29 @@ hold the feature-by-feature history, specs, and hard-won gotchas.
   with that tag (projects.js `tags`) to the front of the grid, kept in
   sessionStorage for the visit. Career order never changes.
 - **Pause contract** (`src/lib/oceanPause.js`): `isPaused()` is true while a
-  page is open AND no water is in view beside it, i.e. the window is no
-  wider than the sheet (PageLayer reports this via `setWaterVisible`;
-  `:root.water-open` is the CSS signal). On a wide screen the dive keeps
+  page is open AND no water is in view: none beside the sheet (the
+  window is no wider than it; PageLayer reports this via
+  `setWaterVisible`) and the porthole is off screen (Porthole reports
+  via `setPortholeVisible`). `:root.water-open` is the CSS signal. On a wide screen the dive keeps
   running under an open page — pausing it there read as a frozen
   background bug. The depth loop skips
   subscribers; any loop with its own rAF MUST check `isPaused()` wherever
   it checks `document.hidden`. Transitions fire `ocean:pause`; the rays
   worker gets a posted visibility message (never terminated).
-- **No porthole.** A window in the page header onto the dive was built
-  and removed: with the water visible both sides it showed the same thing
-  twice. `.dive-ocean` (an UNPOSITIONED wrapper in App.jsx — it must not
-  create a stacking context) and `.ocean-backdrop` are what stay visible
-  under a page; a new water layer goes inside `.dive-ocean`, new UI stays
-  outside it.
+- **Porthole** (`pages/Porthole.jsx`, in every entry page's header): a
+  real hole in the sheet onto the live dive. The first version was
+  removed for showing the same water as the gutters; the owner then
+  asked for it back, improved. The point of this one is CONTRAST: the
+  gutters are dimmed, the glass is not. The hole is a radial-gradient
+  mask on `.page-sheet::before` (the sheet's background), centered on
+  `--ph-x/--ph-y/--ph-r`, which the component measures from layout with
+  a ResizeObserver — never on scroll, the glass and sheet move together.
+  Abyssal water is nearly the page's own color, so a deep page's
+  porthole is a dark disc with snow in it; that is correct, don't
+  brighten it. `.dive-ocean` (an UNPOSITIONED wrapper in App.jsx — it
+  must not create a stacking context) and `.ocean-backdrop` are what
+  stay visible under a page; a new water layer goes inside
+  `.dive-ocean`, new UI stays outside it.
 - **No Related lists.** The owner had them removed from every page. A
   class page lists the projects that came out of it; that is the only
   cross-link block.
@@ -304,7 +325,14 @@ hold the feature-by-feature history, specs, and hard-won gotchas.
   Text never takes a series color; every value must stay reachable
   without hover (arrow keys + table view).
 - **Course column** (`CourseColumn.jsx` + `lib/bubbleSim.js`): lazy chunk
-  behind a fixed-height placeholder in `Education.jsx`. Sim ticks via
+  behind a fixed-height placeholder in `Education.jsx`. Opens BRIEF (the
+  owner found the full column big and obstructive): a short tank with
+  only the classes that have pages, beside a panel listing them and a
+  "Show all N classes" button; expanded is the full column with legend,
+  list view, scrubber, and "Show fewer" top and bottom. Same tank
+  element in both sizes (sim and GL context carry over); a size change
+  re-scatters. The placeholder holds the BRIEF height — re-measure
+  `.course-wrap` if the brief layout changes. Sim ticks via
   `subscribe` (dt-scaled, IntersectionObserver-gated, state in typed
   arrays, transforms written directly); a WebGL2 metaball shader draws
   the wax under DOM label nodes; no WebGL2 → `.course-column--css`

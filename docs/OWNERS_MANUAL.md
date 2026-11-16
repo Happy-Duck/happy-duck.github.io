@@ -290,7 +290,8 @@ Each job is one block. The same block feeds the card on the main page
 | `role` | Job title (the big line) | `'Unity VR Developer'` |
 | `period` | Dates, shown in small caps | `'May 2026 – Present'` |
 | `summary` | ONE sentence. Shown under the link in Google and when the page is shared in Discord, LinkedIn, etc. | any sentence |
-| `description` | The paragraph | any sentence(s) |
+| `blurb` | What the **card** says. Keep it to three lines: the card opens the page, and the detail belongs there. Leave it out and the card shows the `description`. | two or three short sentences |
+| `description` | The full paragraph. It opens the job's page. | any sentence(s) |
 | `stack` | The tools line at the bottom of the card | `['Unity', 'C#', 'VR']` |
 | `tags` | Broad categories: `games`, `xr`, `graphics`, `tools`, `research`. On projects they drive tailored links (see 6.11). | `['xr']` |
 | `skills` | Which of your Skills icons this job used, by their `id` in `src/content/skills.js`. When a visitor presses a skill icon, the cards that list it light up. | `['unity', 'csharp']` |
@@ -336,6 +337,8 @@ visitor clicks the card (see 6.10).
 - `slug`, `summary`, `tags`, `skills` — same meaning as on career cards
   (6.2). The project's page lives at `/projects/<slug>/`.
 - `title`, `description`, `stack` — same drill as career cards.
+- `blurb` — optional, same as on career cards: a shorter text for the
+  card when the `description` runs past three lines.
 - `link` — the full web address the corner button opens. The button's
   icon picks itself: a Steam address shows the Steam logo, `itch.io` the
   itch logo, `github.com` the GitHub logo, anything else a generic arrow.
@@ -416,7 +419,9 @@ for the rest.
 
 - **The rotating "> …" lines** — in `hobbies.js`. `LOG_INTRO` is the
   opening line. Every block in the `HOBBIES` list is one more line, and
-  also a page of its own that the line links to:
+  also a page of its own. The whole line is the way in: it carries a
+  small arrowhead at its end and lights up when pointed at. The lines
+  stop reshuffling while the pointer is on them:
   ```js
   {
     slug:  'fly-fishing',
@@ -454,8 +459,12 @@ for the rest.
 
 ### 6.7 Education and the class bubbles
 
-The Education section is a degree card with a column of bubbles under
-it, one bubble per class.
+The Education section is a degree card with the classes under it. It
+opens small: a short tank holding only the classes that have a page,
+beside a list of them and a button, "Show all 30 classes". That button
+grows it into the full column, one bubble per class, with the category
+filter, the list view, and the semester slider; "Show fewer" puts it
+back. The numbers in the sentence and on the button count themselves.
 
 **The degree card** (degree, GPA, minor, the paragraph) —
 `src/components/Education.jsx`. Edit the text between `>` and `<`.

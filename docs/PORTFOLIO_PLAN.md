@@ -11,7 +11,7 @@ line as work lands. Edit with the Write/Edit tools only.
 | 2 | Job and hobby pages | PARTLY: every hobby and job has a page and a way in. No write-ups yet (waiting on the owner's photos and stories) |
 | 3 | Course bubble column | DONE (four class pages carry placeholder wording) |
 | 4 | Findability | MOSTLY: skill ping, depth-gauge stops, section menu on phones, terminal ls/open, tailored ?for= links. Left: credentials strip (needs the PDFs). CUT by the owner: Ship's Manifest, hero availability line |
-| 5 | Showpieces and polish | DONE: Engine Room (wording awaits the owner), per-page share pictures, print stylesheet. Porthole built, then REMOVED at the owner's call. Not built, on purpose: card-to-page morph, 3D model viewer (see Fourth pass) |
+| 5 | Showpieces and polish | DONE: Engine Room (wording awaits the owner), per-page share pictures, print stylesheet, porthole (second version, see Fifth pass). Not built, on purpose: card-to-page morph, 3D model viewer (see Fourth pass) |
 
 ## Context
 
@@ -417,6 +417,35 @@ The rest of the plan that did not need the owner.
   is cheap to add then.
 - *Credentials strip.* Needs the paper and poster PDFs. The Download
   block is ready for them.
+
+## Fifth pass (2026-11-15) — DONE, one item awaiting the owner
+
+The owner's review of the dive once every card led to a page.
+
+- **Cards are shorter.** New `blurb` field, three lines max at full
+  desktop width; `description` still opens the page. Brunswick 10 lines
+  to 3, Immersive Learning Lab 7 to 3; Party School and this-site were
+  over too. On a phone the same text runs 5 to 6 lines.
+- **Cards say they open.** Hover and focus change the panel tone, double
+  the border in the accent color, and underline the title.
+- **Porthole, second version.** See CLAUDE.md. The lesson from the
+  first: the owner said it felt redundant and "do with that what you
+  will"; removing it was the wrong reading. They wanted it better.
+- **Classes open brief.** A short tank of the four project classes and
+  a list; "Show all 30 classes" expands. Page is about 500px shorter.
+- **Hobby lines are rows**, not underlined links (interim).
+
+**Awaiting the owner: a better door to the hobby pages.** Proposed:
+
+1. *Personal effects on the sea floor.* Six real-photo objects by the
+   wreck (fly reel, d20, controller, playbill, pan, dive mask), each
+   opening its hobby, found and logged like the creatures.
+2. *Shore leave photos.* A strip of six of the owner's own photos in
+   the Captain's Log, one per hobby; the photo is the door.
+3. *A second chapter in the dive log*, "Off duty", listing the six.
+
+1 and 2 need six photos from the owner. Do not build any of them
+until they pick.
 
 ## Things to settle before they bite
 
