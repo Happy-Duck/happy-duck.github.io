@@ -6,8 +6,9 @@ import { HOBBIES, LOG_INTRO, entryPath } from '../content/index.js'
 import { Link } from './Link'
 
 // ── Data ───────────────────────────────────────────────────────────────
-// The log lines live in src/content/hobbies.js. Each hobby line links to
-// that hobby's page; the intro line is plain text.
+// The log lines live in src/content/hobbies.js. Each hobby line is a
+// whole row that opens that hobby's page (a chevron at its end, a tint
+// when pointed at; no underline). The intro line is plain text.
 
 const LOG_ENTRIES = [
   { text: LOG_INTRO },
@@ -26,6 +27,10 @@ function useRotatingTypewriter(lines, pauseMs = 4000) {
   const [typingLen, setTypingLen]   = useState(0)
   const [phase, setPhase]           = useState('paused') // typing | paused
   const started   = useRef(false)
+  // True while the reader is pointing at (or tabbing through) the log:
+  // the rows are links, and a list that reshuffles under the cursor is a
+  // moving target. A line already being typed finishes; the next waits.
+  const heldRef   = useRef(false)
   const timeoutRef = useRef(null)
   const idRef     = useRef(lines.length)
 
@@ -48,6 +53,10 @@ function useRotatingTypewriter(lines, pauseMs = 4000) {
     // updaters, and side effects inside one fork the typing loop into
     // exponentially multiplying chains.
     function cycle() {
+      if (heldRef.current) {
+        timeoutRef.current = setTimeout(cycle, 500)
+        return
+      }
       const line = lines[headRef.current % n]
       const text = line.text
       headRef.current++
@@ -77,7 +86,9 @@ function useRotatingTypewriter(lines, pauseMs = 4000) {
     timeoutRef.current = setTimeout(cycle, pauseMs)
   }, [lines, pauseMs])
 
-  return { entries, typingIdx, typingLen, phase, start }
+  const hold = useCallback((on) => { heldRef.current = on }, [])
+
+  return { entries, typingIdx, typingLen, phase, start, hold }
 }
 
 // ── Discord presence ───────────────────────────────────────────────────
@@ -238,7 +249,7 @@ function ShippingManifest() {
 // ── Typewriter log entries ─────────────────────────────────────────────
 
 function TypewriterLog() {
-  const { entries, typingIdx, typingLen, phase, start } = useRotatingTypewriter(LOG_ENTRIES)
+  const { entries, typingIdx, typingLen, phase, start, hold } = useRotatingTypewriter(LOG_ENTRIES)
   const ref = useRef(null)
 
   useEffect(() => {
@@ -259,22 +270,35 @@ function TypewriterLog() {
   }, [start])
 
   return (
-    <div ref={ref} className="log-entries">
+    <div
+      ref={ref}
+      className="log-entries"
+      onMouseEnter={() => hold(true)}
+      onMouseLeave={() => hold(false)}
+      onFocus={() => hold(true)}
+      onBlur={() => hold(false)}
+    >
       {entries.map((entry, i) => {
         const text = i === typingIdx ? entry.text.slice(0, typingLen) : entry.text
-        return (
-        <p key={entry.id} className="log-entry">
-          <span className="log-prompt" aria-hidden="true">&gt;</span>
-          <span>
-            {entry.href
-              ? <Link href={entry.href} className="log-link">{text}</Link>
-              : text}
-            {((i === typingIdx && phase === 'typing') ||
-              (phase === 'paused' && i === entries.length - 1)) && (
-              <span className="typewriter-cursor" aria-hidden="true">|</span>
-            )}
-          </span>
-        </p>
+        const line = (
+          <>
+            <span className="log-prompt" aria-hidden="true">&gt;</span>
+            <span className="log-text">
+              {text}
+              {((i === typingIdx && phase === 'typing') ||
+                (phase === 'paused' && i === entries.length - 1)) && (
+                <span className="typewriter-cursor" aria-hidden="true">|</span>
+              )}
+            </span>
+          </>
+        )
+        return entry.href ? (
+          <Link key={entry.id} href={entry.href} className="log-entry log-entry--link" data-no-ping>
+            {line}
+            <svg className="row-link-chev" viewBox="0 0 7 12" aria-hidden="true"><path d="M1 1 L6 6 L1 11" /></svg>
+          </Link>
+        ) : (
+          <p key={entry.id} className="log-entry">{line}</p>
         )
       })}
     </div>

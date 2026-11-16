@@ -1189,35 +1189,46 @@ html::-webkit-scrollbar { display: none; }
 .log-entries {
   display:        flex;
   flex-direction: column;
-  gap:            0.6rem;
+  gap:            0.1rem;
 }
 
+/* Each line is a row with a little room around it, so a hobby line (a
+   link to that hobby's page) can take a tint as a whole */
 .log-entry {
-  display:     flex;
-  gap:         0.6rem;
-  align-items: baseline;
-  font-size:   clamp(0.78rem, 0.72rem + 0.15vw, 0.88rem);
-  line-height: 1.6;
-  color:       var(--about-body);
-  margin:      0;
-  transition:  color var(--theme-dur) var(--theme-ease);
+  display:       flex;
+  gap:           0.6rem;
+  align-items:   baseline;
+  margin:        0 -0.6rem;
+  padding:       0.28rem 0.6rem;
+  border-radius: 4px;
+  font-size:     clamp(0.78rem, 0.72rem + 0.15vw, 0.88rem);
+  line-height:   1.6;
+  color:         var(--about-body);
+  transition:    color var(--theme-dur) var(--theme-ease);
 }
+.log-text { flex: 1; min-width: 0; }
 
-/* Hobby lines link to their pages — a quiet dotted underline, so the log
-   still reads as a log */
-.log-link {
-  color:                 inherit;
-  text-decoration:       underline dotted;
-  text-decoration-color: var(--about-bullet);
-  text-underline-offset: 4px;
-  transition:            color 0.2s ease, text-decoration-color 0.2s ease;
+/* A hobby line opens its page. No underline: the row carries a chevron
+   so it reads as a way in at rest, and the whole row answers the pointer
+   (same language as the class rows, .row-link). */
+.log-entry--link {
+  text-decoration: none;
+  cursor:          pointer;
+  transition:      background-color 0.12s ease, color 0.12s ease;
 }
-.log-link:hover,
-.log-link:focus-visible {
-  color:                 var(--about-label);
-  text-decoration-style: solid;
-  text-decoration-color: currentColor;
+.log-entry--link .row-link-chev {
+  align-self: center;
+  color:      var(--icon-color);
 }
+.log-entry--link:hover,
+.log-entry--link:focus-visible {
+  background-color: color-mix(in srgb, var(--icon-color) 13%, transparent);
+  color:            var(--about-label);
+}
+.log-entry--link:hover .log-prompt,
+.log-entry--link:focus-visible .log-prompt,
+.log-entry--link:hover .row-link-chev,
+.log-entry--link:focus-visible .row-link-chev { opacity: 1; }
 
 .log-prompt {
   flex-shrink: 0;
