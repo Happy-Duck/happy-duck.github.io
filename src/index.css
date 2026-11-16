@@ -47,7 +47,6 @@ html::-webkit-scrollbar { display: none; }
   .signal-ring { display: none; }
 
   .beach-wave-1, .beach-wave-2, .beach-wave-3,
-  .kelp-current,
   .signal-orb, .sidebar-orb,
   .jelly-bell, .jelly-tentacle,
   .bio-pulse, .lure-pulse, .angler-lure,
@@ -130,10 +129,6 @@ html::-webkit-scrollbar { display: none; }
   --creature-deep-op:    1;
   --creature-reef-op:    0;
   /* Experience timeline */
-  --kelp-stroke:         rgba(0,180,200,0.28);
-  --kelp-glow:           rgba(0,220,255,0.65);
-  --kelp-dot-bg:         #00d4ff;
-  --kelp-dot-ring:       rgba(0,212,255,0.30);
   --exp-card-bg:         rgba(3,13,34,0.93);
   --exp-card-border:     rgba(0,212,255,0.13);
   --exp-card-border-h:   rgba(0,212,255,0.32);
@@ -245,10 +240,6 @@ html::-webkit-scrollbar { display: none; }
   --creature-deep-op:    0;
   --creature-reef-op:    1;
   /* Experience timeline */
-  --kelp-stroke:         rgba(30,100,50,0.38);
-  --kelp-glow:           rgba(60,170,80,0.70);
-  --kelp-dot-bg:         #2a8a42;
-  --kelp-dot-ring:       rgba(40,140,60,0.28);
   --exp-card-bg:         rgba(250,244,226,0.94);
   --exp-card-border:     rgba(0,120,60,0.18);
   --exp-card-border-h:   rgba(0,120,60,0.38);
@@ -837,33 +828,80 @@ html::-webkit-scrollbar { display: none; }
    ═══════════════════════════════════════════════════════════════════ */
 
 /* Kelp strand paths */
-.kelp-strand {
-  stroke: var(--kelp-stroke);
-  transition: stroke var(--theme-dur) var(--theme-ease);
-}
+/* Career timeline (Experience.jsx). Line, tick, and marker all live in
+   .career-rail and are centered in it, so they cannot drift apart.
+   --career-node-y is how far down a row its marker sits: level with the
+   first line of the card (the dates). */
+.career-rows { --career-node-y: 35px; --career-gap: 6rem; }
 
-.kelp-current {
-  stroke: var(--kelp-glow);
-  stroke-dasharray: 3 9;
-  animation: kelp-flow 2.8s linear infinite;
-  transition: stroke var(--theme-dur) var(--theme-ease);
+.career-row {
+  display:               grid;
+  grid-template-columns: minmax(0, 1fr) 40px minmax(0, 1fr);
+  padding-bottom:        var(--career-gap);
 }
+.career-row:last-child { padding-bottom: 0; }
 
-@keyframes kelp-flow {
-  from { stroke-dashoffset: 0; }
-  to   { stroke-dashoffset: -12; }
+.career-card-cell { grid-row: 1; grid-column: 1; padding-right: 1rem; display: flex; justify-content: flex-end; }
+.career-rail      { grid-row: 1; grid-column: 2; position: relative; }
+.career-year      { grid-row: 1; grid-column: 3; padding-left: 1rem; }
+.career-row--right .career-card-cell { grid-column: 3; padding: 0 0 0 1rem; justify-content: flex-start; }
+.career-row--right .career-year      { grid-column: 1; padding: 0 1rem 0 0; text-align: right; }
+
+/* The line: from this row's marker down to the next row's */
+.career-line {
+  position:   absolute;
+  left:       50%;
+  top:        var(--career-node-y);
+  width:      2px;
+  height:     calc(100% + var(--career-gap));
+  margin-left: -1px;
+  background: color-mix(in srgb, var(--section-heading) 45%, transparent);
+  transition: background-color var(--theme-dur) var(--theme-ease);
 }
-
-/* Dot on the strand */
-.exp-dot {
-  width:  13px;
-  height: 13px;
+/* The tick: from the line across to the card */
+.career-tick {
+  position:   absolute;
+  top:        var(--career-node-y);
+  right:      50%;
+  width:      calc(50% + 1rem);
+  height:     1px;
+  background: color-mix(in srgb, var(--section-heading) 45%, transparent);
+  transition: background-color var(--theme-dur) var(--theme-ease);
+}
+.career-row--right .career-tick { right: auto; left: 50%; }
+/* The marker: a plain disc on the line */
+.career-node {
+  position:      absolute;
+  left:          50%;
+  top:           var(--career-node-y);
+  width:         11px;
+  height:        11px;
+  margin:        -5.5px 0 0 -5.5px;
   border-radius: 50%;
-  background:  var(--kelp-dot-bg);
-  box-shadow:  0 0 0 3px var(--kelp-dot-ring), 0 0 10px var(--kelp-glow);
-  transition:
-    background  var(--theme-dur) var(--theme-ease),
-    box-shadow  var(--theme-dur) var(--theme-ease);
+  background:    var(--section-heading);
+  transition:    background-color var(--theme-dur) var(--theme-ease);
+}
+.career-year {
+  align-self:  start;
+  font-size:   1.05rem;
+  font-weight: 700;
+  /* one line, centered on the marker */
+  line-height: calc(var(--career-node-y) * 2);
+  font-variant-numeric: tabular-nums;
+  color:       var(--section-heading);
+  opacity:     0.8;
+  transition:  color var(--theme-dur) var(--theme-ease);
+}
+
+/* Narrow: the line runs down the left, every card to its right */
+@media (max-width: 639px) {
+  .career-rows { --career-gap: 3rem; }
+  .career-row,
+  .career-row--right { grid-template-columns: 24px minmax(0, 1fr); }
+  .career-row .career-rail { grid-column: 1; }
+  .career-row .career-card-cell { grid-column: 2; padding: 0 0 0 0.75rem; justify-content: flex-start; }
+  .career-row .career-year { display: none; }
+  .career-row .career-tick { right: auto; left: 50%; width: calc(50% + 0.75rem); }
 }
 
 /* Experience card */

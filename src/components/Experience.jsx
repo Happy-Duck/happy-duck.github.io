@@ -3,52 +3,16 @@ import { motion } from 'framer-motion'
 import { WORK as ENTRIES, entryAnchor, entryPath } from '../content/index.js'
 import { cardLinkProps } from '../lib/cardLink'
 
-// ── Kelp cable ─────────────────────────────────────────────────────────
-// Gentle S-curves: organic, not ruler-straight
+// ── Timeline ───────────────────────────────────────────────────────────
+// A straight line down the section with one marker per job, newest at
+// the top. Each marker has a short tick to its card and, on the other
+// side of the line, the year that job started. Markers sit exactly on
+// the line because both are centered in the same 40px rail (index.css,
+// .career-*); the old version drew a wavy kelp strand and put round
+// dots on a straight axis beside it, so they never lined up.
 
-const KELP_PATH = 'M20 0 C5 80 35 160 20 260 C5 360 35 440 20 530 C8 570 32 590 20 620'
-
-function KelpCable() {
-  return (
-    <div
-      aria-hidden="true"
-      // desktop: centered; mobile: hugs left edge
-      className="absolute top-0 bottom-0 left-5 sm:left-1/2 sm:-translate-x-1/2 w-10 pointer-events-none"
-    >
-      <svg
-        width="40"
-        height="100%"
-        viewBox="0 0 40 620"
-        preserveAspectRatio="none"
-        xmlns="http://www.w3.org/2000/svg"
-      >
-        {/* Base strand */}
-        <path
-          d={KELP_PATH}
-          className="kelp-strand"
-          fill="none"
-          strokeWidth="2.5"
-          strokeLinecap="round"
-        />
-        {/* Flowing current — dashes drift downward */}
-        <path
-          d={KELP_PATH}
-          className="kelp-current"
-          fill="none"
-          strokeWidth="2"
-          strokeLinecap="round"
-          pathLength="100"
-        />
-      </svg>
-    </div>
-  )
-}
-
-// ── Dot ────────────────────────────────────────────────────────────────
-
-function Dot() {
-  return <div className="exp-dot" aria-hidden="true" />
-}
+// The year a job started: the first four-digit number in its period
+const startYear = (period) => period.match(/\d{4}/)?.[0] ?? ''
 
 // ── Animation variants ─────────────────────────────────────────────────
 
@@ -116,54 +80,26 @@ export function Experience() {
         <motion.div variants={headerItem} className="section-rule h-px w-full" />
       </motion.div>
 
-      {/* Timeline */}
-      <div className="relative">
-        <KelpCable />
-
-        {/* ── Desktop: alternating left / right ── */}
-        <div className="hidden sm:block">
-          {ENTRIES.map((entry, i) => (
-            <div key={entry.slug} className={`flex items-start${i < ENTRIES.length - 1 ? ' pb-24' : ''}`}>
-              {i % 2 === 0 ? (
-                <>
-                  <div className="flex-1 pr-4 flex justify-end">
-                    <EntryCard entry={entry} fromLeft />
-                  </div>
-                  <div className="w-10 shrink-0 flex justify-center pt-6">
-                    <Dot />
-                  </div>
-                  <div className="flex-1 pl-4" />
-                </>
-              ) : (
-                <>
-                  <div className="flex-1 pr-4" />
-                  <div className="w-10 shrink-0 flex justify-center pt-6">
-                    <Dot />
-                  </div>
-                  <div className="flex-1 pl-4">
-                    <EntryCard entry={entry} fromLeft={false} />
-                  </div>
-                </>
-              )}
-            </div>
-          ))}
-        </div>
-
-        {/* ── Mobile: line on left, cards stacked right ── */}
-        <div className="sm:hidden pl-10">
-          {ENTRIES.map((entry, i) => (
-            <div
-              key={entry.slug}
-              className={`relative${i < ENTRIES.length - 1 ? ' pb-12' : ''}`}
-            >
-              <div className="absolute -left-[1.4rem] top-5">
-                <Dot />
+      {/* Timeline: one row per job. Wide screens alternate the card left
+          and right of the line; narrow ones keep the line on the left.
+          One set of cards for both (CSS grid does the rearranging). */}
+      <div className="career-rows">
+        {ENTRIES.map((entry, i) => {
+          const left = i % 2 === 0
+          return (
+            <div key={entry.slug} className={`career-row career-row--${left ? 'left' : 'right'}`}>
+              <div className="career-card-cell">
+                <EntryCard entry={entry} fromLeft={left} />
               </div>
-              <EntryCard entry={entry} fromLeft={false} />
+              <div className="career-rail" aria-hidden="true">
+                {i < ENTRIES.length - 1 && <span className="career-line" />}
+                <span className="career-tick" />
+                <span className="career-node" />
+              </div>
+              <div className="career-year" aria-hidden="true">{startYear(entry.period)}</div>
             </div>
-          ))}
-        </div>
-
+          )
+        })}
       </div>
     </section>
   )
