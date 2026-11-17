@@ -13,6 +13,83 @@ line as work lands. Edit with the Write/Edit tools only.
 | 4 | Findability | MOSTLY: depth-gauge stops, section menu on phones, terminal ls/open, tailored ?for= links. Left: credentials strip (needs the PDFs). CUT by the owner: Ship's Manifest, hero availability line, skill ping (built, then turned off) |
 | 5 | Showpieces and polish | DONE: Engine Room (wording awaits the owner), per-page share pictures, print stylesheet, porthole (second version, see Fifth pass), card-to-page transition (Sixth pass). Not built: 3D model viewer (nothing to show in it yet) |
 
+## Handoff: where things stand (2026-11-17)
+
+Written for a new chat picking this up cold. Read in this order:
+`CLAUDE.md` (architecture and rules), this section, then
+`docs/CONTENT_NOTES.md` before touching any page text. The auto-memory
+for this project also holds the owner's standing preferences.
+
+**State.** All work is on `feature/portfolio-wave-3`, pushed. `master`
+is still at c4b3194 and nothing has been deployed: the live site is the
+pre-wave-3 version. Do not merge or run `npm run deploy` until the
+owner says the work is ready. Deploy refuses anyway while any page holds
+`<Draft />` (20 of 21 pages do; only CS 222 has none, because it has no
+write-up).
+
+**Built.** The structure is finished. In short:
+
+- A page for every job, project, hobby, and class with a write-up,
+  opened by whole-card links and growing out of its card; real URLs,
+  prerendered, with a share picture each; prints cleanly.
+- Pages are a sheet over the live dive, in the colors of the depth they
+  were opened from, with a porthole onto the water.
+- Page blocks for writing them (figures, galleries, video, diagrams,
+  charts, code tours, before/after, timelines, downloads, live engine
+  controls), a template, a kitchen-sink reference, and `npm run media`
+  for pictures.
+- The class tank (brief, expands with an animation), a section menu on
+  phones, depth-gauge stops, terminal `ls`/`open`, `?for=` links.
+- The dive restyled without the AI-looking patterns; a straight career
+  timeline; three-line card blurbs; a hover that says a card opens.
+- Real text, from the owner's documents, on: This website (says plainly
+  that Claude built it), Party School, SportsBot, CS 415, CS 417,
+  INFO 418, CS 222, Origami Games, fly fishing, musical theater,
+  tabletop RPGs. Each still carries a `Draft` note saying what is real.
+
+**Remaining, waiting on the owner's material** (CONTENT_NOTES.md has the
+detail per page):
+
+- Hobby photos and stories for all six hobby pages. The owner plans to
+  supply these next.
+- New keg safe pictures and schematic for INFO 418 (the current
+  Tinkercad picture is out of date).
+- Placeholder pages with no real text yet: Brunswick (under embargo
+  until CES, January 2027), Immersive Learning Lab, Pelagos, Flarp,
+  Tide Toss, the vision research, CS 418.
+- Missing pieces on written pages: Party School capture and pictures,
+  what changed in the finished SportsBot, Origami Games screenshots,
+  the Duckman drawing, CS 417 pictures.
+- PDFs: the research paper, the IMMERSE poster. Numbers for the two
+  evidence charts (Pelagos downloads over time; accuracy and latency
+  per model).
+
+**Remaining, waiting on the owner's decision:**
+
+- The better way into the hobby pages: three ideas under Fifth pass.
+  Do not build one until they pick.
+- Whether to add the CS 417 YouTube walkthroughs, the other class
+  repositories, teammates' names, and the Chey Gaufre flowchart and the
+  lab's joke name (all currently left off).
+- A review of the wording on the page about this site.
+- They never answered whether the near-opaque cards from the dive
+  restyle look right.
+
+**Small known gaps, not yet raised as bugs.** On a phone, the contact
+bar at the bottom overlaps card text, and creatures show faintly through
+cards; card blurbs run five or six lines there (the three-line rule is
+for desktop). `?for=xr` does nothing because no project is tagged `xr`.
+The `skills` field in the data files is no longer read by anything.
+
+**Testing.** Smoke scripts were throwaway, as CLAUDE.md says; none are
+in the repo. Write fresh ones against your own ports (5199 dev, 4199
+preview). The two transitions (tank opening, card to page) are only
+judgeable by slowing them down and reading screenshots.
+
+**If a new model overhauls the site**, add its row to the `Timeline` on
+`src/content/pages/projects/this-site.mdx` and keep the co-author line
+on every commit: the owner uses the history as the record.
+
 ## Context
 
 The site today is one long dive: Hero → Career → Projects → Skills → Captain's Log. It is strong on atmosphere and thin on evidence. Each job is one paragraph, each project is a card plus a small modal, hobbies are seven typewriter lines, and coursework is shelved in `Education.jsx`. There are no URLs other than `/`, so nothing can be linked from a resume or shared on its own.
@@ -470,11 +547,13 @@ The owner's second review, plus a batch of their documents.
   about sources, what was held back, and what is still needed is in
   docs/CONTENT_NOTES.md.
 
-**Open questions for the owner** (also in CONTENT_NOTES.md): which White
-River; whether to link the YouTube walkthroughs and the other class
-repositories; whether the Chey Gaufre lab's real name and flowchart go
-on the site; whether teammates should be named; who designed the keg
-safe circuit; how the SportsBot work was split in the end.
+**Answered by the owner on 2026-11-17** and applied: the White River is
+in Arkansas; SportsBot was a team of four; they designed the keg safe
+circuit (the Tinkercad picture is out of date, new ones coming); the
+itch.io pages are public. **Still open:** whether to link the YouTube
+walkthroughs and the other class repositories; whether the Chey Gaufre
+lab's real name and flowchart go on the site; whether teammates should
+be named.
 
 ## Things to settle before they bite
 
@@ -485,7 +564,7 @@ safe circuit; how the SportsBot work was split in the end.
 
 ## What I need from you
 
-- ~~Course list~~ received (transcript). Still open: details of the CS 417, CS 418, and INFO 418 projects once they wrap.
+- ~~Course list~~ received (transcript). CS 417 and INFO 418 documents received 2026-11-15. Still open: CS 418, the CS 417 final project once it wraps, new INFO 418 pictures.
 - Numbers for the evidence charts: Pelagos downloads over time; accuracy and latency per model from the vision paper.
 - Photos and clips per project, job, and hobby (real photos, as always), plus the paper and poster PDFs.
 - ~~Backlog picks~~ porthole header and evidence charts. (Hobbies: all six get pages.)

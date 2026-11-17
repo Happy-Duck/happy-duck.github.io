@@ -89,8 +89,8 @@ export const COURSES = [
   {
     slug: 'cs-417', code: 'CS 417', title: 'Intro to Extended Reality', term: 'FA26', credits: 3, category: 'games',
     // Written from the design documents and contribution summaries the
-    // owner shared (2026-11-15). The itch.io addresses come from those
-    // documents: check each is public before the site goes live.
+    // owner shared (2026-11-15). The itch.io pages are public (owner,
+    // 2026-11-17).
     summary:     "UIUC's introduction to extended reality: a VR escape room, a farm sim, and a final project, all built in Unity.",
     description: "UIUC's introduction to extended reality, taught through a run of VR projects in Unity: a room with a comet in orbit, an escape room built by four people, a farm sim built by five, and a final project that is still in progress.",
     links: [
@@ -109,9 +109,10 @@ export const COURSES = [
   {
     slug: 'info-418', code: 'INFO 418', title: 'Makerspace: Escape Rooms', term: 'FA26', credits: 3, category: 'games',
     // Drawn from the repo description and the Keg Safe 2.0 schematic the
-    // owner shared (2026-11-15). Still in progress this semester.
-    summary:     'A makerspace course on building escape rooms. I wrote the Arduino code behind two of the props in Riggs Escape.',
-    description: 'A makerspace course on building escape rooms. For Riggs Escape I wrote the Arduino Uno code that controls the electronics for the sticker dispenser and the keg safe door. The keg safe is a keypad, a solenoid lock, two status lights, and a buzzer. In progress this semester.',
+    // owner shared (2026-11-15). The owner designed the keg safe circuit
+    // (confirmed 2026-11-17). Still in progress this semester.
+    summary:     'A makerspace course on building escape rooms. I built the electronics and Arduino code behind two of the props in Riggs Escape.',
+    description: 'A makerspace course on building escape rooms. For Riggs Escape I wrote the Arduino Uno code that controls the electronics for the sticker dispenser and the keg safe door, and designed the keg safe circuit: a keypad, a solenoid lock, two status lights, and a buzzer. In progress this semester.',
     links: [
       { label: 'Arduino source', href: 'https://github.com/Happy-Duck/MetaPuzzleArduinoCode' },
     ],

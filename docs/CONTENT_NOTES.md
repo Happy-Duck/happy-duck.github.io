@@ -6,7 +6,7 @@ off the site, and what each page is still waiting for. It is the handoff
 for whoever continues the content work (the owner expects to do the
 hobby pages with a different model).
 
-Last updated 2026-11-16.
+Last updated 2026-11-17.
 
 ## Rules for page text
 
@@ -59,16 +59,15 @@ Given by the owner, 2026-11-15: the trout count is 6.
 
 | Water | Trout | Count |
 | --- | --- | --- |
-| The White River | Rainbow | 1 |
+| The White River, Arkansas | Rainbow | 1 |
 | Virginia (the Appalachians) | Brown | 1 |
 | Wisconsin (the Driftless) | Brown | 1 |
 | Wisconsin (the Driftless) | Brook | 3 |
 
 - The Wisconsin numbers came with "I think". Confirm before treating
   them as settled.
-- The owner wrote "white river, AK". AK is Alaska; the well-known trout
-  river of that name is in Arkansas (AR). The page says "the White
-  River" with no state until the owner says which.
+- The White River is the one in Arkansas (owner, 2026-11-17; their
+  first message said "AK").
 - The count appears in three places that must agree: the table and the
   Stats on the page, and the log line in `hobbies.js` ("Current trout
   count: 6").
@@ -148,8 +147,8 @@ Seven Seats vision document.
     therapeutic hodgepodge)". The page calls it "the lab". The chicken
     farm's gun is not mentioned either. This is a portfolio a recruiter
     reads, so it is the owner's call to add them.
-- The three itch.io links in `courses.js` come from the summaries.
-  Check each is public before the site goes live.
+- The three itch.io links in `courses.js` come from the summaries. All
+  are public (owner, 2026-11-17).
 - Seven Seats is in progress; its section describes the plan.
 
 ### CS 415 and Party School (`courses/cs-415`, `projects/party-school`)
@@ -170,19 +169,22 @@ Source: the project proposal (rough draft, group of four).
   was for soccer only; the card speaks of sports in general. What
   changed between plan and finished bot is a placeholder section.
 - `role` used to say "Solo developer". The proposal shows a team of four
-  with the owner in the Discord pair, so it now says that. Owner to
-  confirm how the work was split in the end.
+  with the owner in the Discord pair, so it now says that. The owner
+  confirmed the team of four (2026-11-17).
 
 ### INFO 418 (`courses/info-418`)
 
 Sources: the Keg Safe 2.0 schematic and a Tinkercad breadboard picture.
 
-- The page describes the circuit part by part. It does **not** say who
-  designed it, because that was not stated; the confirmed fact is that
-  the owner wrote the Arduino code for the sticker dispenser and the keg
-  safe door. Ask before claiming more.
-- The schematic PDF was shown in the conversation but is not in the
-  repo. The page has a `Download` placeholder for it.
+- The owner wrote the Arduino code for the sticker dispenser and the
+  keg safe door, and designed the keg safe circuit (confirmed
+  2026-11-17). The page and the card say so.
+- **The Tinkercad picture and the schematic are out of date.** The owner
+  will send new ones. When they arrive: replace
+  `public/media/courses/info-418/keg-safe-breadboard.webp` (or add a new
+  file and point the `Figure` at it), check the parts table against the
+  new schematic, drop "An earlier layout" from the caption, and put the
+  schematic PDF in that folder for the `Download` row.
 
 ### Origami Games (`work/origami-games`)
 

@@ -38,7 +38,7 @@ export const HOBBIES = [
     title: 'Fly fishing',
     // The count is the total of the catch table in
     // src/content/pages/hobbies/fly-fishing.mdx. Change both together.
-    log:   'Avid fly fisherman: fished the Wisconsin Driftless, the Appalachians in Virginia, and the White River. Current trout count: 6',
+    log:   'Avid fly fisherman: fished the Wisconsin Driftless, the Appalachians in Virginia, and the White River in Arkansas. Current trout count: 6',
   },
   {
     slug:  'scuba',

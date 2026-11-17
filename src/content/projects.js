@@ -91,9 +91,9 @@ export const PROJECTS = [
     skills:      ['python', 'sql'],
     courses:     ['cs-222'],
     details: {
-      // From the CS 222 project proposal (group of four; the Discord side
-      // was the owner's half). Owner to confirm how the work was split in
-      // the end.
+      // From the CS 222 project proposal: a team of four, with the owner
+      // in the pair on the Discord side. Team size confirmed by the owner
+      // (2026-11-17).
       role: 'Discord integration, on a four-person team',
       highlights: [
         'Live scores, player stats, and schedule alerts via slash commands',
