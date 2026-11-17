@@ -1,39 +1,74 @@
-<Draft />
+<Draft note="The text and pictures on this page come from the IMMERSE 2026 poster. A headset capture is still to come." />
 
 <Clip wide label="Headset capture: a walk through the app, 20 to 30 seconds" />
 
-## The app
+## Why a headset
 
-Placeholder text. What the application teaches, who puts on the headset, and what they come away knowing about a mass spectrometer that they did not know before.
+Real scientific instruments and institutions are often out of the public's reach, both physically and in how hard they are to understand. Space science is a good case for showing them in 3D instead. Its instruments fly on missions still in development, its physics happens in three dimensions that a flat diagram conveys poorly, and its research centers are on the other side of the world.
 
-<Note title="Permission">
-Anything showing the instrument or the ISSI building should be cleared with the lab before it goes on this page.
-</Note>
+VR helps on each count. It runs on consumer hardware, the Meta Quest, that researchers, students, and the public can get hold of. It lets a visitor look at an instrument from the inside, and scale it up to see how a compact system fits together. And it uses the sense of space people already have, which a flat picture does not.
 
-A second paragraph on the two halves of the work: the instrument visualization, and the replica of the lobby in Bern.
+The app has two halves: a replica of a real building in Bern, and a model of an instrument built there for a comet mission.
 
-<Gallery lead caption="Placeholders for in-headset screenshots." images={[
-  { label: 'The instrument, exploded view' },
-  { label: 'Live data graph' },
-  { label: 'A guide character' },
-  { label: 'The lobby replica' },
-  { label: 'Reference photo of the real lobby' },
+## The lobby in Bern
+
+The International Space Science Institute (ISSI) in Bern is a neutral institute for space and Earth science, working across planetary science, astrophysics, cosmology, the earth sciences, astrobiology, and more. Its main-floor lobby is where about a thousand visiting scientists a year meet. The app has a nearly photorealistic replica of it.
+
+The things in the room run on physics, can be handled, and put themselves back afterwards:
+
+- coffee mugs that fill, and can be drunk from or spilled, and food that can be eaten
+- the ISSI bell, whose clapper swings on a physics joint
+- the institute's published books, and other odds and ends
+
+Facts about the institute are posted around the room, from how much it publishes to how much coffee it gets through. Non-player "scientists" wander the space, and a mural carries a menu that links to the lab's other experiences.
+
+<Gallery lead caption="The lobby, in the headset." images={[
+  { src: '/media/work/immersive-learning-lab/lobby.webp', alt: 'The replica lobby: a reception desk, blue chairs, a large space mural, and shelves of books' },
+  { src: '/media/work/immersive-learning-lab/lobby-coffee.webp', alt: 'A mug of coffee steaming under a coffee machine, beside a plate of cookies' },
+  { src: '/media/work/immersive-learning-lab/lobby-bell.webp', alt: 'The ISSI bell over the coffee counter, beside a sign about how many cups the machine has made' },
+  { src: '/media/work/immersive-learning-lab/lobby-book.webp', alt: 'A book titled Supernovae, picked up from the shelves' },
+  { src: '/media/work/immersive-learning-lab/lobby-books.webp', alt: 'Shelves of ISSI publications beside the coffee counter, with a sign on how many papers visitors publish each year' },
+  { src: '/media/work/immersive-learning-lab/lobby-meeting-room.webp', alt: 'A meeting room with a world map and a sign on how many countries are in the visitor database' },
+  { src: '/media/work/immersive-learning-lab/lobby-mural.webp', alt: 'The space mural, with the pointer circling one of its selections' },
 ]} />
 
-## Making an instrument make sense
+## The instrument
 
-Placeholder text. How a part the size of a shoebox, built for a comet flyby, becomes something a visitor can walk around. Which physics is simulated and which is illustrated.
+MANiaC, the Mass Analyzer for Neutrals in a Coma, is a mass spectrometer from the University of Bern, to be flown on ESA's Comet Interceptor mission (2028 to 2029). The app shows it three ways, as a schematic, a realistic model, and a transparent cross-section, in a room made to look like a space station.
 
-<Figure label="One screen of the live data graphing" caption="A single picture in the text column." />
+It simulates particles moving through the instrument and the time each one takes to reach the detector. Every arrival is plotted as it happens, time of flight against mass per charge, which is how the instrument tells one ion species from another.
 
-## The lobby
+<Figure src="/media/work/immersive-learning-lab/maniac-plot.webp" alt="A graph of mass per charge against flight time in nanoseconds: blue dots low on the left, yellow dots rising to the right" caption="The live plot. Each dot is one particle reaching the detector." />
 
-Placeholder text. Modelling a real room closely enough that people who work there recognize it: reference photos, Blender, texturing, and where you stopped.
+To make that stick, the learner goes along for the ride: they travel through the instrument's chambers as particles of different masses and charges.
+
+<Gallery lead caption="The instrument room, the three models, and the trip through as a particle." images={[
+  { src: '/media/work/immersive-learning-lab/maniac-station.webp', alt: 'The space station room, with the instrument on a stand and the plot on the wall behind it' },
+  { src: '/media/work/immersive-learning-lab/maniac-blue.webp', alt: 'The instrument in pale blue, with particles streaming out of a glass chamber at one end' },
+  { src: '/media/work/immersive-learning-lab/maniac-gold.webp', alt: 'The instrument in gold, with the same stream of particles' },
+  { src: '/media/work/immersive-learning-lab/maniac-cutaway.webp', alt: 'The instrument made transparent, showing the parts inside' },
+  { src: '/media/work/immersive-learning-lab/maniac-particles.webp', alt: 'Inside the instrument among blue and orange spheres, the particles' },
+  { src: '/media/work/immersive-learning-lab/maniac-chamber.webp', alt: 'Looking down a tunnel of gold rings toward an orange sphere' },
+]} />
+
+## How it was built
+
+- Unity, with OpenXR and the XR Interaction Toolkit, deployed to the Meta Quest
+- 3D assets modeled in Blender and textured in Substance Painter
+- Tuned for the Quest's mobile hardware: URP Forward+ with baked lighting, level-of-detail groups, and fixed foveated rendering
+- Physics-driven interactions on Unity's Rigidbody and Joint systems, with custom scripts for proximity triggers and for putting objects back
+- XCharts for the graphs, and AI Navigation for the wandering scientists
+
+Next, as of the poster in April 2026: science challenges and story elements in the lobby for each of ISSI's four disciplines, and a view of a comet's coma for MANiaC.
 
 ## Showing it
 
-Placeholder text. The IMMERSE symposium in April 2026: the poster, the live demo, and what people asked.
+<Note title="Credits">
+The work was done at the Immersive Learning Laboratory, supervised by Prof. Raluca Ilie and Nan Kang, with funding from NSF CAREER award 1945573.
+</Note>
 
-<Figure label="The symposium poster" ratio="3 / 4" caption="A portrait image, such as a poster, can be given its own shape." />
+I presented the app at the IMMERSE Annual Symposium in April 2026, with a live demo and a poster, "No Spacesuit Required: Immersive Applications for Science Communications".
 
-<Download title="The symposium poster" note="add the PDF and this row becomes a link to it" />
+<Figure src="/media/work/immersive-learning-lab/immerse-2026-poster.webp" alt="The poster: four panels of text on motivation, development, the lobby, and the instrument, above sixteen screenshots from the headset" caption="The poster, IMMERSE 2026." />
+
+<Download href="/media/work/immersive-learning-lab/immerse-2026-poster.pdf" title="The poster" note="1.7 MB" />

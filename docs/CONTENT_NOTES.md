@@ -6,7 +6,12 @@ off the site, and what each page is still waiting for. It is the handoff
 for whoever continues the content work (the owner expects to do the
 hobby pages with a different model).
 
-Last updated 2026-11-17.
+Last updated 2026-11-17 (second round: the poster, CS 415's MPs, the
+redacted name).
+
+The owner's documents are attachments in the chat where they were
+shared, not files in the repo. When the owner says they sent
+something, look for it there before saying it never arrived.
 
 ## Rules for page text
 
@@ -104,9 +109,10 @@ From four character sheets and the owner's account, 2026-11-15.
   It is not stated whether the hard campaign and the Illini Metagamers
   one are the same campaign. The page does not say either way.
 - **A second character**, played between two of Duckman's lives: a
-  bugbear bard (College of Whispers, a percussionist). **His name is
-  redacted at the owner's request. Do not print it**, and do not use his
-  backstory, which is crude.
+  bugbear bard (College of Whispers, a percussionist), level 6 on his
+  sheet. **His real name is never printed.** The owner asked
+  (2026-11-17) for it to appear as `[REDACTED]`, which is how the page's
+  timeline titles him. Do not use his backstory, which is crude.
 - **Glorb**: a plasmoid bard, level 3, made for a one-shot with friends.
 - There is a drawing of Duckman on the level 1 sheet. The page has a
   placeholder for it; the image file has not been supplied.
@@ -157,6 +163,52 @@ Sources: the High Level Vision Canvas and the Technical Design Document
 (version 1.2, 25 March 2026). The owner's own part comes from the
 existing card text. Still needed: gameplay capture, pictures of the map
 and the racing minigame, and the two placeholder sections.
+
+- **The class was not one semester-long project** (owner, 2026-11-17):
+  it ran as a set of machine problems (MPs), then a final project of
+  about a month. Party School is that final project, and both documents
+  are about it. The class page now says so; what the MPs were is a
+  placeholder.
+- Open: the card and page say the owner is "implementing" / "building"
+  the racing minigame, in the present tense, but the class ended in
+  spring 2026. Whether the racing game was finished is not known.
+
+### Immersive Learning Lab (`work/immersive-learning-lab`)
+
+Source: the owner's IMMERSE 2026 poster, "No Spacesuit Required:
+Immersive Applications for Science Communications"
+(`IMMERSE_2026_Poster_RishiGarhyan_Final.pdf`). It was in the batch of
+2026-11-16 and was missed until the owner pointed it out on 2026-11-17.
+
+- Used: all of its text (the motivation, the ISSI lobby and what can be
+  done in it, MANiaC and the time-of-flight plot, how it was built, the
+  future work, dated "as of the poster"). 14 of its 16 headset
+  screenshots are on the page; the poster itself is a figure, and its
+  PDF is the `Download`. The `cover` for the share picture is the gold
+  model of the instrument.
+- **The ESA/ISSI permission check** (rule 4 above):
+  the poster was shown in public at the symposium, with the lab's
+  supervisors as co-authors, so its pictures were treated as cleared.
+  The "Permission" note on the page was removed. If the lab wants web
+  use approved separately, take the pictures and the PDF off.
+- The credits note names the supervisors (Prof. Raluca Ilie and Nan
+  Kang) and the NSF award, as the poster's acknowledgments do. They are
+  co-authors, not classmates, but it is the owner's call.
+- Still needed: a headset capture (the `Clip` at the top).
+
+### Documents supplied but not used yet
+
+The 2026-11-16 batch also held five INFO 418 documents that no page
+uses yet: the learning objectives, the paper prototype check-in (a
+durability plan, a block diagram, a parts list), the 1.0 durability
+test (the solenoid power-cycled 1,000 times), the electronics debugging
+log (21 to 27 October), and the sticker dispenser's playtest
+reflection. They would fill the build and play-testing sections of the
+INFO 418 page. **Ask before writing from them:** the paper prototype
+is a sticker dispenser driven by a servo, the later documents a keg
+safe with a solenoid lock, and it is not clear whether these are one
+prop that changed or two props. **Never print the meta-puzzle's
+answer**, which the playtest names: Riggs Escape is a real room.
 
 ### CS 222 and SportsBot (`courses/cs-222`, `projects/sportsbot`)
 
@@ -215,8 +267,8 @@ page's `Timeline`.
 ## Still waiting on the owner (everything else)
 
 - Real text and media for the remaining placeholder pages: Brunswick
-  (under embargo), Immersive Learning Lab, Pelagos, Flarp, Tide Toss,
-  the vision research, CS 418.
-- The research paper and IMMERSE poster PDFs.
+  (under embargo), Pelagos, Flarp, Tide Toss, the vision research,
+  CS 418.
+- The research paper PDF. (The IMMERSE poster arrived; see above.)
 - Numbers for the two evidence charts (Pelagos downloads over time;
   accuracy and latency per model).

@@ -11,6 +11,8 @@
 //            (a card with no blurb falls back to this)
 //   tags     which mission profiles feature this (games, xr, graphics, tools, research)
 //   skills   ids from skills.js — drives the cross-links
+//   cover    optional: a picture under /media/ for the card shown when the
+//            page is shared (made by `npm run media`)
 
 export const WORK = [
   {
@@ -34,6 +36,8 @@ export const WORK = [
     blurb:       "Built a VR educational app in Unity/C# visualizing the University of Bern's MANiaC mass spectrometer for ESA's Comet Interceptor mission. Presented at the IMMERSE Annual Symposium (April 2026).",
     description: "Designed and programmed a VR educational application in Unity/C# visualizing the University of Bern's MANiaC mass spectrometer (ESA's Comet Interceptor mission) and built a near-photorealistic replica of the ISSI lobby in Bern, with physics simulations, live data graphing via XCharts, animation systems, and custom interaction scripts driving NavMesh-driven NPCs. Presented at the IMMERSE Annual Symposium (April 2026) via poster and live demo.",
     stack:       ['Unity', 'C#', 'Blender', 'VR', 'XR Toolkit', 'XCharts', 'OpenXR'],
+    // From the IMMERSE 2026 poster the owner shared (2026-11-16)
+    cover:       '/media/work/immersive-learning-lab/maniac-gold.webp',
     tags:        ['xr'],
     skills:      ['unity', 'csharp', 'blender'],
   },
