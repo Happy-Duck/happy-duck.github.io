@@ -47,6 +47,7 @@ html::-webkit-scrollbar { display: none; }
   .signal-ring { display: none; }
 
   .beach-wave-1, .beach-wave-2, .beach-wave-3,
+  .kelp-current,
   .signal-orb, .sidebar-orb,
   .jelly-bell, .jelly-tentacle,
   .bio-pulse, .lure-pulse, .angler-lure,
@@ -129,6 +130,10 @@ html::-webkit-scrollbar { display: none; }
   --creature-deep-op:    1;
   --creature-reef-op:    0;
   /* Experience timeline */
+  --kelp-stroke:         rgba(0,180,200,0.28);
+  --kelp-glow:           rgba(0,220,255,0.65);
+  --kelp-dot-bg:         #00d4ff;
+  --kelp-dot-ring:       rgba(0,212,255,0.30);
   --exp-card-bg:         rgba(3,13,34,0.93);
   --exp-card-border:     rgba(0,212,255,0.13);
   --exp-card-border-h:   rgba(0,212,255,0.32);
@@ -240,6 +245,10 @@ html::-webkit-scrollbar { display: none; }
   --creature-deep-op:    0;
   --creature-reef-op:    1;
   /* Experience timeline */
+  --kelp-stroke:         rgba(30,100,50,0.38);
+  --kelp-glow:           rgba(60,170,80,0.70);
+  --kelp-dot-bg:         #2a8a42;
+  --kelp-dot-ring:       rgba(40,140,60,0.28);
   --exp-card-bg:         rgba(250,244,226,0.94);
   --exp-card-border:     rgba(0,120,60,0.18);
   --exp-card-border-h:   rgba(0,120,60,0.38);
@@ -827,11 +836,43 @@ html::-webkit-scrollbar { display: none; }
    EXPERIENCE TIMELINE
    ═══════════════════════════════════════════════════════════════════ */
 
-/* Career timeline (Experience.jsx). Line and marker both live in
-   .career-rail and are centered in it, so they cannot drift apart. The
-   rail is as tall as its card (same grid row, and the card stretches to
-   the row), so 50% down the rail is the middle of the card. */
-.career-rows { --career-gap: 6rem; }
+/* Career timeline (Experience.jsx). Each marker is centered in its row's
+   .career-rail; the rail is as tall as its card (same grid row, and the
+   card stretches to the row), so 50% down the rail is the middle of the
+   card. The kelp strand is ONE svg over the whole list, its path drawn
+   in JS through the measured center of every marker (KelpStrand), so the
+   wave always passes through the dots. The first kelp strand was a fixed
+   S-curve stretched to the section with the dots on a straight axis
+   beside it; they never lined up. */
+.career-rows { position: relative; --career-gap: 6rem; }
+
+.career-strand {
+  position:       absolute;
+  inset:          0;
+  width:          100%;
+  height:         100%;
+  overflow:       visible;
+  pointer-events: none;
+}
+/* The strand, and the current flowing down it (the owner's favorite
+   part of the original: keep both, and these colors) */
+.kelp-strand,
+.kelp-current {
+  fill:           none;
+  stroke-linecap: round;
+  transition:     stroke var(--theme-dur) var(--theme-ease);
+}
+.kelp-strand  { stroke: var(--kelp-stroke); stroke-width: 2.5; }
+.kelp-current {
+  stroke:           var(--kelp-glow);
+  stroke-width:     2;
+  stroke-dasharray: 3 9;
+  animation:        kelp-flow 2.8s linear infinite;
+}
+@keyframes kelp-flow {
+  from { stroke-dashoffset: 0; }
+  to   { stroke-dashoffset: -12; }
+}
 
 .career-row {
   display:               grid;
@@ -844,33 +885,22 @@ html::-webkit-scrollbar { display: none; }
 .career-rail      { grid-row: 1; grid-column: 2; position: relative; }
 .career-row--right .career-card-cell { grid-column: 3; padding: 0 0 0 1rem; justify-content: flex-start; }
 
-/* The line, drawn by every row: from the top of its rail through the
-   gap below it, so the rows' segments join into one line. The first
-   starts at its marker and the last stops at its marker. */
-.career-line {
-  position:    absolute;
-  left:        50%;
-  top:         0;
-  width:       2px;
-  height:      calc(100% + var(--career-gap));
-  margin-left: -1px;
-  background:  color-mix(in srgb, var(--section-heading) 45%, transparent);
-  transition:  background-color var(--theme-dur) var(--theme-ease);
-}
-.career-row:first-child .career-line { top: 50%; height: calc(50% + var(--career-gap)); }
-.career-row:last-child .career-line  { height: 50%; }
-.career-row:only-child .career-line  { display: none; }
-/* The marker: a plain disc on the line, level with the card's middle */
+/* The marker: a disc on the strand, level with the card's middle. The
+   original's colors and ring; its blurred glow stays off (the restyle
+   took glow off the interface). */
 .career-node {
   position:      absolute;
   left:          50%;
   top:           50%;
-  width:         11px;
-  height:        11px;
-  margin:        -5.5px 0 0 -5.5px;
+  width:         13px;
+  height:        13px;
+  margin:        -6.5px 0 0 -6.5px;
   border-radius: 50%;
-  background:    var(--section-heading);
-  transition:    background-color var(--theme-dur) var(--theme-ease);
+  background:    var(--kelp-dot-bg);
+  box-shadow:    0 0 0 3px var(--kelp-dot-ring);
+  transition:
+    background-color var(--theme-dur) var(--theme-ease),
+    box-shadow       var(--theme-dur) var(--theme-ease);
 }
 
 /* Narrow: the line runs down the left, every card to its right */

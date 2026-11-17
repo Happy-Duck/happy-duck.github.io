@@ -1,16 +1,85 @@
+import { useEffect, useRef } from 'react'
 import { motion } from 'framer-motion'
 // Career data lives in src/content/work.js
 import { WORK as ENTRIES, entryAnchor, entryPath } from '../content/index.js'
 import { cardLinkProps } from '../lib/cardLink'
 
 // ── Timeline ───────────────────────────────────────────────────────────
-// A straight line down the section with one marker per job, newest at
-// the top, each marker level with the middle of its card. Markers sit
-// exactly on the line because both are centered in the same 40px rail
-// (index.css, .career-*); the old version drew a wavy kelp strand and put
-// round dots on a straight axis beside it, so they never lined up. The
-// ticks to the cards and the start year beside each marker were removed
-// at the owner's request (the card already gives the dates).
+// A kelp strand down the section, with a current flowing along it, and
+// one marker per job, newest at the top, each level with the middle of
+// its card. Markers are centered in their row's 40px rail (index.css,
+// .career-*). The strand is drawn through the measured center of every
+// marker, so the dots always sit on it.
+//
+// History: the first kelp strand was a fixed S-curve stretched to the
+// section with the dots on a straight axis beside it, so they never
+// lined up (the owner: "offcenter for so long and its annoying"). It
+// became a straight line with ticks and start years; the owner found the
+// years redundant and missed the flowing strand, so it is back, drawn
+// through the dots this time.
+
+// One smooth wave from the top of the list to the bottom, crossing the
+// rail's center at every marker and swinging to alternate sides between
+// them. Each stretch is a cubic approximating half a sine wave; the
+// slight change of slope where two stretches of different length meet
+// sits under a marker.
+function strandPath(points, height, amplitude) {
+  const first = points[0]
+  const last = points[points.length - 1]
+  const stops = [{ x: first.x, y: 0 }, ...points, { x: last.x, y: height }]
+  let d = `M${stops[0].x.toFixed(1)} ${stops[0].y.toFixed(1)}`
+  let side = -1
+  for (let i = 1; i < stops.length; i++) {
+    const a = stops[i - 1]
+    const b = stops[i]
+    const len = b.y - a.y
+    if (len < 1) continue
+    // Short stretches (the ends) swing less, so the curve stays gentle
+    const swing = side * Math.min(amplitude, len * 0.07) * 1.27
+    const k = len * 0.36
+    d += ` C${(a.x + swing).toFixed(1)} ${(a.y + k).toFixed(1)} ` +
+      `${(b.x + swing).toFixed(1)} ${(b.y - k).toFixed(1)} ` +
+      `${b.x.toFixed(1)} ${b.y.toFixed(1)}`
+    side = -side
+  }
+  return d
+}
+
+function KelpStrand({ rowsRef }) {
+  const strandRef = useRef(null)
+  const currentRef = useRef(null)
+
+  useEffect(() => {
+    const rows = rowsRef.current
+    if (!rows) return
+    // Measured, not computed from CSS: card heights depend on fonts and
+    // width, and the rail moves to the left edge on narrow screens
+    const draw = () => {
+      const box = rows.getBoundingClientRect()
+      const points = [...rows.querySelectorAll('.career-node')].map((node) => {
+        const r = node.getBoundingClientRect()
+        return { x: r.left + r.width / 2 - box.left, y: r.top + r.height / 2 - box.top }
+      })
+      if (points.length === 0) return
+      const rail = rows.querySelector('.career-rail').getBoundingClientRect().width
+      const d = strandPath(points, box.height, rail * 0.36)
+      strandRef.current?.setAttribute('d', d)
+      currentRef.current?.setAttribute('d', d)
+    }
+    draw()
+    const ro = new ResizeObserver(draw)
+    ro.observe(rows)
+    rows.querySelectorAll('.career-row').forEach((row) => ro.observe(row))
+    return () => ro.disconnect()
+  }, [rowsRef])
+
+  return (
+    <svg className="career-strand" aria-hidden="true">
+      <path ref={strandRef} className="kelp-strand" />
+      <path ref={currentRef} className="kelp-current" />
+    </svg>
+  )
+}
 
 // ── Animation variants ─────────────────────────────────────────────────
 
@@ -57,6 +126,7 @@ function EntryCard({ entry, fromLeft = false }) {
 // ── Section ────────────────────────────────────────────────────────────
 
 export function Experience() {
+  const rowsRef = useRef(null)
   return (
     <section
       id="career"
@@ -81,7 +151,8 @@ export function Experience() {
       {/* Timeline: one row per job. Wide screens alternate the card left
           and right of the line; narrow ones keep the line on the left.
           One set of cards for both (CSS grid does the rearranging). */}
-      <div className="career-rows">
+      <div className="career-rows" ref={rowsRef}>
+        <KelpStrand rowsRef={rowsRef} />
         {ENTRIES.map((entry, i) => {
           const left = i % 2 === 0
           return (
@@ -90,7 +161,6 @@ export function Experience() {
                 <EntryCard entry={entry} fromLeft={left} />
               </div>
               <div className="career-rail" aria-hidden="true">
-                <span className="career-line" />
                 <span className="career-node" />
               </div>
             </div>
