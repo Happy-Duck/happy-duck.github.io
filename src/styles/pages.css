@@ -98,6 +98,59 @@
 :root.water-open .dive--stowed .dive-ocean *::before,
 :root.water-open .dive--stowed .dive-ocean *::after { animation-play-state: running !important; }
 
+/* ── Card to page ──────────────────────────────────────────────────── */
+/* See lib/router.js. .page-morph is the sheet's outline in the window
+   (not the sheet itself, which is as tall as its content). Opening: a
+   panel in the page's paper color grows from the card to that outline,
+   the card's own text fading out of its corner at its own size, and
+   then the panel thins away over the page. Closing is the reverse.
+   The card's picture is never stretched: scaled up, its text became
+   giant letters smeared across the page. */
+.page-morph {
+  position:             absolute;
+  top:                  0;
+  bottom:               0;
+  left:                 50%;
+  width:                min(var(--sheet-w), 100%);
+  transform:            translateX(-50%);
+  pointer-events:       none;
+  view-transition-name: entry-morph;
+}
+::view-transition-group(entry-morph) {
+  animation-duration:        0.42s;
+  animation-timing-function: cubic-bezier(0.22, 1, 0.36, 1);
+}
+::view-transition-group(entry-morph) { overflow: clip; border-radius: 6px; }
+/* The card's picture at its own size, in the box's top left corner */
+::view-transition-old(entry-morph),
+::view-transition-new(entry-morph) {
+  width:           100%;
+  height:          100%;
+  object-fit:      none;
+  object-position: top left;
+}
+/* The panel. Only when a card is part of it (data-morph); moving from
+   page to page, or opening one with no card on screen, is a plain fade. */
+:root[data-morph]::view-transition-image-pair(entry-morph) {
+  background-color: var(--morph-bg);
+  animation:        0.42s ease both;
+}
+:root[data-morph="open"]::view-transition-image-pair(entry-morph)  { animation-name: morph-panel-out; }
+:root[data-morph="close"]::view-transition-image-pair(entry-morph) { animation-name: morph-panel-in; }
+@keyframes morph-panel-out {
+  0%, 50% { background-color: var(--morph-bg); }
+  100%    { background-color: transparent; }
+}
+@keyframes morph-panel-in {
+  0%        { background-color: transparent; }
+  45%, 100% { background-color: var(--morph-bg); }
+}
+/* The card's text leaves early on the way out and arrives late on the way in */
+:root[data-morph="open"]::view-transition-old(entry-morph)  { animation: morph-fade-out 0.16s ease both; }
+:root[data-morph="close"]::view-transition-new(entry-morph) { animation: morph-fade-in 0.2s ease 0.22s both; }
+@keyframes morph-fade-out { to   { opacity: 0; } }
+@keyframes morph-fade-in  { from { opacity: 0; } }
+
 /* ── Scroller and sheet ────────────────────────────────────────────── */
 
 .page-scroll {

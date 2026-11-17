@@ -2,8 +2,9 @@
 // The rotating "> …" lines in the Captain's Log. Pure data — no JSX, no
 // imports — so scripts/prerender.mjs can read it from Node.
 //
-// LOG_INTRO is the opening line. Every block in HOBBIES is one more log
-// line AND a page of its own at /hobbies/<slug>/ — the line links to it.
+// LOG_INTRO is the sentence under the "Captain's Log" heading. Every
+// block in HOBBIES is one log line AND a page of its own at
+// /hobbies/<slug>/ — the line opens it.
 //
 //   slug   the page address — unique, lowercase, hyphens between words
 //   title  the page heading

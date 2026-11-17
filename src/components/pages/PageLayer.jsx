@@ -153,6 +153,9 @@ export function PageLayer({ route, path }) {
 
   return createPortal(
     <div className="page-layer" data-no-ping ref={layerRef}>
+      {/* The sheet's outline in the window: what a card grows into and
+          shrinks back from (lib/router.js). Empty and untouchable. */}
+      <div className="page-morph" aria-hidden="true" />
       {/* Keyed by path: moving between pages remounts the scroller, so
           each page opens at its top */}
       <div className="page-scroll" key={path} ref={scrollRef} onMouseDown={onMouseDown} onClick={onClick}>

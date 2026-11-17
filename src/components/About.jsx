@@ -2,18 +2,20 @@ import { useState, useEffect, useRef, useCallback, useSyncExternalStore } from '
 import { motion } from 'framer-motion'
 import { useLanyard } from '../hooks/useLanyard'
 import { useGithubActivity } from '../hooks/useGithubActivity'
-import { HOBBIES, LOG_INTRO, entryPath } from '../content/index.js'
+import { HOBBIES, LOG_INTRO, entryPath, entryAnchor } from '../content/index.js'
 import { Link } from './Link'
 
 // ── Data ───────────────────────────────────────────────────────────────
-// The log lines live in src/content/hobbies.js. Each hobby line is a
+// The log lines live in src/content/hobbies.js. Each one is a hobby: a
 // whole row that opens that hobby's page (a chevron at its end, a tint
-// when pointed at; no underline). The intro line is plain text.
+// when pointed at; no underline). LOG_INTRO is not a log line: it is the
+// sentence under the heading.
 
-const LOG_ENTRIES = [
-  { text: LOG_INTRO },
-  ...HOBBIES.map(h => ({ text: h.log, href: entryPath('hobbies', h.slug) })),
-]
+const LOG_ENTRIES = HOBBIES.map(h => ({
+  text: h.log,
+  href: entryPath('hobbies', h.slug),
+  anchor: entryAnchor('hobbies', h.slug),
+}))
 
 const LOCATION = 'Urbana, IL'
 
@@ -293,7 +295,13 @@ function TypewriterLog() {
           </>
         )
         return entry.href ? (
-          <Link key={entry.id} href={entry.href} className="log-entry log-entry--link" data-no-ping>
+          <Link
+            key={entry.id}
+            href={entry.href}
+            className="log-entry log-entry--link"
+            data-entry-anchor={entry.anchor}
+            data-no-ping
+          >
             {line}
             <svg className="row-link-chev" viewBox="0 0 7 12" aria-hidden="true"><path d="M1 1 L6 6 L1 11" /></svg>
           </Link>
@@ -327,9 +335,9 @@ export function About() {
         {/* Heading */}
         <h2 className="log-title">Captain's Log</h2>
 
-        {/* Metadata block */}
+        {/* Subtitle, then where the log is kept */}
+        <p className="log-subtitle">{LOG_INTRO}</p>
         <div className="log-meta">
-          <span className="log-meta-line">UIUC, CS '28, 3.98 GPA</span>
           <span className="log-meta-line">{LOCATION}, 40.1141°N 88.2249°W</span>
         </div>
 

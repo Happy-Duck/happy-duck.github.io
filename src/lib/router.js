@@ -7,9 +7,20 @@
 // Navigations run inside a View Transition where supported (and motion is
 // allowed), with the React commit flushed synchronously so the old and
 // new snapshots are the real before and after.
+//
+// Opening a page from its card, and closing back to it, is a shared-
+// element transition: the card grows into the page's sheet and the sheet
+// shrinks back into the card. One view-transition-name (entry-morph) is
+// owned by ONE element per snapshot: the card while the dive is showing,
+// .page-morph (the sheet's outline, PageLayer.jsx) while a page is. The
+// card gets the name by inline style for the length of the transition
+// only; the outline has it in pages.css. While it runs, :root carries
+// data-morph="open" or "close" and --morph-bg (the page's paper color),
+// which is what the growing panel is painted with (pages.css).
 
 import { useSyncExternalStore } from 'react'
 import { flushSync } from 'react-dom'
+import { matchRoute, entryAnchor } from '../content/index.js'
 
 // Trailing slashes are noise: GitHub Pages serves /projects/pelagos/ but
 // both forms are the same page
@@ -39,15 +50,71 @@ function sync() {
   listeners.forEach(fn => fn())
 }
 
-function withTransition(apply) {
+// The element on the dive that stands for a page: its card (or class
+// bubble, or log line), if that is on screen right now
+function cardFor(pathname) {
+  const route = matchRoute(pathname)
+  if (!route.entry) return null
+  const name = entryAnchor(route.kind, route.slug)
+  const el = [...document.querySelectorAll(`[data-entry-anchor="${name}"]`)]
+    .find(n => n.offsetParent !== null)
+  if (!el) return null
+  const box = el.getBoundingClientRect()
+  return box.bottom > 0 && box.top < window.innerHeight ? el : null
+}
+
+// apply() moves the app from `current` to `to`
+function withTransition(apply, to) {
   const animate =
     'startViewTransition' in document &&
     !window.matchMedia('(prefers-reduced-motion: reduce)').matches
   if (!animate) { apply(); return }
-  document.startViewTransition(() => flushSync(apply))
+
+  const root = document.documentElement
+  const from = current
+  const paper = () => {
+    const layer = document.querySelector('.page-layer')
+    return layer ? getComputedStyle(layer).getPropertyValue('--page-bg').trim() : ''
+  }
+  const mark = (direction, color) => {
+    root.dataset.morph = direction
+    root.style.setProperty('--morph-bg', color || 'transparent')
+  }
+  let card = null
+  let closing = null
+  // Opening from the dive: the card owns the name in the old snapshot
+  if (from === '/' && to !== '/') {
+    card = cardFor(to)
+    if (card) card.style.viewTransitionName = 'entry-morph'
+  }
+  // Closing: the page's color has to be read while the page still exists
+  if (from !== '/' && to === '/') closing = paper()
+
+  const transition = document.startViewTransition(() => {
+    flushSync(apply)
+    if (card) {
+      card.style.viewTransitionName = ''
+      card = null
+      mark('open', paper())
+    }
+    // Closing to the dive: the card owns the name in the new snapshot
+    // (after the commit, which is also when the dive is back at its depth)
+    if (closing !== null) {
+      card = cardFor(from)
+      if (card) {
+        card.style.viewTransitionName = 'entry-morph'
+        mark('close', closing)
+      }
+    }
+  })
+  transition.finished.finally(() => {
+    if (card) card.style.viewTransitionName = ''
+    delete root.dataset.morph
+    root.style.removeProperty('--morph-bg')
+  })
 }
 
-window.addEventListener('popstate', () => withTransition(sync))
+window.addEventListener('popstate', () => withTransition(sync, normalize(window.location.pathname)))
 
 // history.state.idx counts in-app pushes, so goBack() can tell a page the
 // visitor navigated to from one they landed on directly
@@ -63,7 +130,7 @@ export function navigate(to, { replace = false } = {}) {
     if (replace) window.history.replaceState({ idx: historyIdx() }, '', href)
     else window.history.pushState({ idx: historyIdx() + 1 }, '', href)
     sync()
-  })
+  }, normalize(url.pathname))
 }
 
 // Back to wherever the visitor came from inside the site; on a direct

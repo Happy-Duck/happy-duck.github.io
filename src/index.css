@@ -1170,6 +1170,17 @@ html::-webkit-scrollbar { display: none; }
   margin:          0 0 0.75rem;
 }
 
+/* The sentence under the heading */
+.log-subtitle {
+  margin:      0 0 0.6rem;
+  max-width:   46rem;
+  font-family: ui-sans-serif, system-ui, sans-serif;
+  font-size:   clamp(0.95rem, 0.88rem + 0.25vw, 1.08rem);
+  line-height: 1.5;
+  color:       var(--about-body);
+  transition:  color var(--theme-dur) var(--theme-ease);
+}
+
 .log-meta {
   display:         flex;
   flex-wrap:       wrap;
