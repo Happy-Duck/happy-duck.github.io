@@ -267,15 +267,24 @@ needs: READ IT before writing or changing page content.
   skill, and listed them underneath; the owner had that turned off.
   Don't bring it back. `skills` in the data files is unused by the UI.
 - **Career timeline** (`Experience.jsx`, `.career-*`): a straight line,
-  one marker per job, a tick to the card, the start year on the other
-  side. Line, tick, and marker are centered in the same 40px rail so
-  they cannot drift (the old wavy kelp strand with dots beside it never
-  lined up, and it annoyed the owner for months). One set of cards;
-  CSS grid rearranges them for narrow screens. If you touch it, measure:
-  marker within 0.5px of the line at several widths, after scrolling
-  each card into view (they slide in 52px on first sight).
+  one marker per job, level with the MIDDLE of its card. No ticks to the
+  cards and no start years (the owner found the years redundant with
+  the card's dates; both were removed 2026-11-17). Line and marker are
+  centered in the same 40px rail so they cannot drift (the old wavy kelp
+  strand with dots beside it never lined up, and it annoyed the owner
+  for months); the rail is as tall as its card, and each row draws its
+  own stretch of line, so the line meets every marker whatever the card
+  heights. The owner does not love the straight line either: ideas for
+  something better are in docs/PORTFOLIO_PLAN.md (Seventh pass), waiting
+  on their pick. One set of cards; CSS grid rearranges them for narrow
+  screens. If you touch it, measure: marker within 0.5px of the line and
+  of the card's middle at several widths, after scrolling each card into
+  view (they slide in 52px on first sight).
 - **Captain's Log** (`About.jsx`): `LOG_INTRO` is the sentence under the
-  heading, not a log line. Every rotating line is a hobby and a row
+  heading, not a log line, and it stays on ONE LINE (the owner's rule):
+  `.log-subtitle` sizes it to its container (`cqi`) from a measured
+  width, down to 0.8rem; only phones let it wrap. Change the sentence's
+  length and re-measure. Every rotating line is a hobby and a row
   link carrying `data-entry-anchor="hobbies-<slug>"`.
 - **Depth gauge stops** (`DepthGauge.jsx`): any section with `id` +
   `data-waypoint="Label"` gets a clickable tick; positions are
@@ -366,10 +375,17 @@ needs: READ IT before writing or changing page content.
 - **Course column** (`CourseColumn.jsx` + `lib/bubbleSim.js`): lazy chunk
   behind a fixed-height placeholder in `Education.jsx`. Opens BRIEF (the
   owner found the full column big and obstructive): a short tank with
-  only the classes that have pages, beside a panel listing them and a
-  "Show all N classes" button; expanded is the full column with legend,
-  list view, scrubber, and ONE "Show fewer" button. Same tank element in
-  both sizes (sim and GL context carry over). The change of size is
+  only the classes that have pages, beside a panel listing them;
+  expanded is the full column with legend, list view, and scrubber. The
+  size toggle is ONE button that never moves: the last cell of the
+  control row above the tank, which exists in both sizes, with both
+  labels stacked in one grid cell so its box is identical ("click back
+  and forth without moving the mouse", the owner). The tank grows down,
+  away from it, so nothing scrolls on collapse. Bubble COLOR = the
+  department in the class code (`courseCategory()` in courses.js: CS,
+  GSD, MATH and PHYS, everything else), never a hand-set topic: the
+  topic version took judgement calls the owner read as inconsistent.
+  Same tank element in both sizes (sim and GL context carry over). The change of size is
   animated (`resizeTank`: measure, flushSync, measure, animate width and
   height with WAAPI; the ResizeObserver feeds each size to the sim) and
   the other classes enter from the floor one at a time (`entered`

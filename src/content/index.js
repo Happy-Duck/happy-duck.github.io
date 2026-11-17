@@ -14,7 +14,7 @@ import { HOBBIES, LOG_INTRO } from './hobbies.js'
 export { WORK, PROJECTS, SKILL_GROUPS, COURSES, HOBBIES, LOG_INTRO }
 export {
   TERMS, CURRENT_TERM, COURSE_CATEGORIES, STATUS_LABEL,
-  termLabel, courseStatus, courseHasPage,
+  termLabel, courseStatus, courseHasPage, courseCategory,
 } from './courses.js'
 
 export const SITE_URL = 'https://happy-duck.github.io'

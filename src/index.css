@@ -827,12 +827,11 @@ html::-webkit-scrollbar { display: none; }
    EXPERIENCE TIMELINE
    ═══════════════════════════════════════════════════════════════════ */
 
-/* Kelp strand paths */
-/* Career timeline (Experience.jsx). Line, tick, and marker all live in
-   .career-rail and are centered in it, so they cannot drift apart.
-   --career-node-y is how far down a row its marker sits: level with the
-   first line of the card (the dates). */
-.career-rows { --career-node-y: 35px; --career-gap: 6rem; }
+/* Career timeline (Experience.jsx). Line and marker both live in
+   .career-rail and are centered in it, so they cannot drift apart. The
+   rail is as tall as its card (same grid row, and the card stretches to
+   the row), so 50% down the rail is the middle of the card. */
+.career-rows { --career-gap: 6rem; }
 
 .career-row {
   display:               grid;
@@ -843,54 +842,35 @@ html::-webkit-scrollbar { display: none; }
 
 .career-card-cell { grid-row: 1; grid-column: 1; padding-right: 1rem; display: flex; justify-content: flex-end; }
 .career-rail      { grid-row: 1; grid-column: 2; position: relative; }
-.career-year      { grid-row: 1; grid-column: 3; padding-left: 1rem; }
 .career-row--right .career-card-cell { grid-column: 3; padding: 0 0 0 1rem; justify-content: flex-start; }
-.career-row--right .career-year      { grid-column: 1; padding: 0 1rem 0 0; text-align: right; }
 
-/* The line: from this row's marker down to the next row's */
+/* The line, drawn by every row: from the top of its rail through the
+   gap below it, so the rows' segments join into one line. The first
+   starts at its marker and the last stops at its marker. */
 .career-line {
-  position:   absolute;
-  left:       50%;
-  top:        var(--career-node-y);
-  width:      2px;
-  height:     calc(100% + var(--career-gap));
+  position:    absolute;
+  left:        50%;
+  top:         0;
+  width:       2px;
+  height:      calc(100% + var(--career-gap));
   margin-left: -1px;
-  background: color-mix(in srgb, var(--section-heading) 45%, transparent);
-  transition: background-color var(--theme-dur) var(--theme-ease);
+  background:  color-mix(in srgb, var(--section-heading) 45%, transparent);
+  transition:  background-color var(--theme-dur) var(--theme-ease);
 }
-/* The tick: from the line across to the card */
-.career-tick {
-  position:   absolute;
-  top:        var(--career-node-y);
-  right:      50%;
-  width:      calc(50% + 1rem);
-  height:     1px;
-  background: color-mix(in srgb, var(--section-heading) 45%, transparent);
-  transition: background-color var(--theme-dur) var(--theme-ease);
-}
-.career-row--right .career-tick { right: auto; left: 50%; }
-/* The marker: a plain disc on the line */
+.career-row:first-child .career-line { top: 50%; height: calc(50% + var(--career-gap)); }
+.career-row:last-child .career-line  { height: 50%; }
+.career-row:only-child .career-line  { display: none; }
+/* The marker: a plain disc on the line, level with the card's middle */
 .career-node {
   position:      absolute;
   left:          50%;
-  top:           var(--career-node-y);
+  top:           50%;
   width:         11px;
   height:        11px;
   margin:        -5.5px 0 0 -5.5px;
   border-radius: 50%;
   background:    var(--section-heading);
   transition:    background-color var(--theme-dur) var(--theme-ease);
-}
-.career-year {
-  align-self:  start;
-  font-size:   1.05rem;
-  font-weight: 700;
-  /* one line, centered on the marker */
-  line-height: calc(var(--career-node-y) * 2);
-  font-variant-numeric: tabular-nums;
-  color:       var(--section-heading);
-  opacity:     0.8;
-  transition:  color var(--theme-dur) var(--theme-ease);
 }
 
 /* Narrow: the line runs down the left, every card to its right */
@@ -900,8 +880,6 @@ html::-webkit-scrollbar { display: none; }
   .career-row--right { grid-template-columns: 24px minmax(0, 1fr); }
   .career-row .career-rail { grid-column: 1; }
   .career-row .career-card-cell { grid-column: 2; padding: 0 0 0 0.75rem; justify-content: flex-start; }
-  .career-row .career-year { display: none; }
-  .career-row .career-tick { right: auto; left: 50%; width: calc(50% + 0.75rem); }
 }
 
 /* Experience card */
@@ -1170,15 +1148,28 @@ html::-webkit-scrollbar { display: none; }
   margin:          0 0 0.75rem;
 }
 
-/* The sentence under the heading */
+/* The sentence under the heading. ONE LINE (the owner's rule): its size
+   follows the card's width so it never wraps, down to the width where it
+   would drop below 0.8rem; narrower than that (phones) it wraps, balanced.
+   The sentence is 50.5em wide in Segoe UI; dividing by 54 leaves room for
+   wider system fonts. Change LOG_INTRO's length and re-measure. The
+   container is a wrapper, not .log-card: a size container contains
+   layout, which would trap anything fixed inside the card. */
+.log-subtitle-box { container-type: inline-size; }
 .log-subtitle {
   margin:      0 0 0.6rem;
-  max-width:   46rem;
   font-family: ui-sans-serif, system-ui, sans-serif;
   font-size:   clamp(0.95rem, 0.88rem + 0.25vw, 1.08rem);
   line-height: 1.5;
+  text-wrap:   balance;
   color:       var(--about-body);
   transition:  color var(--theme-dur) var(--theme-ease);
+}
+@container (min-width: 690px) {
+  .log-subtitle {
+    white-space: nowrap;
+    font-size:   min(1.08rem, calc(100cqi / 54));
+  }
 }
 
 .log-meta {
@@ -2850,13 +2841,34 @@ html::-webkit-scrollbar { display: none; }
   font-family: 'Share Tech Mono', ui-monospace, monospace;
 }
 
+/* The row above the tank, in both sizes: the legend (or, brief, a line
+   about what is in the tank), the list toggle, and the size toggle. The
+   size toggle is always the last cell, top right, so it does not move
+   when it is clicked (CourseColumn.jsx). */
 .course-controls {
-  display:         flex;
-  align-items:     center;
-  justify-content: space-between;
-  flex-wrap:       wrap;
-  gap:             0.6rem 1rem;
-  margin-bottom:   0.8rem;
+  display:               grid;
+  grid-template-columns: minmax(0, 1fr) auto auto;
+  align-items:           start;
+  gap:                   0.6rem 0.45rem;
+  margin-bottom:         0.8rem;
+}
+.course-controls > .course-legend,
+.course-controls > .course-brief-text { grid-column: 1; grid-row: 1; margin-right: 0.55rem; }
+.course-list-toggle { grid-column: 2; grid-row: 1; }
+.course-expand      { grid-column: 3; grid-row: 1; }
+/* Both labels share one cell; the hidden one still sizes the button, so
+   its box is the same in both states */
+.course-view-toggle.course-expand {
+  display:      inline-grid;
+  place-items:  center;
+}
+.course-expand > span { grid-area: 1 / 1; }
+.course-expand > .course-expand-off { visibility: hidden; }
+@media (max-width: 640px) {
+  .course-controls { grid-template-columns: minmax(0, 1fr) auto; }
+  .course-controls > .course-legend { grid-row: 1 / span 2; }
+  .course-list-toggle { grid-column: 2; grid-row: 2; }
+  .course-expand      { grid-column: 2; grid-row: 1; }
 }
 
 .course-legend {
@@ -3129,17 +3141,17 @@ html::-webkit-scrollbar { display: none; }
 /* Holds the height of the column while its chunk loads (Education.jsx) */
 /* Holds the page's length while the column's chunk loads: the height of
    the BRIEF view, which is what it opens as */
-.course-placeholder { height: 322px; }
+.course-placeholder { height: 286px; }
 @media (max-width: 760px) {
-  .course-placeholder { height: 540px; }
+  .course-placeholder { height: 528px; }
 }
 
 /* ── Brief view: a short tank beside what is in it ─────────────────── */
-.course-controls-end { display: flex; flex-wrap: wrap; gap: 0.45rem; }
 
-/* What appears around the tank when it opens (the legend above, the
-   scrubber below) and beside it when it closes (the list) eases in while
-   the glass changes size, instead of popping */
+/* What appears around the tank when it opens (the legend, the scrubber
+   below) and beside it when it closes (the list) eases in while the
+   glass changes size, instead of popping. The control row itself stays
+   put: its contents change, the row and the size toggle do not. */
 @keyframes course-unfold {
   from { max-height: 0; opacity: 0; margin-top: 0; margin-bottom: 0; }
   to   { max-height: 220px; opacity: 1; }
@@ -3148,11 +3160,13 @@ html::-webkit-scrollbar { display: none; }
   from { opacity: 0; }
   to   { opacity: 1; }
 }
-.course-controls,
 .course-scrub { overflow: hidden; animation: course-unfold 0.7s cubic-bezier(0.22, 1, 0.36, 1) both; }
+.course-legend,
+.course-list-toggle,
+.course-brief-text { animation: course-fade-in 0.4s ease both; }
 .course-brief  { animation: course-fade-in 0.5s ease 0.25s both; }
 @media (prefers-reduced-motion: reduce) {
-  .course-controls, .course-scrub, .course-brief { animation: none; }
+  .course-scrub, .course-brief, .course-legend, .course-list-toggle, .course-brief-text { animation: none; }
 }
 
 .course-wrap--brief .course-stage {
@@ -3177,19 +3191,21 @@ html::-webkit-scrollbar { display: none; }
   font-family:    ui-sans-serif, system-ui, sans-serif;
 }
 .course-brief-list { align-self: stretch; }
+/* Lives in the control row (above the tank), level with the toggle */
 .course-brief-text {
-  margin:      0 0 0.6rem;
+  align-self:  center;
+  margin:      0;
+  font-family: ui-sans-serif, system-ui, sans-serif;
   font-size:   0.92rem;
   line-height: 1.5;
   color:       var(--course-muted);
 }
 .course-brief-list {
-  margin:     0 0 0.9rem;
+  margin:     0;
   padding:    0;
   list-style: none;
-  border-top: 1px solid var(--course-line);
 }
-.course-brief-list li { border-bottom: 1px solid var(--course-line); }
+.course-brief-list li + li { border-top: 1px solid var(--course-line); }
 .course-brief-code {
   flex:        none;
   width:       4.9rem;

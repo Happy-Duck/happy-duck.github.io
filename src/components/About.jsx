@@ -336,7 +336,9 @@ export function About() {
         <h2 className="log-title">Captain's Log</h2>
 
         {/* Subtitle, then where the log is kept */}
-        <p className="log-subtitle">{LOG_INTRO}</p>
+        <div className="log-subtitle-box">
+          <p className="log-subtitle">{LOG_INTRO}</p>
+        </div>
         <div className="log-meta">
           <span className="log-meta-line">{LOCATION}, 40.1141°N 88.2249°W</span>
         </div>

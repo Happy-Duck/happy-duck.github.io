@@ -5,14 +5,12 @@ import { cardLinkProps } from '../lib/cardLink'
 
 // ── Timeline ───────────────────────────────────────────────────────────
 // A straight line down the section with one marker per job, newest at
-// the top. Each marker has a short tick to its card and, on the other
-// side of the line, the year that job started. Markers sit exactly on
-// the line because both are centered in the same 40px rail (index.css,
-// .career-*); the old version drew a wavy kelp strand and put round
-// dots on a straight axis beside it, so they never lined up.
-
-// The year a job started: the first four-digit number in its period
-const startYear = (period) => period.match(/\d{4}/)?.[0] ?? ''
+// the top, each marker level with the middle of its card. Markers sit
+// exactly on the line because both are centered in the same 40px rail
+// (index.css, .career-*); the old version drew a wavy kelp strand and put
+// round dots on a straight axis beside it, so they never lined up. The
+// ticks to the cards and the start year beside each marker were removed
+// at the owner's request (the card already gives the dates).
 
 // ── Animation variants ─────────────────────────────────────────────────
 
@@ -92,11 +90,9 @@ export function Experience() {
                 <EntryCard entry={entry} fromLeft={left} />
               </div>
               <div className="career-rail" aria-hidden="true">
-                {i < ENTRIES.length - 1 && <span className="career-line" />}
-                <span className="career-tick" />
+                <span className="career-line" />
                 <span className="career-node" />
               </div>
-              <div className="career-year" aria-hidden="true">{startYear(entry.period)}</div>
             </div>
           )
         })}

@@ -1,9 +1,10 @@
 // ── Course column — every class as a bubble in a lava-lamp column ──────
 // A cold seep: bubble plumes really do rise from the deep seafloor. Each
 // class in src/content/courses.js is one bubble — size by credit hours,
-// color by category, solid when completed, translucent while in progress,
-// faint when planned. Classes with a page carry a glow ring and are real
-// links; the rest show a hover card.
+// color by the department in its code (CS, GSD, MATH and PHYS, the rest;
+// see COURSE_CATEGORIES), solid when completed, translucent while in
+// progress, faint when planned. Classes with a page carry a glow ring and
+// are real links; the rest show a hover card.
 //
 // Layers: a WebGL2 metaball canvas draws the wax (bubbles that press
 // together fuse and split), and plain DOM nodes on top carry the labels,
@@ -23,6 +24,12 @@
 // column big and in the way as the default. The tank element is the
 // same one in both sizes, so the sim and the GL context carry over.
 //
+// The size toggle is ONE button that never moves: the last cell of the
+// control row above the tank, which exists in both sizes, with both
+// labels stacked in one grid cell so its box is the same either way. The
+// owner wanted to click back and forth without moving the mouse. The
+// tank grows downward, away from it, so nothing scrolls on the way back.
+//
 // The change of size is animated (resizeTank): the glass grows from its
 // brief size to its full one while the rest of the classes rise in from
 // the floor a few at a time, the same way the scrubber adds them. The
@@ -36,7 +43,7 @@ import { createBubbleSim } from '../lib/bubbleSim'
 import { Link } from './Link'
 import {
   COURSES, TERMS, CURRENT_TERM, COURSE_CATEGORIES, STATUS_LABEL,
-  courseStatus, courseHasPage, termLabel, entryPath, entryAnchor,
+  courseStatus, courseHasPage, courseCategory, termLabel, entryPath, entryAnchor,
 } from '../content/index.js'
 
 const MAX_BALLS = 40 // shader array size — raise it here and in FRAG together
@@ -45,7 +52,8 @@ const BUBBLES = COURSES.slice(0, MAX_BALLS).map(c => ({
   status:    courseStatus(c),
   hasPage:   courseHasPage(c),
   termIdx:   TERMS.findIndex(t => t.id === c.term),
-  color:     COURSE_CATEGORIES.find(k => k.id === c.category)?.color ?? '#22c7f5',
+  category:  courseCategory(c).id,
+  color:     courseCategory(c).color,
   dept:      c.code.split(' ')[0],
   number:    c.code.split(' ').slice(1).join(' '),
 }))
@@ -301,12 +309,8 @@ export function CourseColumn() {
       setView('bubbles')
       setExpanded(toExpanded)
     })
-    // Collapsing from far down the column would leave the visitor looking
-    // at whatever slid up into its place, so bring the section back
-    const section = wrapRef.current?.closest('section')
-    if (!toExpanded && section && section.getBoundingClientRect().top < 0) {
-      section.scrollIntoView({ block: 'start', behavior: 'instant' })
-    }
+    // No scrolling here: the toggle sits above the tank, so it stays under
+    // the pointer while the glass changes size below it
     if (!animate || wrapRef.current !== wrap) return
     const to = wrap.getBoundingClientRect()
     wrap.animate(
@@ -503,40 +507,53 @@ export function CourseColumn() {
 
   return (
     <div className={`course-wrap${expanded ? '' : ' course-wrap--brief'}`}>
-      {/* Controls */}
-      {expanded && (
+      {/* Controls: the same row in both sizes, so the size toggle (its
+          last cell) is in the same place in both. Keep the toggle the
+          third child: React then keeps the same button, and focus. */}
       <div className="course-controls" data-no-ping>
-        <div className="course-legend" role="group" aria-label="Filter classes by category">
-          {COURSE_CATEGORIES.map(k => (
-            <button
-              key={k.id}
-              type="button"
-              className={`course-chip${filter === k.id ? ' course-chip--on' : ''}`}
-              style={{ '--bubble-color': k.color }}
-              aria-pressed={filter === k.id}
-              onClick={() => setFilter(f => (f === k.id ? null : k.id))}
-            >
-              <span className="course-chip-dot" aria-hidden="true" />
-              {k.label}
-            </button>
-          ))}
-        </div>
+        {expanded ? (
+          <div className="course-legend" role="group" aria-label="Filter classes by department">
+            {COURSE_CATEGORIES.map(k => (
+              <button
+                key={k.id}
+                type="button"
+                className={`course-chip${filter === k.id ? ' course-chip--on' : ''}`}
+                style={{ '--bubble-color': k.color }}
+                aria-pressed={filter === k.id}
+                onClick={() => setFilter(f => (f === k.id ? null : k.id))}
+              >
+                <span className="course-chip-dot" aria-hidden="true" />
+                {k.label}
+              </button>
+            ))}
+          </div>
+        ) : (
+          <p className="course-brief-text">
+            {BUBBLES.length} classes, taken and planned. These {PAGED.length} came with projects.
+          </p>
+        )}
 
-        <div className="course-controls-end">
+        {expanded && (
           <button
             type="button"
-            className="course-view-toggle"
+            className="course-view-toggle course-list-toggle"
             aria-pressed={view === 'list'}
             onClick={() => { setHover(-1); setView(v => (v === 'bubbles' ? 'list' : 'bubbles')) }}
           >
             {view === 'bubbles' ? 'List view' : 'Bubble view'}
           </button>
-          <button type="button" className="course-view-toggle course-expand" aria-expanded="true" onClick={() => resizeTank(false)}>
-            Show fewer
-          </button>
-        </div>
+        )}
+
+        <button
+          type="button"
+          className="course-view-toggle course-expand"
+          aria-expanded={expanded}
+          onClick={() => resizeTank(!expanded)}
+        >
+          <span className={expanded ? undefined : 'course-expand-off'}>Show fewer</span>
+          <span className={expanded ? 'course-expand-off' : undefined}>Show all {BUBBLES.length} classes</span>
+        </button>
       </div>
-      )}
 
       <div className="course-stage">
       {view === 'bubbles' ? (
@@ -604,12 +621,10 @@ export function CourseColumn() {
         <CourseList through={through} filter={filter} />
       )}
 
-      {/* Brief view: what is in the tank, and the way to the rest */}
+      {/* Brief view: what is in the tank (the way to the rest is the
+          toggle above) */}
       {!expanded && (
         <div className="course-brief" data-no-ping>
-          <p className="course-brief-text">
-            {BUBBLES.length} classes, taken and planned. These {PAGED.length} came with projects.
-          </p>
           <ul className="course-brief-list">
             {PAGED.map(b => (
               <li key={b.slug}>
@@ -624,9 +639,6 @@ export function CourseColumn() {
               </li>
             ))}
           </ul>
-          <button type="button" className="course-view-toggle course-expand" aria-expanded="false" onClick={() => resizeTank(true)}>
-            Show all {BUBBLES.length} classes
-          </button>
         </div>
       )}
       </div>

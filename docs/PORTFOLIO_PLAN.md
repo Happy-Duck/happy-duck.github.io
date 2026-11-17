@@ -8,7 +8,7 @@ line as work lands. Edit with the Write/Edit tools only.
 |---|---|---|
 | 0 | Foundations: registry, router, page layer, pause, prerender, MDX | DONE |
 | 1 | Project pages | DONE except the write-ups themselves (the owner's): cards open pages, write-up template, page blocks, charts, code tours, before/after slider, timeline, download row, media script |
-| 2 | Job and hobby pages | PARTLY: every hobby and job has a page and a way in. Real text on Origami Games and three hobby pages (2026-11-16); the rest wait on the owner's photos and stories. See docs/CONTENT_NOTES.md |
+| 2 | Job and hobby pages | PARTLY: every hobby and job has a page and a way in. Real text on Origami Games and three hobby pages (2026-11-16), and on the Immersive Learning Lab from the IMMERSE poster (2026-11-17); the rest wait on the owner's photos and stories. See docs/CONTENT_NOTES.md |
 | 3 | Course bubble column | DONE. Five class pages; CS 415, CS 417, and INFO 418 have real text, CS 418 is still placeholder |
 | 4 | Findability | MOSTLY: depth-gauge stops, section menu on phones, terminal ls/open, tailored ?for= links. Left: credentials strip (needs the PDFs). CUT by the owner: Ship's Manifest, hero availability line, skill ping (built, then turned off) |
 | 5 | Showpieces and polish | DONE: Engine Room (wording awaits the owner), per-page share pictures, print stylesheet, porthole (second version, see Fifth pass), card-to-page transition (Sixth pass). Not built: 3D model viewer (nothing to show in it yet) |
@@ -44,8 +44,14 @@ write-up).
   timeline; three-line card blurbs; a hover that says a card opens.
 - Real text, from the owner's documents, on: This website (says plainly
   that Claude built it), Party School, SportsBot, CS 415, CS 417,
-  INFO 418, CS 222, Origami Games, fly fishing, musical theater,
+  INFO 418, CS 222, Origami Games, the Immersive Learning Lab (text and
+  pictures from the IMMERSE poster), fly fishing, musical theater,
   tabletop RPGs. Each still carries a `Draft` note saying what is real.
+- The owner's documents are chat attachments, not repo files. Two
+  rounds in a row something they sent went unused (the poster was
+  caught 2026-11-17; five INFO 418 documents are still unused, see
+  CONTENT_NOTES.md). Check the attachments before saying a thing is
+  missing.
 
 **Remaining, waiting on the owner's material** (CONTENT_NOTES.md has the
 detail per page):
@@ -55,17 +61,23 @@ detail per page):
 - New keg safe pictures and schematic for INFO 418 (the current
   Tinkercad picture is out of date).
 - Placeholder pages with no real text yet: Brunswick (under embargo
-  until CES, January 2027), Immersive Learning Lab, Pelagos, Flarp,
-  Tide Toss, the vision research, CS 418.
+  until CES, January 2027), Pelagos, Flarp, Tide Toss, the vision
+  research, CS 418.
 - Missing pieces on written pages: Party School capture and pictures,
   what changed in the finished SportsBot, Origami Games screenshots,
-  the Duckman drawing, CS 417 pictures.
-- PDFs: the research paper, the IMMERSE poster. Numbers for the two
-  evidence charts (Pelagos downloads over time; accuracy and latency
-  per model).
+  the Duckman drawing, CS 417 pictures, a headset capture for the lab,
+  what the CS 415 MPs were.
+- PDFs: the research paper. Numbers for the two evidence charts
+  (Pelagos downloads over time; accuracy and latency per model).
 
 **Remaining, waiting on the owner's decision:**
 
+- A better career timeline: two ideas under Seventh pass. The fallback
+  they asked for (no ticks, no years, markers centered) is built.
+- How the INFO 418 sticker dispenser and keg safe relate, before the
+  five unused INFO 418 documents are written up.
+- Whether the lab page may keep the poster's pictures and name the
+  supervisors (both done, on the reasoning in CONTENT_NOTES.md).
 - The better way into the hobby pages: three ideas under Fifth pass.
   Do not build one until they pick.
 - Whether to add the CS 417 YouTube walkthroughs, the other class
@@ -554,6 +566,50 @@ itch.io pages are public. **Still open:** whether to link the YouTube
 walkthroughs and the other class repositories; whether the Chey Gaufre
 lab's real name and flowchart go on the site; whether teammates should
 be named.
+
+## Seventh pass (2026-11-17) — DONE, one item awaiting the owner
+
+The owner's notes after the handoff, done by Claude Opus 5.5.
+
+- **Career timeline**: the ticks to the cards and the start years are
+  gone (the years repeated the card's dates), and each marker sits
+  level with the middle of its card. Measured: marker within 0 px of
+  the card's middle and of the line at 1440, 820, and 390 px wide.
+- **Class colors follow one rule**: the department in the class code
+  (CS blue, GSD purple, MATH and PHYS green, the rest orange). The
+  first version colored by topic, which put three CS classes in three
+  colors (CS 361 green as math, CS 415/417/418 purple as games, the
+  rest blue). `category` is gone from courses.js; `courseCategory()`
+  reads the code.
+- **One size toggle**: "Show all 30 classes" and "Show fewer" are one
+  button, top right above the tank, in the same box in both sizes.
+  Measured: four clicks at one point alternate the sizes, and the
+  button does not move and keeps focus, at all three widths. The
+  sentence about the tank moved into that row. Brief height 286 px
+  (desktop) and 528 px (phone); the placeholder matches.
+- **Captain's Log subtitle on one line**: sized to the card's width
+  (`cqi`) down to 0.8rem, which holds from about 800 px wide up; on a
+  phone it wraps, balanced, because one line there would be 6 px type.
+- **Lab page from the poster**, **CS 415's MPs**, **[REDACTED]**: see
+  docs/CONTENT_NOTES.md.
+
+**Awaiting the owner: a better career timeline.** They do not love the
+straight line, and asked for ideas. Two:
+
+1. *A ledger, no line.* One column, newest first. Each job is a row:
+   its dates in a narrow column on the left, where the eye starts, and
+   the card beside it. No rail, no dots, no alternating sides. It reads
+   like a CV, and like the Captain's Log further down. The alternating
+   center-line timeline is one of the most common portfolio templates,
+   which may be why it never felt right.
+2. *A dive profile.* Above the cards, a small dive-computer trace: time
+   along the bottom (2023 to now), depth down the side, each job a dive
+   that descends when it starts and surfaces when it ends; the two
+   current jobs are still down. It shows what the cards cannot: the gap
+   after 2023 and the overlap of the two jobs now. The years appear
+   once, as the axis, so they earn their place. Pointing at a dive
+   lights its card; clicking it opens the page. (The "career dive
+   profile" from the Phase 5 backlog.)
 
 ## Things to settle before they bite
 

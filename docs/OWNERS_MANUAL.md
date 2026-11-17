@@ -418,6 +418,10 @@ the item's `id`.
 for the rest.
 
 - **The sentence under "Captain's Log"** — `LOG_INTRO` in `hobbies.js`.
+  It is kept on one line by shrinking its text to fit (phones excepted,
+  where it would be too small to read). If you make it much longer, it
+  will get smaller; ask for the size rule in `index.css` (`.log-subtitle`)
+  to be re-measured.
 - **The rotating "> …" lines** — also in `hobbies.js`. Every block in the `HOBBIES` list is one more line, and
   also a page of its own. The whole line is the way in: it carries a
   small arrowhead at its end and lights up when pointed at. The lines
@@ -461,10 +465,17 @@ for the rest.
 
 The Education section is a degree card with the classes under it. It
 opens small: a short tank holding only the classes that have a page,
-beside a list of them and a button, "Show all 30 classes". That button
-grows it into the full column, one bubble per class, with the category
-filter, the list view, and the semester slider; "Show fewer" puts it
-back. The numbers in the sentence and on the button count themselves.
+beside a list of them. Above the tank, top right, is a button, "Show
+all 30 classes". It grows the tank into the full column, one bubble per
+class, with the color filter, the list view, and the semester slider.
+The same button, in the same spot, then says "Show fewer" and puts it
+back, so you can click back and forth without moving the mouse. The
+numbers in the sentence and on the button count themselves.
+
+**Bubble colors follow one rule: the department in the class code.**
+Every CS class is blue, every GSD class purple, MATH and PHYS green,
+and every other department (INFO, THEA, and so on) orange. You never
+pick a color; a new class colors itself from its code.
 
 **The degree card** (degree, GPA, minor, the paragraph) —
 `src/components/Education.jsx`. Edit the text between `>` and `<`.
@@ -473,16 +484,15 @@ back. The numbers in the sentence and on the button count themselves.
 One line per class:
 
 ```js
-{ slug: 'cs-225', code: 'CS 225', title: 'Data Structures', term: 'FA25', credits: 4, category: 'core' },
+{ slug: 'cs-225', code: 'CS 225', title: 'Data Structures', term: 'FA25', credits: 4 },
 ```
 
 | Label | What it is |
 |---|---|
 | `slug` | Unique id: the code in lowercase with a hyphen. |
-| `code`, `title` | What the bubble and the hover card show. |
+| `code`, `title` | What the bubble and the hover card show. The part of the code before the space (`CS`, `MATH`) sets the bubble's color. |
 | `term` | When you took it. One of the ids in the `TERMS` list at the top of the file (`FA24`, `SP25`, …). |
 | `credits` | Credit hours. Bigger number, bigger bubble. |
-| `category` | The bubble's color. One of the ids in `COURSE_CATEGORIES`: `core`, `games`, `math`, `breadth`. |
 | `note` | *Optional* extra line in the hover card. |
 
 - **Add a class** — copy a line, change the values, put it under the right
@@ -493,14 +503,16 @@ One line per class:
   new term's id. Classes before it show as completed, classes in it as in
   progress (slightly see-through), and classes after it as planned
   (faint). Nothing else needs touching.
-- **Rename a category or change its color** — edit `COURSE_CATEGORIES`.
+- **Change a color, or give a department its own** — edit
+  `COURSE_CATEGORIES`. Each group lists its departments (`depts: ['MATH',
+  'PHYS']`); a department in no list goes in the last group.
 - **Grades are deliberately not in this file.** Don't add them.
 
 **Making a class clickable** — give it a `summary` and a `description`:
 
 ```js
 {
-  slug: 'cs-418', code: 'CS 418', title: 'Interactive Computer Graphics', term: 'FA26', credits: 3, category: 'games',
+  slug: 'cs-418', code: 'CS 418', title: 'Interactive Computer Graphics', term: 'FA26', credits: 3,
   summary:     'One sentence for Google and link previews.',
   description: 'The opening paragraph on the class page.',
 },
