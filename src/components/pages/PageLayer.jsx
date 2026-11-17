@@ -9,19 +9,39 @@
 //
 // z-75: above the fabs, floor stamp, and toasts; below the terminal (80),
 // which stays usable on top of a page.
-import { useEffect, useRef } from 'react'
+import { useEffect, useLayoutEffect, useRef } from 'react'
 import { createPortal } from 'react-dom'
 import '../../styles/pages.css'
 import { goBack } from '../../lib/router'
 import { setWaterVisible } from '../../lib/oceanPause'
 import { useOceanDepth } from '../../hooks/useOceanDepth'
-import { KINDS, SITE_TITLE, entryTitle, entryShortName } from '../../content/index.js'
+import { KINDS, SITE_TITLE, entryTitle, entryShortName, entryAnchor } from '../../content/index.js'
 import { devBodyLoader } from '../../content/bodies.js'
 import { MdxBody } from '../mdx/MdxBody'
 import { EntryPage } from './EntryPage'
 import { NotFoundPage } from './NotFoundPage'
 
+// Which theme the dive will be in once it has travelled to this entry's
+// card: used on a direct landing, before the dive has got there. Depth is
+// how far down the document the card sits; the dive turns from reef to
+// deep sea between 0.30 and 0.40 (OceanDepthContext), so 0.35 splits it.
+function themeAtCard(route) {
+  const names = route.entry ? [entryAnchor(route.kind, route.slug), route.kind] : []
+  for (const name of names) {
+    const el = [...document.querySelectorAll(`[data-entry-anchor="${name}"]`)]
+      .find(n => n.offsetParent !== null)
+    if (!el) continue
+    const r = el.getBoundingClientRect()
+    const max = document.documentElement.scrollHeight - window.innerHeight
+    const depth = max > 0 ? (r.top + window.scrollY + r.height / 2 - window.innerHeight / 2) / max : 0
+    return depth < 0.35 ? 'shallow-reef' : 'deep-sea'
+  }
+  // No card to travel to (the 404 page): the dive stays at the surface
+  return 'shallow-reef'
+}
+
 export function PageLayer({ route, path }) {
+  const layerRef = useRef(null)
   const scrollRef = useRef(null)
   const downOutside = useRef(false)
   const { depthMeters } = useOceanDepth()
@@ -65,6 +85,34 @@ export function PageLayer({ route, path }) {
     }
   }, [])
 
+  // The page takes the colors of the water it was opened from: beige from
+  // the beige cards near the surface, navy from the deep ones (pages.css,
+  // data-page-theme). It is set once and then left alone, so the page does
+  // not change color if the dive underneath moves (the engine controls on
+  // the page about this site move it). Written straight to the element:
+  // it has to be right before the first paint.
+  useLayoutEffect(() => {
+    const layer = layerRef.current
+    const root = document.documentElement
+    // Opened from a card: the dive is already in that card's theme
+    if ((window.history.state?.idx ?? 0) > 0) {
+      layer.dataset.pageTheme = root.dataset.theme || 'deep-sea'
+      return
+    }
+    // Landed here directly: the dive is still on its way to the card.
+    // Start from where the card is, then follow the dive until it settles.
+    layer.dataset.pageTheme = themeAtCard(route)
+    const follow = new MutationObserver(() => { layer.dataset.pageTheme = root.dataset.theme })
+    const start = setTimeout(() => {
+      layer.dataset.pageTheme = root.dataset.theme || layer.dataset.pageTheme
+      follow.observe(root, { attributes: true, attributeFilter: ['data-theme'] })
+    }, 1100)
+    const stop = setTimeout(() => follow.disconnect(), 2600)
+    return () => { clearTimeout(start); clearTimeout(stop); follow.disconnect() }
+    // once, when the layer opens; moving between pages keeps the theme
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
+
   // Each page (first open and page-to-page) takes focus on its heading:
   // screen readers announce where they are, Tab continues into the page,
   // and no focus ring is drawn on a non-interactive target
@@ -104,7 +152,7 @@ export function PageLayer({ route, path }) {
   }
 
   return createPortal(
-    <div className="page-layer" data-no-ping>
+    <div className="page-layer" data-no-ping ref={layerRef}>
       {/* Keyed by path: moving between pages remounts the scroller, so
           each page opens at its top */}
       <div className="page-scroll" key={path} ref={scrollRef} onMouseDown={onMouseDown} onClick={onClick}>

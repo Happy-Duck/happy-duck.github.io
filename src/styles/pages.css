@@ -21,7 +21,16 @@
   --ink:       #dde9f3;
   --ink-2:     #a8bfd2;
   --ink-3:     #7890a6;
+  --ink-strong: #f2f8fc;                      /* headings, big numbers */
+  --ink-hover:  #ffffff;                      /* a link being pointed at */
   --rule:      rgba(150, 190, 225, 0.15);
+  --edge:      rgba(150, 190, 225, 0.32);     /* outlines of controls and diagram boxes */
+  --edge-faint: rgba(150, 190, 225, 0.11);
+  --panel-2:   #0d2038;                       /* a second panel tone, beside --panel */
+  --warn:      #f0c58f;
+  --warn-edge: rgba(255, 190, 110, 0.45);
+  --stripe-a:  #071325;
+  --stripe-b:  #091a30;
   --link:      #74d2f3;
   --measure:   41rem;      /* the text column */
   --sheet-w:   1120px;
@@ -43,6 +52,35 @@
     transparent     calc(50% + var(--sheet-w) / 2 - 16px),
     var(--page-dim) calc(50% + var(--sheet-w) / 2 - 16px));
   color:      var(--ink);
+}
+
+/* ── A page takes the colors of the water it was opened from ───────── */
+/* The cards on the dive are beige paper near the surface and navy in
+   the deep (index.css themes). A page opened from a beige card is beige;
+   one opened from a navy card is navy, which is the default above.
+   PageLayer.jsx sets data-page-theme when the page opens and does not
+   change it afterwards, whatever the dive underneath does.
+   Only variables change here. A rule elsewhere in this file that needs a
+   different color in the two themes takes a variable, not a literal.
+   Code blocks and charts keep their own dark panels in both (their
+   colors were chosen against one). */
+.page-layer[data-page-theme="shallow-reef"] {
+  --page-bg:    #f6f0de;
+  --panel:      #ebe3cc;
+  --panel-2:    #e0d6ba;
+  --ink:        #0d2434;
+  --ink-2:      #2c4253;
+  --ink-3:      #5b6c78;
+  --ink-strong: #06202f;
+  --ink-hover:  #06202f;
+  --rule:       rgba(13, 36, 52, 0.17);
+  --edge:       rgba(13, 36, 52, 0.38);
+  --edge-faint: rgba(13, 36, 52, 0.10);
+  --warn:       #875006;
+  --warn-edge:  rgba(135, 80, 6, 0.5);
+  --stripe-a:   #ece4cd;
+  --stripe-b:   #e3dabf;
+  --link:       #00609c;
 }
 
 /* ── The dive while a page is open ─────────────────────────────────── */
@@ -107,7 +145,7 @@
   text-decoration: none;
   white-space:     nowrap;
 }
-.page-layer .page-back:hover { color: #fff; }
+.page-layer .page-back:hover { color: var(--ink-hover); }
 .page-back-chev {
   width:           7px;
   height:          12px;
@@ -138,7 +176,7 @@
 .page-main { padding: clamp(2rem, 5vw, 3.75rem) var(--sheet-pad) 6rem; }
 
 .page-layer a { color: var(--link); text-underline-offset: 3px; }
-.page-layer a:hover { color: #fff; }
+.page-layer a:hover { color: var(--ink-hover); }
 .page-layer h1[tabindex="-1"]:focus { outline: none; }
 
 /* ── Entry header ──────────────────────────────────────────────────── */
@@ -151,7 +189,7 @@
   font-weight:    900;
   line-height:    1.03;
   letter-spacing: -0.028em;
-  color:          #f2f8fc;
+  color:          var(--ink-strong);
   text-wrap:      balance;
 }
 .entry-sub {
@@ -331,7 +369,7 @@
 
 .entry-body h1,
 .entry-body h2,
-.entry-body h3 { color: #eef5fa; text-wrap: balance; }
+.entry-body h3 { color: var(--ink-strong); text-wrap: balance; }
 .entry-body h1 {
   margin:         0 0 1.25rem;
   font-size:      clamp(2.1rem, 1.3rem + 3.6vw, 3.7rem);
@@ -464,7 +502,7 @@
 .entry-list-title { font-weight: 600; }
 .entry-list-kind  { flex: none; font-size: 0.86rem; color: var(--ink-3); }
 .entry-list .entry-related-link:hover .entry-list-title {
-  color:                 #fff;
+  color:                 var(--ink-hover);
   text-decoration:       underline;
   text-underline-offset: 3px;
 }
@@ -483,7 +521,7 @@
   font-weight:    900;
   line-height:    1;
   letter-spacing: -0.03em;
-  color:          #f2f8fc;
+  color:          var(--ink-strong);
 }
 .page-lost-text { margin: 0 0 1.5rem; font-size: 1.15rem; line-height: 1.6; color: var(--ink-2); }
 
@@ -496,10 +534,10 @@
   max-width:     none;
   margin:        0 0 2rem;
   padding:       0.55rem 0.85rem;
-  border:        1px dashed rgba(255, 190, 110, 0.45);
+  border:        1px dashed var(--warn-edge);
   border-radius: 4px;
   font-size:     0.88rem;
-  color:         #f0c58f;
+  color:         var(--warn);
 }
 
 /* ── Placeholder frame ─────────────────────────────────────────────── */
@@ -515,7 +553,7 @@
   overflow:        hidden;
 }
 .blk-ph-cross { position: absolute; inset: 0; width: 100%; height: 100%; }
-.blk-ph-cross line { stroke: rgba(150, 190, 225, 0.11); stroke-width: 1; }
+.blk-ph-cross line { stroke: var(--edge-faint); stroke-width: 1; }
 .blk-ph-play {
   position: absolute;
   top:      50%;
@@ -524,7 +562,7 @@
   height:   64px;
   margin:   -32px 0 0 -32px;
 }
-.blk-ph-play circle { fill: rgba(3, 11, 26, 0.8); stroke: var(--ink-3); stroke-width: 1; }
+.blk-ph-play circle { fill: var(--page-bg); stroke: var(--ink-3); stroke-width: 1; }
 .blk-ph-play path   { fill: var(--ink-2); }
 .blk-ph-label {
   position:       relative;
@@ -647,7 +685,7 @@
 
 /* ── Diagram ───────────────────────────────────────────────────────── */
 .blk-diagram svg { display: block; width: 100%; height: auto; overflow: visible; }
-.blk-diagram-node  { fill: var(--panel); stroke: rgba(150, 190, 225, 0.32); stroke-width: 1; }
+.blk-diagram-node  { fill: var(--panel); stroke: var(--edge); stroke-width: 1; }
 .blk-diagram-label { fill: var(--ink);   font-size: 13.5px; font-weight: 600; }
 .blk-diagram-note  { fill: var(--ink-3); font-size: 11.5px; }
 .blk-diagram-link  { fill: none; stroke: var(--ink-3); stroke-width: 1.25; }
@@ -668,7 +706,7 @@
   font-weight:    800;
   line-height:    1.1;
   letter-spacing: -0.02em;
-  color:          #f2f8fc;
+  color:          var(--ink-strong);
 }
 .blk-stat-label { margin-top: 0.3rem; font-size: 0.9rem; color: var(--ink-3); }
 
@@ -697,7 +735,7 @@
   background:    var(--panel);
   color:         var(--ink);
 }
-.entry-body .blk-callout-title { margin: 0 0 0.3rem; font-weight: 700; color: #f2f8fc; }
+.entry-body .blk-callout-title { margin: 0 0 0.3rem; font-weight: 700; color: var(--ink-strong); }
 .blk-callout-body > :last-child { margin-bottom: 0; }
 
 /* ── Redacted ──────────────────────────────────────────────────────── */
@@ -710,7 +748,7 @@
   margin:          2rem 0;
   padding:         1.2rem;
   border-radius:   4px;
-  background:      repeating-linear-gradient(135deg, #071325 0 14px, #091a30 14px 28px);
+  background:      repeating-linear-gradient(135deg, var(--stripe-a) 0 14px, var(--stripe-b) 14px 28px);
   text-align:      center;
 }
 .blk-redacted-why  { font-weight: 700; color: var(--ink); }
@@ -731,7 +769,7 @@
   font-size:   0.94rem;
   color:       var(--link);
 }
-.entry-body a.blk-repo:hover .blk-repo-name { color: #fff; text-decoration: underline; text-underline-offset: 3px; }
+.entry-body a.blk-repo:hover .blk-repo-name { color: var(--ink-hover); text-decoration: underline; text-underline-offset: 3px; }
 .blk-repo-desc { font-size: 0.94rem; line-height: 1.5; color: var(--ink-2); }
 .blk-repo-meta { font-size: 0.84rem; color: var(--ink-3); }
 
@@ -755,7 +793,7 @@
   object-fit:    cover;
 }
 /* A placeholder pair has to look like two pictures, so the upper is a shade lighter */
-.blk-compare-side--before .blk-ph { background: #0d2038; }
+.blk-compare-side--before .blk-ph { background: var(--panel-2); }
 .blk-compare-tag {
   position:      absolute;
   left:          0.6rem;
@@ -812,7 +850,7 @@
   max-width: 44%;
   transform: translate(-50%, -50%);
 }
-.blk-compare-side--before .blk-ph-label { left: 25%; background: #0d2038; }
+.blk-compare-side--before .blk-ph-label { left: 25%; background: var(--panel-2); }
 
 /* ── Timeline ──────────────────────────────────────────────────────── */
 .entry-body .blk-timeline {
@@ -861,8 +899,8 @@
 }
 .blk-download-title { font-weight: 700; line-height: 1.4; color: var(--link); }
 .blk-download-meta  { font-size: 0.84rem; line-height: 1.5; color: var(--ink-3); }
-.entry-body a.blk-download:hover .blk-download-title { color: #fff; text-decoration: underline; text-underline-offset: 3px; }
-.entry-body a.blk-download:hover .blk-download-icon  { stroke: #fff; }
+.entry-body a.blk-download:hover .blk-download-title { color: var(--ink-hover); text-decoration: underline; text-underline-offset: 3px; }
+.entry-body a.blk-download:hover .blk-download-icon  { stroke: var(--ink-hover); }
 .blk-download--ph .blk-download-title { color: var(--ink-2); }
 .blk-download--ph { border-style: dashed; border-left: 0; border-right: 0; }
 
@@ -1130,7 +1168,7 @@
 .blk-engine-buttons button {
   min-height:    36px;
   padding:       0.35rem 0.9rem;
-  border:        1px solid rgba(150, 190, 225, 0.32);
+  border:        1px solid var(--edge);
   border-radius: 4px;
   background:    none;
   color:         var(--ink);
@@ -1166,7 +1204,7 @@
 }
 .blk-engine-label { font-size: 0.92rem; color: var(--ink-3); }
 .blk-engine-buttons { display: flex; flex-wrap: wrap; gap: 0.5rem; }
-.entry-body .blk-engine-note { margin: 0.6rem 0 0.2rem; font-size: 0.92rem; color: #f0c58f; }
+.entry-body .blk-engine-note { margin: 0.6rem 0 0.2rem; font-size: 0.92rem; color: var(--warn); }
 .entry-body .blk-engine-readout {
   display:     flex;
   flex-wrap:   wrap;
@@ -1198,13 +1236,23 @@
   /* Everything that is not the page: the dive, the console, toasts */
   :root.page-open body > :not(.page-layer) { display: none !important; }
 
-  .page-layer {
+  .page-layer,
+  .page-layer[data-page-theme] {
     --page-bg:   #fff;
     --panel:     #eef1f4;
+    --panel-2:   #e3e7eb;
     --ink:       #111;
     --ink-2:     #26303a;
     --ink-3:     #56616c;
+    --ink-strong: #000;
+    --ink-hover: #111;
     --rule:      #c6ccd3;
+    --edge:      #9aa3ad;
+    --edge-faint: #c6ccd3;
+    --warn:      #7a4a0c;
+    --warn-edge: #a36a1c;
+    --stripe-a:  #eef1f4;
+    --stripe-b:  #eef1f4;
     --link:      #111;
     --sheet-pad: 0px;
     position:   static;
@@ -1219,13 +1267,6 @@
   .page-sheet::before { display: none !important; }
   .entry-head--porthole { display: block; }
 
-  .entry-title,
-  .entry-body h1,
-  .entry-body h2,
-  .entry-body h3,
-  .entry-list-label,
-  .blk-stat-value,
-  .entry-body .blk-callout-title { color: #000; }
   .entry-body { font-size: 10.5pt; line-height: 1.55; }
   .entry-body h2,
   .entry-body h3 { break-after: avoid; }
