@@ -266,20 +266,22 @@ needs: READ IT before writing or changing page content.
   to be buttons that sent a sonar ping, outlined the cards using the
   skill, and listed them underneath; the owner had that turned off.
   Don't bring it back. `skills` in the data files is unused by the UI.
-- **Career timeline** (`Experience.jsx`, `.career-*`): a straight line,
-  one marker per job, level with the MIDDLE of its card. No ticks to the
-  cards and no start years (the owner found the years redundant with
-  the card's dates; both were removed 2026-11-17). Line and marker are
-  centered in the same 40px rail so they cannot drift (the old wavy kelp
-  strand with dots beside it never lined up, and it annoyed the owner
-  for months); the rail is as tall as its card, and each row draws its
-  own stretch of line, so the line meets every marker whatever the card
-  heights. The owner does not love the straight line either: ideas for
-  something better are in docs/PORTFOLIO_PLAN.md (Seventh pass), waiting
-  on their pick. One set of cards; CSS grid rearranges them for narrow
-  screens. If you touch it, measure: marker within 0.5px of the line and
-  of the card's middle at several widths, after scrolling each card into
-  view (they slide in 52px on first sight).
+- **Career timeline** (`Experience.jsx`, `.career-*`): a kelp strand
+  with a current flowing down it (dashes drifting, `kelp-flow`), in the
+  original colors (`--kelp-*`: cyan in deep water, green on the reef),
+  and one marker per job level with the MIDDLE of its card. No ticks
+  and no start years (the owner found the years redundant). The owner
+  likes the flowing strand; what they hated was the first version's
+  dots sitting BESIDE it (a fixed S-curve stretched to the section, dots
+  on a straight axis). Now `KelpStrand` measures every marker's center
+  and draws one smooth wave through all of them (a half-sine cubic per
+  stretch, alternating sides), redrawn by a ResizeObserver. Markers are
+  centered in their row's 40px rail, which is as tall as its card. The
+  straight line in between (2026-11-15 to 17) is gone. One set of cards;
+  CSS grid rearranges them for narrow screens. If you touch it, measure:
+  the strand within 0.5px of every marker center, and the marker on the
+  card's middle, at several widths, after scrolling each card into view
+  (they slide in 52px on first sight).
 - **Captain's Log** (`About.jsx`): `LOG_INTRO` is the sentence under the
   heading, not a log line, and it stays on ONE LINE (the owner's rule):
   `.log-subtitle` sizes it to its container (`cqi`) from a measured

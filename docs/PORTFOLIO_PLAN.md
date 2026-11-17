@@ -47,11 +47,10 @@ write-up).
   INFO 418, CS 222, Origami Games, the Immersive Learning Lab (text and
   pictures from the IMMERSE poster), fly fishing, musical theater,
   tabletop RPGs. Each still carries a `Draft` note saying what is real.
-- The owner's documents are chat attachments, not repo files. Two
-  rounds in a row something they sent went unused (the poster was
-  caught 2026-11-17; five INFO 418 documents are still unused, see
-  CONTENT_NOTES.md). Check the attachments before saying a thing is
-  missing.
+- The owner's documents are chat attachments, not repo files. Six of
+  them sat unused for a round (the IMMERSE poster and five INFO 418
+  documents, all written up on 2026-11-17). Check the attachments
+  before saying a thing is missing.
 
 **Remaining, waiting on the owner's material** (CONTENT_NOTES.md has the
 detail per page):
@@ -72,10 +71,6 @@ detail per page):
 
 **Remaining, waiting on the owner's decision:**
 
-- A better career timeline: two ideas under Seventh pass. The fallback
-  they asked for (no ticks, no years, markers centered) is built.
-- How the INFO 418 sticker dispenser and keg safe relate, before the
-  five unused INFO 418 documents are written up.
 - Whether the lab page may keep the poster's pictures and name the
   supervisors (both done, on the reasoning in CONTENT_NOTES.md).
 - The better way into the hobby pages: three ideas under Fifth pass.
@@ -567,7 +562,14 @@ walkthroughs and the other class repositories; whether the Chey Gaufre
 lab's real name and flowchart go on the site; whether teammates should
 be named.
 
-## Seventh pass (2026-11-17) — DONE, one item awaiting the owner
+## Seventh pass (2026-11-17) — DONE
+
+**Settled the same day:** the owner chose neither idea below. They
+liked the original's flowing kelp strand and its colors, and wanted
+those back. The strand is back, drawn through the measured center of
+every marker so the dots sit on it (the original's fault), with the
+current still flowing down it. Measured within 0.2 px of every marker
+at 1440, 820, and 390 px. The two ideas are kept below for the record.
 
 The owner's notes after the handoff, done by Claude Opus 5.5.
 
@@ -593,8 +595,7 @@ The owner's notes after the handoff, done by Claude Opus 5.5.
 - **Lab page from the poster**, **CS 415's MPs**, **[REDACTED]**: see
   docs/CONTENT_NOTES.md.
 
-**Awaiting the owner: a better career timeline.** They do not love the
-straight line, and asked for ideas. Two:
+**Proposed for a better career timeline (not chosen):**
 
 1. *A ledger, no line.* One column, newest first. Each job is a row:
    its dates in a narrow column on the left, where the eye starts, and

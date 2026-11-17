@@ -47,7 +47,7 @@ export const PROJECTS = [
     title:       'Party School',
     summary:     'A multiplayer sandbox party game in Unreal Engine 5, built in a five-person team on a streamed real-world city map.',
     blurb:       'Multiplayer sandbox party game built in a five-person team. Built the shared multiplayer core, streamed a real-world city-scale map from the Google Map Tiles API, and implemented the racing minigame.',
-    description: "Multiplayer sandbox party game with minigame activities built in a five-person team. Built the shared core project base supporting multiplayer integration, reviewed teammates' code, and streamed a real-world city-scale map into the engine from the Google Map Tiles API via the BLOSM plugin; also implementing the racing minigame using Unreal's Chaos Vehicle system.",
+    description: "Multiplayer sandbox party game with minigame activities built in a five-person team. Built the shared core project base supporting multiplayer integration, reviewed teammates' code, and streamed a real-world city-scale map into the engine from the Google Map Tiles API via the BLOSM plugin; also built the racing minigame on Unreal's Chaos Vehicle system.",
     stack:       ['Unreal Engine 5', 'Blueprints', 'Chaos Vehicles', 'BLOSM'],
     link:        '#',
     tags:        ['games'],
@@ -58,7 +58,7 @@ export const PROJECTS = [
       highlights: [
         "Built the shared core project base supporting multiplayer integration across all minigames, and reviewed teammates' code",
         "Streamed a real-world city-scale map into the engine from Google's Map Tiles API via the BLOSM plugin",
-        "Implementing the racing minigame on Unreal's Chaos Vehicle system",
+        "Built the racing minigame on Unreal's Chaos Vehicle system",
       ],
     },
   },

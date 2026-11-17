@@ -124,11 +124,13 @@ export const COURSES = [
   },
   {
     slug: 'info-418', code: 'INFO 418', title: 'Makerspace: Escape Rooms', term: 'FA26', credits: 3,
-    // Drawn from the repo description and the Keg Safe 2.0 schematic the
-    // owner shared (2026-11-15). The owner designed the keg safe circuit
-    // (confirmed 2026-11-17). Still in progress this semester.
-    summary:     'A makerspace course on building escape rooms. I built the electronics and Arduino code behind two of the props in Riggs Escape.',
-    description: 'A makerspace course on building escape rooms. For Riggs Escape I wrote the Arduino Uno code that controls the electronics for the sticker dispenser and the keg safe door, and designed the keg safe circuit: a keypad, a solenoid lock, two status lights, and a buzzer. In progress this semester.',
+    // Drawn from the repo description and the class documents the owner
+    // shared (2026-11-15). One prop: the keg for the final puzzle. It was
+    // planned as a sticker dispenser and became a solenoid-locked drawer
+    // that tips out of the keg; the dispenser was dropped (owner,
+    // 2026-11-17). Still in progress this semester.
+    summary:     'A makerspace course on building escape rooms. For Riggs Escape I built the electronics and Arduino code for the final puzzle: a keg whose drawer opens on the right code.',
+    description: 'A makerspace course on building escape rooms. For Riggs Escape I designed the circuit and wrote the Arduino Uno code for the final puzzle\'s prop: a keg with a keypad set into it, where the right code releases a solenoid lock and a drawer tips out. In progress this semester.',
     links: [
       { label: 'Arduino source', href: 'https://github.com/Happy-Duck/MetaPuzzleArduinoCode' },
     ],

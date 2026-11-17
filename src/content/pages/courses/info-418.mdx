@@ -1,4 +1,4 @@
-<Draft note="The circuit section is drawn from the Keg Safe 2.0 schematic, which has changed since; new pictures are coming. The room, the build photos, and the play-testing are still placeholders, and the class is in progress." />
+<Draft note="Written from the class documents: the learning objectives, the paper prototype, the durability test, the debugging log, the playtest, and the Keg Safe 2.0 schematic, which has changed since; new pictures are coming. The room and the build photos are still placeholders, and the class is in progress." />
 
 ## The room
 
@@ -8,7 +8,11 @@ Placeholder text. What Riggs Escape is: the story of the room, how many players,
 
 ## My part
 
-I wrote the Arduino code for two of the room's props, the sticker dispenser and the door of the keg safe, and designed the keg safe's circuit. The safe is a lock the players open with a code typed on a keypad; a solenoid holds the door.
+My part is the prop for the final puzzle: a keg with a keypad set into it. Solve the rest of the hunt, type the answer on the keypad, and a solenoid lock lets a drawer tip out of the keg. I designed the circuit and wrote the Arduino code.
+
+It did not start as a drawer. The first plan was a sticker dispenser: the right code would make a servo arm push out a sticker as the prize. That is the version the paper prototype tested. The dispenser was dropped, and the keg became a locked drawer, the keg safe of the schematic below.
+
+The class had me set two learning objectives. One was designing a prop to last through many players over many sessions. The other was electronics, because, as I wrote at the start of term, "as a computer scientist, my work largely involves abstract software, but I am interested in being able to combine that skill with hardware components to create more physically tangible experiences."
 
 <Diagram
   caption="The keg safe, from the schematic."
@@ -48,14 +52,49 @@ The parts, and why each is there:
 
 <RepoCard repo="Happy-Duck/MetaPuzzleArduinoCode" />
 
+## The first week on the bench
+
+I kept a log while the first prototype came together, from 21 to 27 October. It starts with the blinking-light tutorial from Arduino and ends with the lights, the speaker, and the solenoid lock (wired from Adafruit's schematic) all answering a typed code. Along the way:
+
+| What went wrong | Why | The fix |
+| --- | --- | --- |
+| An LED would not blink | The LED was dead. The board's own LED blinked, so the code was fine. | A new LED. From the log: "always test LEDs before using them." |
+| Typed input, standing in for the keypad, did nothing | The serial port was never started | `Serial.begin()` in setup |
+| The lights were dim | Resistors far stronger than needed | 220 Ω |
+| Ran out of ground pins | Three parts needed one, and the Uno has two | The breadboard's rail as a shared ground |
+| The speaker played only the last note of a tune | Each note cut off the one before it | A function that plays a note for a set time, then pauses |
+| The Arduino would not connect | A different USB port from the day before | The first port |
+| Typed codes were slow to answer | The code read whole strings | Read one character at a time, which is also how the keypad will send them |
+
 <Gallery caption="Placeholder frames for build photos." images={[
   { label: 'The real breadboard' },
-  { label: 'Inside the prop' },
+  { label: 'Inside the keg' },
   { label: 'Testing on the bench' },
 ]} />
 
+## Built to last
+
+A prop in a room is handled by many players over many sessions, and most of my building before this class had been prototypes, not made to last. The durability plan, written at the paper prototype stage:
+
+| What could fail | The plan |
+| --- | --- |
+| The symbols on the keypad wear off | A metal keypad of the kind payphones use |
+| Wires come loose | Screw terminal shields: the wires are screwed down, but can still be changed in late testing, which soldering would not allow |
+| Spilled drinks | The electronics sealed under a 3D printed false keg top, and the keypad set in, away from spills |
+| A power cut | A battery bank between the wall and the Arduino, as a small UPS |
+
+Then the first prototype went through a stress test:
+
+- The solenoid was switched 1,000 times, on for 100 ms in every 400 ms, and stayed responsive. That is far more often than the drawer will open in the room. The lock piece jiggled when it pointed up, and the whole thing shook, so it should be mounted sideways or facing down, on something solid like the keg itself rather than a printed platform.
+- Nothing grew noticeably warm, the flyback diode and the transistors included. The lights and the speaker went through the same test with the same result.
+- The Arduino's power was pulled and restored 25 times, across its three states (waiting, right code, wrong code). It came back working every time.
+
 ## Play-testing
 
-Placeholder text. What happened the first time real players tried it, and what you changed afterward.
+The paper prototype was play-tested while the keg was still a sticker dispenser. It went as intended: the players typed the code and got their sticker. They got the code right on the first try, though, and never went near the keg until they had solved everything else. They also said they were unsure what each puzzle was for, and how the puzzles came together.
 
-<Clip label="A group opening the safe" caption="Placeholder frame." />
+Meeting the keg early, and trying a code on it, would have shown them what shape the final answer takes. The one change the playtest suggested was where the keg stands: somewhere players meet it sooner.
+
+The paper sticker had a problem of its own. Players could not tell whether it was a sticker, a coin, or some other trinket: a cut-out piece of paper does not look like a sticker when everything around it is paper too.
+
+<Clip label="A group opening the drawer" caption="Placeholder frame." />

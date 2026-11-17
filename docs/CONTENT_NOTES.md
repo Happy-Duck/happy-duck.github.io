@@ -169,9 +169,8 @@ and the racing minigame, and the two placeholder sections.
   about a month. Party School is that final project, and both documents
   are about it. The class page now says so; what the MPs were is a
   placeholder.
-- Open: the card and page say the owner is "implementing" / "building"
-  the racing minigame, in the present tense, but the class ended in
-  spring 2026. Whether the racing game was finished is not known.
+- The racing minigame was finished (owner, 2026-11-17). The card, the
+  highlights, and both pages say so in the past tense.
 
 ### Immersive Learning Lab (`work/immersive-learning-lab`)
 
@@ -196,20 +195,6 @@ Immersive Applications for Science Communications"
   co-authors, not classmates, but it is the owner's call.
 - Still needed: a headset capture (the `Clip` at the top).
 
-### Documents supplied but not used yet
-
-The 2026-11-16 batch also held five INFO 418 documents that no page
-uses yet: the learning objectives, the paper prototype check-in (a
-durability plan, a block diagram, a parts list), the 1.0 durability
-test (the solenoid power-cycled 1,000 times), the electronics debugging
-log (21 to 27 October), and the sticker dispenser's playtest
-reflection. They would fill the build and play-testing sections of the
-INFO 418 page. **Ask before writing from them:** the paper prototype
-is a sticker dispenser driven by a servo, the later documents a keg
-safe with a solenoid lock, and it is not clear whether these are one
-prop that changed or two props. **Never print the meta-puzzle's
-answer**, which the playtest names: Riggs Escape is a real room.
-
 ### CS 222 and SportsBot (`courses/cs-222`, `projects/sportsbot`)
 
 Source: the project proposal (rough draft, group of four).
@@ -226,11 +211,30 @@ Source: the project proposal (rough draft, group of four).
 
 ### INFO 418 (`courses/info-418`)
 
-Sources: the Keg Safe 2.0 schematic and a Tinkercad breadboard picture.
+Sources: the Keg Safe 2.0 schematic, a Tinkercad breadboard picture,
+and five class documents from the 2026-11-16 batch (written up on
+2026-11-17, after sitting unused for a round): the learning objectives,
+the paper prototype check-in (durability plan, block diagram, parts
+list), the 1.0 durability test, the debugging log (21 to 27 October),
+and the paper prototype's playtest reflection.
 
-- The owner wrote the Arduino code for the sticker dispenser and the
-  keg safe door, and designed the keg safe circuit (confirmed
-  2026-11-17). The page and the card say so.
+- **One prop, which changed** (owner, 2026-11-17): the keg for the
+  final puzzle of the hunt. It was planned as a sticker dispenser (a
+  servo arm pushing out a sticker as the prize; that is what the paper
+  prototype and its playtest were), then became a solenoid-locked
+  drawer that tips out of the keg, the "keg safe" of the schematic. The
+  sticker dispenser was dropped. The page and the card say so; the old
+  text claiming two props is gone.
+- The owner designed the keg safe circuit and wrote its Arduino code
+  (confirmed 2026-11-17).
+- **Never print the final puzzle's answer.** The playtest names it, and
+  Riggs Escape is a real room. The page says only that meeting the keg
+  early would show players "what shape the final answer takes".
+- Left off: the sticker procurement options and costs (the dispenser
+  was dropped), and the name of the person the owner was waiting on
+  for the sticker budget.
+- Quoted, as the owner's own words: one sentence from the learning
+  objectives, and "always test LEDs before using them" from the log.
 - **The Tinkercad picture and the schematic are out of date.** The owner
   will send new ones. When they arrive: replace
   `public/media/courses/info-418/keg-safe-breadboard.webp` (or add a new
@@ -263,6 +267,13 @@ commit on the source branches:
 46 commits from March carry no such line, so the history does not name
 a model for them. When a new model does an overhaul, add a row to the
 page's `Timeline`.
+
+Claude Opus 5.5 finished the November round after Fable 5.2 (from
+36632d2 on 2026-11-17; its commits carry its own co-author line). The
+owner decided on 2026-11-17 that it gets no row: "the purpose was to
+explore fable 5.2, its better to keep a crisp narrative." A model that
+only finishes another model's round is not added; one that does its own
+overhaul is.
 
 ## Still waiting on the owner (everything else)
 
