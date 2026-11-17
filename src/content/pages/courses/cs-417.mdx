@@ -1,33 +1,97 @@
-<Draft />
+<Draft note="The text on this page is drawn from the design documents and contribution summaries written for the class. Most pictures and video are still to come, and the final project is in progress." />
 
-## The class
-
-Placeholder text. What the course is about and which headset and engine it uses. One paragraph.
-
-## Game one
-
-Placeholder text. The first of the three VR games: the brief, what you built, and one thing that only works because it is in VR.
-
-<Clip label="Headset capture of game one" />
-
-## Game two
-
-<Note title="Team">
-This one was a team project. Credit the others here.
-</Note>
-
-Placeholder text. The second game. The repository below is its source.
-
-<Gallery caption="Placeholders for screenshots." images={[
-  { label: 'In the headset' },
-  { label: 'The scene in the editor' },
-  { label: 'An interaction up close' },
+<Stats items={[
+  { value: '4', label: 'projects, each larger than the last' },
+  { value: '6', label: 'people on the largest team' },
+  { value: '42', label: 'mechanics in the farm sim, across the whole team' },
 ]} />
 
-<RepoCard repo="Happy-Duck/CS417_MP2" />
+## How the class runs
 
-## Game three
+Every project is built in Unity for a VR headset and published as a playable build. The work is specified as a list of small feature stories, and each person writes up which ones they built and where each can be seen in a recording of the game. The projects get bigger as the semester goes: a menu alone, a room alone, an escape room in a team of four, a simulation in a team of five, and then a final project.
 
-Placeholder text. The third game, still in progress this semester.
+<Timeline items={[
+  { when: 'Project 0', title: 'Button Clicker', text: 'Alone. A menu and nothing else: buttons with click sounds, a score that counts presses, a credits screen, a volume slider, and a way to trade points for a second score.' },
+  { when: 'Project 1, part one', title: 'The room', text: 'Alone. A furnished VR room with a planet, its moon, and a comet in orbit.' },
+  { when: 'Project 1, part two', title: 'Shiny Hunter Simulator', text: 'Four people. An escape room in a school building. I built the classroom.' },
+  { when: 'Project 2', title: 'Chey Gaufre', text: 'Five people. A waffle house and the farms that supply it. I built the chicken farm.' },
+  { when: 'Final project', title: 'Seven Seats', text: 'Six people, in progress. A pirate ship that is also a restaurant. I am building the procedural world.' },
+]} />
 
-<Figure label="Game three, when there is something to show" />
+## The room
+
+The first VR project was a single room to stand in, with something moving in it. I put a planet in the middle, with a moon as its child object and a comet circling it.
+
+<Figure src="/media/courses/cs-417/the-room.webp" alt="A Unity scene with a planet, a small moon, and a comet, each outlined in magenta, above a patch of grass with market stalls, crates, and a well" caption="The room in the Unity editor. The planet, moon, and comet carry the outline shader." />
+
+The comet is not on a rail. Each frame it is pulled toward the planet and its velocity and position are integrated from that pull, scaled by the frame time so the orbit does not depend on frame rate. It starts with exactly the speed a circular orbit needs at that distance, the square root of gravity over distance, so it stays in a stable circle instead of falling in or drifting off.
+
+The rest is the basic vocabulary of VR: the camera follows the headset, a trigger fires a projectile in the direction the controller points with a puff of smoke and a sound placed in space, one button teleports the player to a second viewpoint, and another changes the color of the room's light. A vertex shader draws the outline around the planet, moon, and comet.
+
+## Shiny Hunter Simulator
+
+An escape room for four, built by four. The player is a student who breaks into a school building after hours to change a grade and gets locked into one room after another: a hallway, the professor's office, a classroom, a bathroom, and a utility closet. The building is modelled on the University of Illinois campus. Each of us built one room around a different kind of lock: keycards in the office, color sorting in the classroom, real keys and keyholes in the bathroom, and a number code in the closet. The last door needs all four.
+
+<Note title="One rule for physics">
+Every movable object in the game has a mass between 0.5 and 10, so no two can differ by more than twenty to one. Past that, collisions between a heavy thing and a light one become unstable and objects fly off.
+</Note>
+
+**The classroom was mine.** A to-do list on the whiteboard, left by the professor, tells the player what the room wants: throw the trash away, then print the test and hand it out.
+
+1. **Trash.** Trash in two colors goes into the bin of the matching color. It is the simpler puzzle on purpose, to get the player thinking about sorting by color. Finishing it lifts the bookshelves into the ceiling, uncovering a printer.
+2. **Tests.** A button on the computer prints paper in five colors. Each of the five front desks takes one sheet, in an order that is only shown on a cork board nearby. This time the desks are not color coded, so the player has to carry the order over.
+
+Things that can be picked up say so three ways at once: a mark on the controller turns yellow, a sound plays, and the controller buzzes. When the right object is held near the place it belongs, a translucent yellow copy of it appears there. Eight more objects in the room (a stapler, a mug, two plants, a stack of books) can be picked up and thrown and have nothing to do with either puzzle.
+
+<Gallery caption="Placeholder frames for pictures of the classroom." images={[
+  { label: 'The whiteboard list and the two bins' },
+  { label: 'Paper coming off the printer' },
+  { label: 'The five desks and the cork board' },
+]} />
+
+## Chey Gaufre
+
+A simulation for five people to build in five connected parts. The player runs a waffle house, cooking at stations placed on a grid and selling to customers, and spends the money on the farms that supply it. Each part belongs to one of us, and the parts feed each other: produce from the farms stocks the kitchen, and leftovers from the kitchen go back to the farms.
+
+<Diagram
+  caption="What unlocks what. Each box was built by a different person; the chicken farm was mine."
+  nodes={[
+    { id: 'waffle', label: 'Waffle house', note: 'where the game starts', col: 0, row: 0 },
+    { id: 'chicken', label: 'Chicken farm', note: 'eggs and meat', col: 1, row: 0 },
+    { id: 'crop', label: 'Crop farm', note: 'wheat and corn', col: 1, row: 1 },
+    { id: 'green', label: 'Greenhouse', note: 'fruit', col: 2, row: 1 },
+    { id: 'lab', label: 'The lab', note: 'premium toppings', col: 2, row: 0 },
+  ]}
+  links={[
+    { from: 'waffle', to: 'chicken' },
+    { from: 'waffle', to: 'crop' },
+    { from: 'crop', to: 'green' },
+    { from: 'chicken', to: 'lab' },
+    { from: 'green', to: 'lab' },
+  ]}
+/>
+
+**The chicken farm was mine.** Chickens wander a pen on a navigation mesh, walking around whatever the player has built, and each carries its own needs as bars over its head: hunger, thirst, warmth, and health, plus progress toward its next egg. The player keeps them alive with three machines bought from a shelf and placed on a grid: a feeder filled with hay, a water trough filled from a watering can dipped in a well, and a heater that burns fuel. Eggs come in five colors of rising value and go bad if left. Everything is sold at a market stall with twenty-two trades.
+
+The second half of the project was about teaching the player without a manual, and that is the part I would point to.
+
+| What | How the chicken farm does it |
+| --- | --- |
+| Hold content back | The farm starts with chickens that only lay eggs. Hunger switches on after 2 eggs are collected, thirst after 6, warmth after 12, and each brings its machine with it. Eight thresholds in all. |
+| Show what is next | A goal board names the next threshold with live progress, such as 3 of 6 eggs. Empty shelves carry a sign saying they will restock. |
+| Give room to learn | A new need starts about 100 seconds short of mattering, so the player can buy and place the machine before any chicken suffers. |
+| Explain a mistake | Fourteen wrong moves each get a line of floating text saying why it failed and what to do instead. Hay in the heater: "Don't burn the hay! That goes in the feeder". |
+| Confirm it worked | The first time each machine does its job, one line says so. |
+| Automate the chore | Later thresholds unlock machines that refill the others, and a basket that collects eggs. |
+
+The farm ties into the others in four places. A distributor refills feeders with leftovers from the waffle house or with feed crafted at a teammate's workbench, a second machine keeps heaters lit on fuel from the lab, and everything is bought and sold in the waffle house's money.
+
+<Clip label="A recording of the chicken farm: a first egg through to the automated machines" caption="Placeholder frame." />
+
+## Seven Seats
+
+The final project, in progress, with a team of six. The player captains a pirate ship that is also a restaurant with seven seats. By day they sail between islands, fish, and gather ingredients; at night they anchor and cook for whoever turns up; after closing they spend the takings on the ship. The design names Overcooked and Cooking Mama for the cooking, Dave the Diver for the world, and Stardew Valley for the cycle of days.
+
+Each of us owns one mechanic. Mine is the world: an ocean of procedurally generated islands, each with its own resources, structures, and inhabitants. As days pass, new kinds of island join the pool, some far enough out that only a faster ship can reach them.
+
+<Figure label="Seven Seats: the ship, or a generated island" caption="Placeholder frame, for when there is something to show." />

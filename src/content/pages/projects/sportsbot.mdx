@@ -1,45 +1,47 @@
-<Draft />
+<Draft note="This page is written from the project proposal, so it describes the plan. What changed between the plan and the finished bot is still to be written." />
 
-## What it does
+## The idea
 
-Placeholder text. Which sports and leagues it covers, what a person types, and what comes back. One example command and its reply is worth more than a feature list.
+Casual sports fans have a hard time keeping up with their teams and players across several leagues at once. SportsBot brings the numbers to where they already are: a Discord server. Ask it for a player or a team and it answers in the channel; subscribe a channel and it posts updates on its own.
 
-<Figure label="A slash command and the bot's reply, in Discord" caption="A screenshot of the bot answering." />
+It was the semester project for [CS 222, Software Design Lab](/courses/cs-222/), built by a group of four. The proposal was for soccer, under the working title Soccer Stats for Discord.
 
-## How it is put together
+## What it was planned to do
 
-Placeholder text. A paragraph walking through the diagram below: a command arrives, the bot asks a sports API, and the answer is cached and sent back. Scheduled alerts run on their own loop.
+| Command | What it does |
+| --- | --- |
+| `/stats` and a player or team name | Shows that player's or team's statistics for the current season. |
+| `/subscribe` and a player or team name | Posts updates for them in the channel automatically. |
+| `/unsubscribe` and a name | Stops those updates. |
+| `/subscriptions` | Lists everything the channel is subscribed to. |
 
-<Diagram
-  caption="Placeholder diagram, drawn from the project description. Correct the boxes and add what is missing."
-  nodes={[
-    { id: 'user', label: 'Slash command', note: 'in Discord', col: 0, row: 0 },
-    { id: 'bot', label: 'Bot', note: 'discord.py, asyncio', col: 1, row: 0 },
-    { id: 'api', label: 'Sports APIs', note: 'REST', col: 2, row: 0 },
-    { id: 'db', label: 'Database', note: 'SQL', col: 1, row: 1 },
-  ]}
-  links={[
-    { from: 'user', to: 'bot' },
-    { from: 'bot', to: 'api', label: 'scores, stats' },
-    { from: 'bot', to: 'db' },
-  ]}
-/>
+## How it fits together
 
-<Note title="Margin note">
-The code below is a stand-in to show how a snippet looks. Swap in a real one from the repo.
+<Figure src="/media/projects/sportsbot/architecture.webp" alt="Several Discord servers feed the Discord Gateway API, which feeds a request handler in the backend. The request handler talks to a SQLite database and to an outside sports data API." caption="The architecture diagram from the proposal." />
+
+A Discord bot is one program, so the interface and the backend live in the same Python process and call each other directly. A request first checks a small SQLite database for a recent answer. Only if there is none does it go out to the sports data service, clean up what comes back, and store it.
+
+<Note title="Why cache at all">
+The free sports data services limit how often they can be asked. Keeping the latest answers means ten people asking about the same match costs one request, not ten.
 </Note>
 
-```python
-# Placeholder code
-@tasks.loop(minutes=5)
-async def check_schedule():
-    for game in await fetch_upcoming():
-        if game.starts_within(minutes=30):
-            await alert_subscribers(game)
-```
+Live updates were the hard part to plan. The services that push scores as they happen all cost money, so the plan was to ask a free one on a schedule instead, without blocking the bot while it waits, using Python's asyncio.
 
-## What was hard
+## How the team planned to work
 
-Placeholder text. Rate limits, time zones, or keeping scheduled tasks alive across restarts: pick the one that cost the most time and tell that story.
+The four of us split into two pairs: one for the data (requests to the sports service, the database, subscriptions) and one for the Discord side (commands, formatting, how results are shown). I was in the second.
+
+- A new branch for each small feature every week, reviewed by the other member of the pair before merging.
+- Tests in pytest, run automatically on every push, with merging blocked while they fail.
+- One style for the whole codebase, checked by a linter and fixed by a formatter.
+- A ten-week schedule with the first big milestone at week six: a single request working end to end.
+
+The proposal also named what could go wrong: rate limits on free services, player data too detailed to clean up quickly, and subscriptions that do not scale. For each it gave what it would cost and what to cut.
+
+## What changed along the way
+
+Placeholder text. What the finished bot does that the plan did not say, what was cut, and anything that turned out harder than expected.
+
+<Figure label="The bot answering a command in a Discord channel" caption="Placeholder frame." />
 
 <RepoCard repo="Happy-Duck/DiscordSportsBot" />

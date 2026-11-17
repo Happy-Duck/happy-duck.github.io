@@ -1,9 +1,21 @@
-<Draft note="Written from the code and its notes, not placeholder text. The wording, and how the build is credited, still need your review." />
+<Draft note="Written by Claude from the code and the commit history, not placeholder text. Rishi has not reviewed the wording yet." />
 
 <Stats items={[
   { value: '6,000 m', label: 'from the surface to the floor' },
   { value: '380', label: 'fish in the school, simulated on the GPU' },
   { value: '11', label: 'species to find in the dive log' },
+]} />
+
+## Who built it
+
+I did not write this site's code. Claude, Anthropic's AI model, did: the design, every line of the code, and the text on this page. My part is deciding what the site should be, trying what comes back, and saying what I do not like. There has been a lot of that last one.
+
+I treat the site as a running experiment. When a notably more capable model comes out, I hand it the whole project and ask for an overhaul, mostly to find out what it can do with something it has to read, understand, and extend instead of starting clean. The commit history records which model made each change: every commit a model made ends with a line naming it, and the repository is public (linked at the top of this page).
+
+<Timeline items={[
+  { when: 'March 2026', title: 'Claude Opus 4.6', text: 'The first build: the ocean, the two depth themes, the first animals, and the original sections.' },
+  { when: 'June and July 2026', title: 'Claude Fable 5', text: 'Two expansions. First the dive log, sonar, the console, and time of day. Then the graphics work: the fish school on the GPU, the light shafts, the snow, and the dive in VR.' },
+  { when: 'November 2026', title: 'Claude Fable 5.2', text: 'The portfolio overhaul: a page for every job, project, class, and hobby, the tank of classes, and a restyle of the whole site.' },
 ]} />
 
 ## Try it

@@ -1,25 +1,37 @@
-<Draft />
+<Draft note="The text on this page is drawn from the team's vision canvas and technical design document. The pictures and video are still placeholders." />
 
 <Clip wide label="Gameplay capture: a round of one minigame, start to finish" />
 
 ## What it is
 
-Placeholder text. Two or three sentences on the pitch: a sandbox party game where the map is a real city and the minigames happen in it. Say who it is for and how many people play at once.
+Party School is a third-person multiplayer party game set on the University of Illinois campus, in a low-poly style. Players run around campus with their friends, wait in a lobby, and walk to wherever the next minigame is being played. Between rounds the campus itself is the game: there are collectibles hidden around it to find.
 
-<Note title="Team">
-Five people. This note is a good place to credit the others by name and say who did what.
+It was the final project for [CS 415, Game Development](/courses/cs-415/), built by a team of five for PC. The team wrote it for three kinds of player, in this order: UIUC students who play games, people who like an immersive world, and casual multiplayer players.
+
+<Note title="Where it came from">
+The design document lists what each idea was borrowed from: Fall Guys for parkour party games, Mario Party for the minigame format, Slender for avoid-and-collect horror, Garry's Mod for minigames inside one fixed map, and Minecraft server lobbies for the open-world lobby.
 </Note>
 
-A second paragraph on how a session flows, from joining a lobby to the end of a round.
+## The minigames
+
+| Minigame | What the player does |
+| --- | --- |
+| Horror | Avoid and collect, in the style of Slender, with the Alma Mater statue doing the chasing. |
+| Squirrel game | Find and photograph campus squirrels, which hide when a player gets close. |
+| Prop hunt | Shoot friends who are disguised as props. |
+| Open-world exploration | Explore the campus for collectibles, on foot or flying. |
+| Racing | Drive cars around obstacles, with power-ups. A stretch goal in the plan. |
+
+The design document says what each one should feel like: curious while exploring, surprised on finding a collectible, startled on spotting the Alma Mater in the horror game, and fast in the race.
 
 ## My part
 
-Placeholder text. The page should be clear about which pieces were yours. From the card: the shared project base every minigame builds on, code review for the team, the city map, and the racing minigame.
+I built the shared project base that every minigame sits on, including the multiplayer integration, and reviewed teammates' code as it came in. I brought the real campus into the engine by streaming a city-scale map from Google's Map Tiles API through the BLOSM plugin. I am also building the racing minigame on Unreal's Chaos Vehicle system.
 
 <Diagram
-  caption="Placeholder diagram, drawn from the project description. Correct the boxes and add what is missing."
+  caption="How the pieces relate. The other minigames are teammates' work."
   nodes={[
-    { id: 'map', label: 'City map', note: 'Map Tiles API via BLOSM', col: 0, row: 0 },
+    { id: 'map', label: 'Campus map', note: 'Map Tiles API via BLOSM', col: 0, row: 0 },
     { id: 'core', label: 'Shared core project', note: 'multiplayer base', col: 1, row: 0 },
     { id: 'race', label: 'Racing minigame', note: 'Chaos Vehicles', col: 2, row: 0 },
     { id: 'others', label: 'Other minigames', note: 'teammates', col: 2, row: 1 },
@@ -31,12 +43,29 @@ Placeholder text. The page should be clear about which pieces were yours. From t
   ]}
 />
 
-## A real city in the engine
+## How the work was planned
 
-Placeholder text. How the map gets from Google into Unreal, what broke along the way, and what the frame rate looks like with a whole city loaded.
+The technical design document breaks the game into eight systems and gives every feature a priority, a difficulty, and a risk. This is its top level, as of version 1.2 (March 2026).
 
-<Gallery caption="Three or more pictures form a grid." images={[
-  { label: 'The city from above' },
+| System | What it covers | Top priority in it |
+| --- | --- | --- |
+| Player | Walking, jumping, flying, driving, health, interacting, collecting | Walk, run, and jump |
+| Shooting | Guns (hitscan), scopes, and the camera for the squirrel game | Firing a gun |
+| Multiplayer | Lobbies, player names, join messages | Lobby handling |
+| AI movement | The Alma Mater chasing players; squirrels hiding from them | Chasing the player |
+| UI | Pause, lobby, and start menus; a scrapbook of achievements | The three menus |
+| Map | Collectibles and a minimap | The minimap |
+| Save system | Collectibles and achievements kept between sessions | Collectibles |
+| Racing | Cars, obstacles, driving controls, start and finish, power-ups | All marked as stretch |
+
+Behind those sit the systems a player never sees: navigation meshes for the AI, multiplayer networking, the mapping from the real world to 3D, and saving.
+
+## A real campus in the engine
+
+Placeholder text. How the map gets from Google into Unreal, what broke along the way, and what the frame rate looks like with a whole campus loaded.
+
+<Gallery caption="Placeholder frames for three pictures of the map." images={[
+  { label: 'The campus from above' },
   { label: 'Street level' },
   { label: 'The same block in the editor' },
 ]} />
@@ -45,4 +74,4 @@ Placeholder text. How the map gets from Google into Unreal, what broke along the
 
 Placeholder text. What the cars feel like, how the vehicle setup works, and what is still unfinished.
 
-<Figure label="A car on a city street, mid-race" caption="Captions are optional." />
+<Figure label="A car on a campus street, mid-race" caption="Placeholder frame." />

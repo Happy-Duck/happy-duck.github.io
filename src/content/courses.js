@@ -62,7 +62,12 @@ export const COURSES = [
   { slug: 'phys-212', code: 'PHYS 212', title: 'University Physics: Electricity & Magnetism', term: 'SU25', credits: 5, category: 'math', note: 'Summer transfer credit' },
 
   // ── Fall 2025 ──
-  { slug: 'cs-222',   code: 'CS 222',   title: 'Software Design Lab',             term: 'FA25', credits: 1, category: 'core' },
+  {
+    slug: 'cs-222', code: 'CS 222', title: 'Software Design Lab', term: 'FA25', credits: 1, category: 'core',
+    // From the project proposal the owner shared (2026-11-15)
+    summary:     "UIUC's software design lab: one team project for the whole semester. Ours was SportsBot, a Discord bot for sports statistics.",
+    description: 'A one-credit lab built around a single team project that runs the whole semester, planned week by week and merged through pull requests. Our group of four built SportsBot, a Discord bot for sports statistics.',
+  },
   { slug: 'cs-225',   code: 'CS 225',   title: 'Data Structures',                 term: 'FA25', credits: 4, category: 'core' },
   { slug: 'cs-233',   code: 'CS 233',   title: 'Computer Architecture',           term: 'FA25', credits: 4, category: 'core' },
   { slug: 'gsd-102',  code: 'GSD 102',  title: 'Intro to the Videogame Industry', term: 'FA25', credits: 3, category: 'games' },
@@ -83,11 +88,16 @@ export const COURSES = [
   { slug: 'cs-357',   code: 'CS 357',   title: 'Numerical Methods I',             term: 'FA26', credits: 3, category: 'math' },
   {
     slug: 'cs-417', code: 'CS 417', title: 'Intro to Extended Reality', term: 'FA26', credits: 3, category: 'games',
-    // PLACEHOLDER wording — replace once the games are done
-    summary:     "UIUC's introduction to extended reality: three VR games built over the semester.",
-    description: "UIUC's introduction to extended reality. Three VR games, in progress this semester. Write-ups coming as they wrap.",
+    // Written from the design documents and contribution summaries the
+    // owner shared (2026-11-15). The itch.io addresses come from those
+    // documents: check each is public before the site goes live.
+    summary:     "UIUC's introduction to extended reality: a VR escape room, a farm sim, and a final project, all built in Unity.",
+    description: "UIUC's introduction to extended reality, taught through a run of VR projects in Unity: a room with a comet in orbit, an escape room built by four people, a farm sim built by five, and a final project that is still in progress.",
     links: [
       { label: 'MP2 source', href: 'https://github.com/Happy-Duck/CS417_MP2' },
+      { label: 'The room on itch.io', href: 'https://happy-ducky.itch.io/the-room' },
+      { label: 'Escape room on itch.io', href: 'https://happy-ducky.itch.io/shiny-hunter-simulator' },
+      { label: 'Chicken farm on itch.io', href: 'https://happy-ducky.itch.io/chicken-farming-simulator' },
     ],
   },
   {
@@ -98,10 +108,10 @@ export const COURSES = [
   },
   {
     slug: 'info-418', code: 'INFO 418', title: 'Makerspace: Escape Rooms', term: 'FA26', credits: 3, category: 'games',
-    // PLACEHOLDER wording, drawn from the repo description — replace once
-    // the build is done
+    // Drawn from the repo description and the Keg Safe 2.0 schematic the
+    // owner shared (2026-11-15). Still in progress this semester.
     summary:     'A makerspace course on building escape rooms. I wrote the Arduino code behind two of the props in Riggs Escape.',
-    description: 'A makerspace course on building escape rooms. For Riggs Escape I wrote the Arduino Uno code that controls the electronics for the sticker dispenser and the keg safe door. In progress this semester; write-up coming.',
+    description: 'A makerspace course on building escape rooms. For Riggs Escape I wrote the Arduino Uno code that controls the electronics for the sticker dispenser and the keg safe door. The keg safe is a keypad, a solenoid lock, two status lights, and a buzzer. In progress this semester.',
     links: [
       { label: 'Arduino source', href: 'https://github.com/Happy-Duck/MetaPuzzleArduinoCode' },
     ],

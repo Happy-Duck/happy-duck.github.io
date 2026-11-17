@@ -1,31 +1,27 @@
-<Draft />
+<Draft note="The text on this page is drawn from the presentation given at the end of the internship. The pictures are still placeholders." />
 
-## Two prototypes
+## The studio
 
-Placeholder text. A short page for a short job. Say what the studio makes, what you were asked to build in two months, and how far each prototype got.
+Origami Games is a game studio based in Maharashtra, known for mobile horror games such as Floors of Fear. I spent June and July of 2023 there building prototypes for games the studio might make next, in Unity and C#.
 
-<Gallery caption="Placeholders for screenshots of the two prototypes." images={[
-  { label: 'Endless runner' },
-  { label: 'Maze escape' },
-  { label: 'A generated level' },
-]} />
+## Endless runner
 
-## Procedural levels
+The player runs forward along a path without stopping and steers left and right by dragging, in the manner of Subway Surfers or Temple Run.
 
-Placeholder text. How the level generator works, in a paragraph a non-programmer could follow, then the snippet for those who want it.
+<Figure label="The endless runner: a figure running down a lane between obstacles" caption="Placeholder frame. There is a screenshot of this in the final presentation." />
 
-<Note title="Margin note">
-The code is a stand-in to show how a snippet looks on the page.
-</Note>
+The steering was the new part for me. I had never built this kind of input before.
 
-```cs
-// Placeholder code
-Chunk NextChunk(Chunk previous) {
-    var options = library.Where(c => c.entry == previous.exit);
-    return options.ElementAt(rng.Next(options.Count()));
-}
-```
+## Procedural maze escape
+
+The maze is not laid out by hand. An algorithm generates it, and the game builds what it comes up with as objects in the scene for the player to find a way out of.
+
+<Figure label="The maze from above, with the player in a corridor" caption="Placeholder frame. There is a screenshot of this in the final presentation." />
+
+The algorithm was the hard part. It took a good deal of research into maze generation before there was anything to turn into a playable level.
 
 ## What I took from it
 
-Placeholder text. One paragraph. A first job in games is mostly about learning how work gets reviewed and shipped; say what changed in how you work.
+- **Unity and C#**, used every day on something with a deadline.
+- **How a studio works**: constant contact with a mentor, and how a game goes from an idea to something produced.
+- **Iteration**: both prototypes were changed after several rounds of feedback, and ideas went back and forth with peers.

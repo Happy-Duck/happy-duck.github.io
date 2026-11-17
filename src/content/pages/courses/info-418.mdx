@@ -1,58 +1,61 @@
-<Draft />
+<Draft note="The circuit section is drawn from the Keg Safe 2.0 schematic. The room, the build photos, and the play-testing are still placeholders, and the class is in progress." />
 
 ## The room
 
 Placeholder text. What Riggs Escape is: the story of the room, how many players, and how long they get.
 
-<Figure wide label="The finished room, or the prop in place" caption="A wide picture runs the full width of the page." />
+<Figure wide label="The finished room, or the prop in place" caption="Placeholder frame." />
 
 ## My part
 
-Placeholder text. The two props you wrote the electronics for, the sticker dispenser and the keg safe door, and what each one has to do when a puzzle is solved.
+I wrote the Arduino code for two of the room's props, the sticker dispenser and the door of the keg safe. The safe is a lock the players open with a code typed on a keypad; a solenoid holds the door.
 
 <Diagram
-  caption="Placeholder diagram, drawn from the repository description. Correct the boxes and add what is missing."
+  caption="The keg safe, from the schematic."
   nodes={[
-    { id: 'input', label: 'Puzzle input', note: 'what players do', col: 0, row: 0 },
-    { id: 'uno', label: 'Arduino Uno', note: 'the code in the repo', col: 1, row: 0 },
-    { id: 'sticker', label: 'Sticker dispenser', col: 2, row: 0 },
-    { id: 'door', label: 'Keg safe door', col: 2, row: 1 },
+    { id: 'keypad', label: 'Keypad', note: '4 by 4', col: 0, row: 0 },
+    { id: 'uno', label: 'Arduino Uno', col: 1, row: 0 },
+    { id: 'lock', label: 'Solenoid lock', note: '12 V, through a TIP120', col: 2, row: 0 },
+    { id: 'lights', label: 'Red and green lights', col: 2, row: 1 },
+    { id: 'buzzer', label: 'Buzzer', note: 'piezo', col: 2, row: 2 },
   ]}
   links={[
-    { from: 'input', to: 'uno' },
-    { from: 'uno', to: 'sticker' },
-    { from: 'uno', to: 'door' },
+    { from: 'keypad', to: 'uno', label: 'code' },
+    { from: 'uno', to: 'lock' },
+    { from: 'uno', to: 'lights' },
+    { from: 'uno', to: 'buzzer' },
   ]}
 />
 
-## Wiring and code
+## The circuit
 
-<Note title="Margin note">
-A photo of the wiring next to the snippet that drives it works well here.
-</Note>
+<Figure src="/media/courses/info-418/keg-safe-breadboard.webp" alt="A breadboard layout: an Arduino Uno wired to a TIP120 transistor, a solenoid, a bench power supply, a red and a green LED with resistors, a diode, and a piezo buzzer" caption="Keg Safe 2.0 laid out in Tinkercad." />
 
-Placeholder text. How the circuit is laid out and what the program does on each loop.
+The parts, and why each is there:
 
-<Gallery caption="Placeholders for build photos." images={[
-  { label: 'The breadboard' },
+| Part | What it does |
+| --- | --- |
+| Arduino Uno | Reads the keypad and decides whether the code is right. |
+| 4 by 4 keypad | Eight wires, four rows and four columns, scanned to find which key is down. |
+| 12 V solenoid | The lock itself. It needs far more current than a pin on the Arduino can supply. |
+| TIP120 transistor, 1 kΩ resistor | The Arduino switches the transistor, and the transistor switches the solenoid's 12 V. |
+| Diode across the solenoid | A coil pushes back when it is switched off. The diode gives that current a path that is not the transistor. |
+| Red and green LEDs, 220 Ω each | Two status lights. |
+| Piezo buzzer, small transistor | Sound, driven the same way as the solenoid but at a smaller scale. |
+| 0.1 µF capacitor | Across the 12 V supply, to smooth it. |
+
+<Download title="Keg Safe 2.0 schematic" note="add the PDF to public/media/courses/info-418 and this row becomes a link to it" />
+
+<RepoCard repo="Happy-Duck/MetaPuzzleArduinoCode" />
+
+<Gallery caption="Placeholder frames for build photos." images={[
+  { label: 'The real breadboard' },
   { label: 'Inside the prop' },
   { label: 'Testing on the bench' },
 ]} />
-
-```cpp
-// Placeholder code
-void loop() {
-  if (digitalRead(SOLVED_PIN) == HIGH && !opened) {
-    openLatch();
-    opened = true;
-  }
-}
-```
-
-<RepoCard repo="Happy-Duck/MetaPuzzleArduinoCode" />
 
 ## Play-testing
 
 Placeholder text. What happened the first time real players tried it, and what you changed afterward.
 
-<Clip label="A group solving the puzzle" />
+<Clip label="A group opening the safe" caption="Placeholder frame." />

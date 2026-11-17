@@ -89,8 +89,12 @@ export const PROJECTS = [
     link:        'https://github.com/Happy-Duck/DiscordSportsBot',
     tags:        ['tools'],
     skills:      ['python', 'sql'],
+    courses:     ['cs-222'],
     details: {
-      role: 'Solo developer',
+      // From the CS 222 project proposal (group of four; the Discord side
+      // was the owner's half). Owner to confirm how the work was split in
+      // the end.
+      role: 'Discord integration, on a four-person team',
       highlights: [
         'Live scores, player stats, and schedule alerts via slash commands',
         'Built with asyncio for concurrent, scheduled background tasks',
@@ -137,16 +141,18 @@ export const PROJECTS = [
     slug:        'this-site',
     title:       'This website',
     summary:     'A portfolio built as a dive from the surface to 6,000 m, with the water, light, and animals drawn live in the browser.',
-    blurb:       'The site you are on. Scrolling is a dive from the surface to 6,000 metres. The light and the fish school are drawn on the graphics card, and every moving thing runs off one clock.',
-    description: 'The site you are on. Scrolling is a dive from the surface to 6,000 metres: the water darkens, the light changes, and different animals live at each depth. The light and the fish school are drawn on the graphics card, and every moving thing runs off one clock.',
+    blurb:       'The site you are on, designed and written entirely by Claude as an experiment I rerun when a more capable model comes out. Scrolling is a dive from the surface to 6,000 metres, drawn live in the browser.',
+    description: 'The site you are on. I did not write its code: Claude, Anthropic\'s AI model, designed and wrote all of it, and I rerun the experiment with an overhaul whenever a notably more capable model comes out. Scrolling is a dive from the surface to 6,000 metres: the water darkens, the light changes, and different animals live at each depth.',
     stack:       ['React', 'Vite', 'WebGL2', 'WebGPU', 'three.js'],
     link:        'https://github.com/Happy-Duck/happy-duck.github.io',
     tags:        ['graphics'],
     skills:      [],
     details: {
-      // PLACEHOLDER role wording: say how you want to credit the build
-      role: 'Design and development',
+      // The owner asked (2026-11-15) for this page to be plain that the
+      // site is Claude's work. Keep it that way in any rewording.
+      role: 'Direction and review. Design, code, and this write-up by Claude (Anthropic)',
       highlights: [
+        'Designed and written entirely by Claude: Opus 4.6, then Fable 5, then Fable 5.2',
         'One animation loop drives everything, scaled to real elapsed time',
         'About 380 fish simulated on the GPU with WebGPU',
         'Light shafts rendered in WebGL2, off the main thread',
