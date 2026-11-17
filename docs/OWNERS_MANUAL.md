@@ -301,7 +301,7 @@ Each job is one block. The same block feeds the card on the main page
   it where you want it in the list. **Order in the list = order on the
   page, top card first.** Newest job goes at the top.
 - **Remove a job** — delete its block, `{` through `},`.
-- Cards alternate left/right of the kelp strand automatically; nothing to
+- Cards alternate left/right of the timeline automatically; nothing to
   configure.
 
 One caveat: each job must have a **different `slug`** (it is the page
@@ -417,8 +417,8 @@ the item's `id`.
 **Files:** `src/content/hobbies.js` for the lines, `src/components/About.jsx`
 for the rest.
 
-- **The rotating "> …" lines** — in `hobbies.js`. `LOG_INTRO` is the
-  opening line. Every block in the `HOBBIES` list is one more line, and
+- **The sentence under "Captain's Log"** — `LOG_INTRO` in `hobbies.js`.
+- **The rotating "> …" lines** — also in `hobbies.js`. Every block in the `HOBBIES` list is one more line, and
   also a page of its own. The whole line is the way in: it carries a
   small arrowhead at its end and lights up when pointed at. The lines
   stop reshuffling while the pointer is on them:
@@ -696,9 +696,15 @@ card content.
 
 ### 6.11 Things that take care of themselves
 
-- **Skill icons are buttons.** Pressing one outlines every career and
-  project card whose `skills` list includes it and names them under the
-  icons. To change what answers, edit the `skills` lists (6.2, 6.3).
+- **Skill icons** show a tooltip when pointed at. They do nothing when
+  clicked.
+- **The career line** places itself: one marker per job, and the year
+  beside it is read from the job's `period`.
+- **Page colors.** A page opened from a beige card near the surface is
+  beige; one opened from a navy card in deep water is navy. Nothing to
+  set.
+- **The class tank** counts its own classes. Give a class a
+  `description` and it joins the short list; the numbers update.
 - **The depth gauge** on the right edge has a tick for each section;
   clicking one jumps there. On a phone there is no room for it, so the
   depth shows in the top corner instead, and tapping it lists the

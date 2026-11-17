@@ -8,6 +8,9 @@ the ocean systems; `docs/FEATURE_PLAN.md` (wave 1),
 `docs/PORTFOLIO_PLAN.md` (wave 3: pages, content registry, courses —
 IN PROGRESS on branch `feature/portfolio-wave-3`, phase table at the top)
 hold the feature-by-feature history, specs, and hard-won gotchas.
+`docs/CONTENT_NOTES.md` is the record of what each page's text is built
+from, what was left off the site on purpose, and what each page still
+needs: READ IT before writing or changing page content.
 
 ## Commands
 
@@ -98,7 +101,8 @@ hold the feature-by-feature history, specs, and hard-won gotchas.
   not as UI buttons.
 - **Sonar** (`src/lib/sonar.js`): clicks outside `a,button,input,
   [data-no-ping]` fire pings. Put `data-no-ping` on any new interactive
-  surface.
+  surface. `<SonarPing />` sits INSIDE `.dive-ocean` so a ping sent from
+  a page (the engine controls) is visible in the water beside it.
 - **Time of day** (`src/constants/timeOfDay.js` + pre-paint script in
   `index.html` — keep hexes in sync): dawn/dusk tint water stops, waves,
   glow, sky gradient (`--tod-sky-grad`), and god-ray uniforms coherently;
@@ -153,9 +157,18 @@ hold the feature-by-feature history, specs, and hard-won gotchas.
   then `getDelta()` (the first consumes the delta → dt≈0, everything
   freezes; shipped that way once); dt comes from the loop timestamp.
 - **View Transitions** (`lib/router.js`): every navigation cross-fades in
-  a View Transition. The old card↔modal shared-element morph went with
-  the modal; if it comes back as card↔page, the rule still holds — the vt
-  name is owned by ONE element per snapshot (card before, page after).
+  a View Transition. Opening a page from its card, and closing back to
+  it, is also a shared-element transition: `entry-morph` is owned by ONE
+  element per snapshot — the card (inline style, for the transition
+  only) while the dive shows, `.page-morph` (the sheet's outline in the
+  window, pages.css) while a page does. What grows is a PANEL in the
+  page's paper color (`--morph-bg` + `data-morph="open|close"` on
+  `:root`, painted on `::view-transition-image-pair`); the card's
+  snapshot stays its own size (`object-fit: none`) and fades early.
+  Do not stretch it: scaled to the sheet its text became giant letters
+  over the page. To judge a transition, slow it with an injected
+  `::view-transition-group(*) { animation-duration: 3s !important }`
+  and screenshot the frames.
 - **Scroll-driven animations** (`index.css` @supports block): depth fades
   on the compositor; keyframe percentages MUST mirror the JS ramps —
   update both together.
@@ -187,8 +200,8 @@ hold the feature-by-feature history, specs, and hard-won gotchas.
   `.log-entry--link`): whole row is the target, chevron icon at the end,
   tint on hover, NO underline (the owner had the underlines removed);
   the log holds its rotation while pointed at;
-  class bubbles with a page are `<Link>`s; skill-ping answers and
-  terminal `open` navigate too. Each card carries
+  class bubbles with a page are `<Link>`s; terminal `open` navigates
+  too. Each card carries
   `data-entry-anchor="<kind>-<slug>"`, and each section a bare
   `data-entry-anchor="<kind>"` fallback — that is where closing a
   directly-loaded page scrolls the dive to.
@@ -215,9 +228,24 @@ hold the feature-by-feature history, specs, and hard-won gotchas.
   undimmed at the sheet edges and behind the scrollbar. It is a
   gradient: dim either side of the sheet, reaching 16px in under each
   sheet edge, clear under the sheet's column so the porthole looks out
-  on undimmed water. Keep that overlap wider than half a scrollbar. The document never scrolls, so closing a page restores
+  on undimmed water. Keep that overlap wider than half a scrollbar.
+  Anything a page portals to body (the lightbox) is still its React
+  child, so its clicks bubble to the layer's handlers: the gutter-click
+  test requires the target to be inside the scroller in the DOM, or the
+  lightbox's buttons close the page. The document never scrolls, so closing a page restores
   the exact depth. Terminal lives OUTSIDE `.dive` so it works over a
   page. Page text is NOT selectable, same as the dive.
+- **Page theme**: a page takes the colors of the water it was opened
+  from. PageLayer writes `data-page-theme` (`shallow-reef` = beige
+  paper, dark ink; `deep-sea` = navy, the default) once, when the layer
+  opens, straight to the element in a layout effect, and never changes
+  it after (the engine controls move the dive under an open page). On a
+  direct landing it starts from the theme at the entry's card depth and
+  follows the dive for 2.6 s while it settles. pages.css: the light
+  theme ONLY redefines variables — a rule that needs a different color
+  in the two themes takes a variable (`--ink-strong`, `--ink-hover`,
+  `--edge`, `--edge-faint`, `--panel-2`, `--warn`, `--stripe-a/b`),
+  never a literal. Code blocks and charts keep dark panels in both.
 - **Page styles** are all in `src/styles/pages.css` (imported by
   PageLayer), NOT index.css. Its header lists the design rules — the
   owner had AI-looking patterns removed and does not want them back: no
@@ -234,10 +262,21 @@ hold the feature-by-feature history, specs, and hard-won gotchas.
   rubber stamp); contact buttons are plain round icon buttons with no
   pulse or glow; no em dashes in copy, titles, or meta tags. Glow
   belongs to the creatures, not to the interface.
-- **Skill ping** (`Skills.jsx`): each skill is a button; pressing it
-  dispatches `ocean:ping` from the icon, toggles `.card--answer` on
-  every `[data-skills~=id]` card (career + project cards carry
-  `data-skills`), and lists `pagesForSkill(id)` as links.
+- **Skills are plain icons** with a tooltip (hover or focus). They used
+  to be buttons that sent a sonar ping, outlined the cards using the
+  skill, and listed them underneath; the owner had that turned off.
+  Don't bring it back. `skills` in the data files is unused by the UI.
+- **Career timeline** (`Experience.jsx`, `.career-*`): a straight line,
+  one marker per job, a tick to the card, the start year on the other
+  side. Line, tick, and marker are centered in the same 40px rail so
+  they cannot drift (the old wavy kelp strand with dots beside it never
+  lined up, and it annoyed the owner for months). One set of cards;
+  CSS grid rearranges them for narrow screens. If you touch it, measure:
+  marker within 0.5px of the line at several widths, after scrolling
+  each card into view (they slide in 52px on first sight).
+- **Captain's Log** (`About.jsx`): `LOG_INTRO` is the sentence under the
+  heading, not a log line. Every rotating line is a hobby and a row
+  link carrying `data-entry-anchor="hobbies-<slug>"`.
 - **Depth gauge stops** (`DepthGauge.jsx`): any section with `id` +
   `data-waypoint="Label"` gets a clickable tick; positions are
   re-measured by a ResizeObserver on body (page length changes when
@@ -329,9 +368,15 @@ hold the feature-by-feature history, specs, and hard-won gotchas.
   owner found the full column big and obstructive): a short tank with
   only the classes that have pages, beside a panel listing them and a
   "Show all N classes" button; expanded is the full column with legend,
-  list view, scrubber, and "Show fewer" top and bottom. Same tank
-  element in both sizes (sim and GL context carry over); a size change
-  re-scatters. The placeholder holds the BRIEF height — re-measure
+  list view, scrubber, and ONE "Show fewer" button. Same tank element in
+  both sizes (sim and GL context carry over). The change of size is
+  animated (`resizeTank`: measure, flushSync, measure, animate width and
+  height with WAAPI; the ResizeObserver feeds each size to the sim) and
+  the other classes enter from the floor one at a time (`entered`
+  counter, `ENTRY_RANK`), as the scrubber adds them. A resize under a
+  running sim moves the walls and retargets radii only: never re-place
+  or `settle()` there, it fast-forwards the sim. The tank is its own
+  water: only a pointer or sonar ping INSIDE the glass pushes bubbles. The placeholder holds the BRIEF height — re-measure
   `.course-wrap` if the brief layout changes. Sim ticks via
   `subscribe` (dt-scaled, IntersectionObserver-gated, state in typed
   arrays, transforms written directly); a WebGL2 metaball shader draws
@@ -342,8 +387,9 @@ hold the feature-by-feature history, specs, and hard-won gotchas.
   docs/PORTFOLIO_PLAN.md §3) — measure fused-pair counts offline before
   changing it; the kernel is (r²/d²)² on purpose. The sim module is pure
   (no DOM), so it can be driven from Node for that.
-- **Placeholder content**: every page currently has a draft write-up
-  opening with `<Draft />`. Filler text must describe what belongs
+- **Placeholder content**: every page with a write-up (all but CS 222)
+  still opens with `<Draft />`, most with a `note` saying which parts
+  are real (see docs/CONTENT_NOTES.md). Filler text must describe what belongs
   there, never invent facts about the owner's work; invented numbers are
   captioned as sample. The build lists pages still containing `<Draft`,
   and `npm run deploy` (`--no-drafts`) refuses to publish while any
@@ -391,7 +437,12 @@ and one was killed by a cleanup that matched on the command line. Git
 Bash rewrites arguments that start with `/` into Windows paths; pass
 URL paths without the leading slash. To drive the router from
 a dev-server smoke script:
-`page.evaluate(async () => (await import('/src/lib/router.js')).navigate('/work/brunswick/'))`.
+`page.evaluate(async () => (await import('/src/lib/router.js')).navigate('/work/brunswick/'))`
+— but only if router.js has not been hot-updated since the server
+started: after an HMR update Vite serves the app `router.js?t=…`, and
+the bare import is a second module instance the app does not listen to
+(the page silently fails to open). Safer:
+`history.pushState({ idx: 1 }, '', '/work/brunswick/'); dispatchEvent(new PopStateEvent('popstate'))`.
 
 ## React gotchas already paid for (dev runs StrictMode)
 

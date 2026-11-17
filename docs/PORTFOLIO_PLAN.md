@@ -8,10 +8,10 @@ line as work lands. Edit with the Write/Edit tools only.
 |---|---|---|
 | 0 | Foundations: registry, router, page layer, pause, prerender, MDX | DONE |
 | 1 | Project pages | DONE except the write-ups themselves (the owner's): cards open pages, write-up template, page blocks, charts, code tours, before/after slider, timeline, download row, media script |
-| 2 | Job and hobby pages | PARTLY: every hobby and job has a page and a way in. No write-ups yet (waiting on the owner's photos and stories) |
-| 3 | Course bubble column | DONE (four class pages carry placeholder wording) |
-| 4 | Findability | MOSTLY: skill ping, depth-gauge stops, section menu on phones, terminal ls/open, tailored ?for= links. Left: credentials strip (needs the PDFs). CUT by the owner: Ship's Manifest, hero availability line |
-| 5 | Showpieces and polish | DONE: Engine Room (wording awaits the owner), per-page share pictures, print stylesheet, porthole (second version, see Fifth pass). Not built, on purpose: card-to-page morph, 3D model viewer (see Fourth pass) |
+| 2 | Job and hobby pages | PARTLY: every hobby and job has a page and a way in. Real text on Origami Games and three hobby pages (2026-11-16); the rest wait on the owner's photos and stories. See docs/CONTENT_NOTES.md |
+| 3 | Course bubble column | DONE. Five class pages; CS 415, CS 417, and INFO 418 have real text, CS 418 is still placeholder |
+| 4 | Findability | MOSTLY: depth-gauge stops, section menu on phones, terminal ls/open, tailored ?for= links. Left: credentials strip (needs the PDFs). CUT by the owner: Ship's Manifest, hero availability line, skill ping (built, then turned off) |
+| 5 | Showpieces and polish | DONE: Engine Room (wording awaits the owner), per-page share pictures, print stylesheet, porthole (second version, see Fifth pass), card-to-page transition (Sixth pass). Not built: 3D model viewer (nothing to show in it yet) |
 
 ## Context
 
@@ -446,6 +446,35 @@ The owner's review of the dive once every card led to a page.
 
 1 and 2 need six photos from the owner. Do not build any of them
 until they pick.
+
+## Sixth pass (2026-11-15 and 16) — DONE
+
+The owner's second review, plus a batch of their documents.
+
+- **Lightbox buttons closed the page.** A portal's events still bubble
+  through React to the page layer. See CLAUDE.md, Page layer.
+- **Skill ping turned off.** Plain icons again.
+- **Class tank**: grows open with the classes rising in; one Show fewer;
+  clicks outside the glass do not push the bubbles.
+- **Career timeline** replaces the kelp strand. Measured, not eyeballed.
+- **Pages take the theme of the water they were opened from.**
+- **Card grows into its page.** I had listed this under "not built, on
+  purpose", reasoning that the owner had removed hover lift and tilt.
+  They had never rejected it and asked for it. Second time in two
+  passes that I cut something the owner wanted on an inference from a
+  different complaint; ask instead.
+- **Captain's Log**: the intro is the subtitle; six lines, all hobbies.
+- **Sonar from a page**, code tour buttons, porthole caption spacing.
+- **Content**: eleven pages written from the owner's documents, and the
+  page about this site says plainly that Claude built it. Everything
+  about sources, what was held back, and what is still needed is in
+  docs/CONTENT_NOTES.md.
+
+**Open questions for the owner** (also in CONTENT_NOTES.md): which White
+River; whether to link the YouTube walkthroughs and the other class
+repositories; whether the Chey Gaufre lab's real name and flowchart go
+on the site; whether teammates should be named; who designed the keg
+safe circuit; how the SportsBot work was split in the end.
 
 ## Things to settle before they bite
 
